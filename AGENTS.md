@@ -19,6 +19,9 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 - `bibles/model.py` holds the in-memory `Bible` every parser builds; parsers add verses with
   `Bible.add_verse`, which applies the shared text rules in `bibles/normalize.py`. Those rules are documented in
   `docs/normalization.md`; keep the doc and the marker sets in sync.
+- `bibles/writer.py` writes a `Bible` to SQLite with `write_database`. `SCHEMA` is copied from the reference
+  project and a test compares it with `bible_esv.sqlite`; never change it on its own. The database is built in a
+  temporary file beside the output and moved into place only when complete. Book ids equal sort order.
 - `docs/` holds Markdown documentation, linked from the README.
 - `bin/bibles` is a bash wrapper that runs the package from any directory.
 - `tests/` contains `unittest` tests.
@@ -43,4 +46,5 @@ verification (`.agent/verification.json`) is intentionally disabled.
   otherwise it is a full file path. `--name` with a full file path is an error. `--name` without an extension
   gets `.sqlite` appended.
 - The CLI currently resolves the output path and creates its parent directory, but does not write a database.
-  The conversion pipeline (TASK-014) must not leave a partial or empty database behind on failure.
+  The conversion pipeline (TASK-014) wires parsers to `write_database`, which already guarantees no partial or
+  empty database is left behind on failure.

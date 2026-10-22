@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, Iterator, List, Union
+from typing import Dict, Iterable, Iterator, List, Optional, Union
 
 from bibles.books import Book, book_for_code
 from bibles.normalize import normalize_verse_text
@@ -43,9 +43,15 @@ class BibleBook:
 
 @dataclass
 class Bible:
-    """Books, chapters and verses in the order the parser added them."""
+    """Books, chapters and verses in the order the parser added them.
+
+    `version` (a short abbreviation such as "KJV") and `version_name` are set by parsers whose format
+    supplies them; the writer derives a fallback when they are left as None.
+    """
 
     books: List[BibleBook] = field(default_factory=list)
+    version: Optional[str] = None
+    version_name: Optional[str] = None
     _book_index: Dict[str, BibleBook] = field(default_factory=dict, repr=False, compare=False)
     _chapter_index: Dict[tuple, Chapter] = field(default_factory=dict, repr=False, compare=False)
     _verse_keys: set = field(default_factory=set, repr=False, compare=False)
