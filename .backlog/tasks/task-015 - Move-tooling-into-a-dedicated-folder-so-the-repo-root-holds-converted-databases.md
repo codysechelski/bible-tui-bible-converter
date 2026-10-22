@@ -3,9 +3,11 @@ id: TASK-015
 title: >-
   Move tooling into a dedicated folder so the repo root holds converted
   databases
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 15:01'
+updated_date: '2026-10-22 15:35'
 labels:
   - repo-layout
 dependencies: []
