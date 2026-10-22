@@ -56,3 +56,11 @@ Create a single new top-level folder that holds all of the tooling, so the repos
 - [x] #18 The task is moved to "Ready for Testing"
 - [x] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Moved bibles/, bin/, tests/, docs/ and samples/ into tool/ with git mv (36 renames). No code changes were needed: bin/bibles resolves the package relative to itself and the tests locate files from __file__. REPO_ROOT in test_cli.py and test_samples.py is renamed TOOL_ROOT. README, AGENTS.md, tool/samples/README.md and tool/docs/validation.md use tool/ paths. .gitignore adds build/ (scratch output); a .sqlite at the root is not ignored (checked with git check-ignore).
+
+Verification: py_compile over tool/bibles, tool/bibles/parsers and tool/tests (ok); python3 -m unittest discover -s tool/tests -t tool (160 tests OK); tool/bin/bibles run from another directory converted tool/samples/kjv.usfm; cd tool && python3 -m bibles --version printed bibles 0.1.0. DoD #7 (style guide) does not apply.
+<!-- SECTION:NOTES:END -->
