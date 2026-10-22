@@ -14,7 +14,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: medium
 type: docs
-ordinal: 13000
+ordinal: 14
 ---
 
 ## Description
