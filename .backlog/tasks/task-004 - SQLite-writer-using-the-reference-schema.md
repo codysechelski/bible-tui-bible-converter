@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:31'
+updated_date: '2026-10-22 14:33'
 labels:
   - schema
 dependencies:
@@ -32,14 +32,14 @@ This task owns the schema, the row writing, and the metadata population, and is 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The generated database contains the same four tables and four indexes as the reference schema, with matching names, columns, types, constraints and uniqueness rules
-- [ ] #2 Foreign key enforcement is enabled while writing and a foreign key check on the finished database reports no violations
-- [ ] #3 Book rows are written in canonical sort order using the canonical name, common name, slug and testament from the shared book reference data
-- [ ] #4 A chapter row exists for every chapter that contains verses, numbered from 1 with no gaps
-- [ ] #5 Verse rows carry the book id, chapter id, chapter number, verse number and text, and no duplicate book, chapter and verse combination exists
-- [ ] #6 The metadata table contains at least the keys version, version_name, source, created_at_utc, book_count, chapter_count and verse_count, all with non empty values
-- [ ] #7 Version and version_name are taken from the source file when the format supplies them and otherwise derive a sensible value from the input rather than being blank
-- [ ] #8 An automated test compares the generated schema against the reference project schema and fails on any difference in table or index names, columns, or constraints
+- [x] #1 The generated database contains the same four tables and four indexes as the reference schema, with matching names, columns, types, constraints and uniqueness rules
+- [x] #2 Foreign key enforcement is enabled while writing and a foreign key check on the finished database reports no violations
+- [x] #3 Book rows are written in canonical sort order using the canonical name, common name, slug and testament from the shared book reference data
+- [x] #4 A chapter row exists for every chapter that contains verses, numbered from 1 with no gaps
+- [x] #5 Verse rows carry the book id, chapter id, chapter number, verse number and text, and no duplicate book, chapter and verse combination exists
+- [x] #6 The metadata table contains at least the keys version, version_name, source, created_at_utc, book_count, chapter_count and verse_count, all with non empty values
+- [x] #7 Version and version_name are taken from the source file when the format supplies them and otherwise derive a sensible value from the input rather than being blank
+- [x] #8 An automated test compares the generated schema against the reference project schema and fails on any difference in table or index names, columns, or constraints
 <!-- AC:END -->
 
 ## Definition of Done
@@ -64,3 +64,24 @@ This task owns the schema, the row writing, and the metadata population, and is 
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/writer.py`: `SCHEMA` (verbatim from bible-esv tools/build_sqlite.py), `write_database(bible, output, source, source_format=None, created_at=None)` and `build_metadata`. `Bible` gained optional `version`/`version_name` for parsers to fill.
+
+Design decisions (please review):
+- Book id = sort_order (as in the reference db, so ids stay stable even when only some books are present). Chapter and verse ids are autoassigned in canonical order.
+- Only books that contain verses are written; whether all 66 are required is left to validation (TASK-011).
+- Chapters must run 1..n per book or `DatabaseWriteError` names the missing ones. An empty Bible is also an error.
+- Metadata fallbacks: version = source file stem when the format gives none (e.g. `kjv`); version_name = version. source = "<file name> (<format>)". Counts are the real written counts. Only the seven required keys are written.
+- Atomic write: temp file beside the output, os.replace on success, temp file removed on any failure, so an existing output is never clobbered by a failed run. An existing output is overwritten on success (CLI overwrite policy is TASK-014's call).
+
+Verification: `python3 -m py_compile bibles/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 59 tests OK (14 new). Mutation check: changing `common_name TEXT NOT NULL` to `TEXT` makes ReferenceSchemaTests fail. The schema test compares normalized sqlite_master SQL plus PRAGMA table_info/foreign_key_list/index_list/index_info against bible_esv.sqlite (skipped if absent). README unchanged (no user-visible behavior yet). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the SQLite writer that reproduces the reference schema, with atomic writes, metadata and a schema test against the reference database.
+<!-- SECTION:FINAL_SUMMARY:END -->
