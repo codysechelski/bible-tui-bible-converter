@@ -1,9 +1,11 @@
 ---
 id: TASK-014
 title: Conversion pipeline and parser dispatch
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:12'
+updated_date: '2026-10-22 14:58'
 labels:
   - cli
   - core
