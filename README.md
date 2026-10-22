@@ -8,9 +8,11 @@ It is Python 3.9+ and standard library only, so it runs anywhere the TUI does.
 
 ## Repository layout
 
-The repository is both the converter and a collection of the databases it produces:
+The repository is both the converter and a collection of the databases it produces, in two top-level
+directories:
 
-- The repository root holds the converted `.sqlite` Bible databases, ready to open.
+- [`bibles/`](bibles) holds the converted `.sqlite` Bible databases, ready to open. A conversion without
+  `--output` is written here.
 - [`tool/`](tool) holds the converter: the `bibles` package, the `tool/bin/bibles` wrapper, the tests, the
   [documentation](tool/docs) and the [samples](tool/samples/README.md).
 
@@ -19,19 +21,19 @@ The commands below are run from the repository root. The wrapper works from any 
 
 ## Converted Bibles
 
-These databases sit at the repository root. Open one with the TUI directly; nothing needs converting first.
+These databases are in `bibles/`. Open one with the TUI directly; nothing needs converting first.
 
 | File | Translation | Books, chapters, verses | Licence |
 | --- | --- | --- | --- |
-| `bible_kjv.sqlite` | King James Version (1769 standardized text) | 66, 1189, 31102 | Public domain (outside the United Kingdom, where the Crown's letters patent restrict printing) |
-| `bible_asv.sqlite` | American Standard Version (1901) | 66, 1189, 31086 | Public domain |
+| `bibles/bible_kjv.sqlite` | King James Version (1769 standardized text) | 66, 1189, 31102 | Public domain (outside the United Kingdom, where the Crown's letters patent restrict printing) |
+| `bibles/bible_asv.sqlite` | American Standard Version (1901) | 66, 1189, 31086 | Public domain |
 
 Where each one came from:
 
 | File | Source | Source files dated | SHA-256 of the downloaded zip |
 | --- | --- | --- | --- |
-| `bible_kjv.sqlite` | eBible.org [`eng-kjv_usfm.zip`](https://ebible.org/Scriptures/eng-kjv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-kjv)) | 2026-09-26 | `67561758cf58d9e767e89226a99171dba722579157d3894767c2f27538bcb38e` |
-| `bible_asv.sqlite` | eBible.org [`eng-asv_usfm.zip`](https://ebible.org/Scriptures/eng-asv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-asv)) | 2026-10-20 | `5e385a1a89887849cb07c88ddf4df37708e0fa901b1f1b7f0b8204c153f0a901` |
+| `bibles/bible_kjv.sqlite` | eBible.org [`eng-kjv_usfm.zip`](https://ebible.org/Scriptures/eng-kjv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-kjv)) | 2026-09-26 | `67561758cf58d9e767e89226a99171dba722579157d3894767c2f27538bcb38e` |
+| `bibles/bible_asv.sqlite` | eBible.org [`eng-asv_usfm.zip`](https://ebible.org/Scriptures/eng-asv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-asv)) | 2026-10-20 | `5e385a1a89887849cb07c88ddf4df37708e0fa901b1f1b7f0b8204c153f0a901` |
 
 Both copyright pages shipped in the zips (`copr.htm`) state the text is public domain and may be copied freely.
 Notes on the content:
@@ -49,23 +51,23 @@ Notes on the content:
 
    ```sh
    unzip eng-web_usfm.zip -d eng-web && cat eng-web/*.usfm > WEB.usfm
-   tool/bin/bibles WEB.usfm -n bible_web       # writes ./bible_web.sqlite
+   tool/bin/bibles WEB.usfm -n bible_web       # writes bibles/bible_web.sqlite
    ```
 
 2. Check the run's warnings: skipped books should be only non-canonical ones, and missing verses should be
    ones the translation genuinely omits. The conversion fails if any validation check fails.
 3. Add the database to both tables above (source URL, date of the source files, SHA-256 of the download,
-   licence) and to `COLLECTION` in `tool/tests/test_collection.py`, which checks that every database at the
-   root is listed, validates and matches the reference schema.
-4. Commit the `.sqlite` file. Re-converting the same download must give the same books, chapters and verses;
+   licence) and to `COLLECTION` in `tool/tests/test_collection.py`, which checks that every database in
+   `bibles/` is listed, validates and matches the reference schema.
+4. Commit the `.sqlite` file in `bibles/`. Re-converting the same download must give the same books, chapters and verses;
    only `created_at_utc` changes.
 
 ## Quick start
 
 ```sh
-tool/bin/bibles kjv.usfm                      # writes ./kjv.sqlite
-tool/bin/bibles --validate kjv.sqlite         # checks an existing database
-cd tool && python3 -m bibles ../kjv.usfm      # the same, as a module (writes tool/kjv.sqlite)
+tool/bin/bibles kjv.usfm                      # writes bibles/kjv.sqlite
+tool/bin/bibles --validate bibles/kjv.sqlite  # checks an existing database
+cd tool && python3 -m bibles ../kjv.usfm      # the same, as a module
 ```
 
 A run reports each stage:
@@ -75,12 +77,12 @@ Source: kjv.usfm
 Format: usfm (detected from content)
 Parser: bibles.parsers.usfm
 Warning: skipped book TOB: not one of the 66 canonical books
-Validating: /home/me/kjv.sqlite
+Validating: /home/me/bibles/bibles/kjv.sqlite
   PASS  Schema tables: metadata, books, chapters, verses
   PASS  SQLite integrity: ok
   ...
 Validation passed: 15 checks, 0 failed, 0 warnings
-Output: /home/me/kjv.sqlite
+Output: /home/me/bibles/bibles/kjv.sqlite
 Wrote 66 books, 1189 chapters and 31102 verses (version kjv)
 ```
 
@@ -94,7 +96,7 @@ tool/bin/bibles --validate DATABASE [--allow-partial]
 | Option | Meaning |
 | --- | --- |
 | `SOURCE` | Path to the source Bible file (required). With `--validate`, the database to check. |
-| `-o, --output` | Output directory or full output file path. Defaults to the current working directory. |
+| `-o, --output` | Output directory or full output file path, relative to the current directory. Defaults to `bibles/` at the repository root, wherever the command is run from. |
 | `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`; `.sqlite` is appended when the name has no extension. |
 | `-f, --format` | Force a format instead of detecting it: `usfm`, `usx`, `osis`, `vpl` or `usj`. |
 | `--allow-partial` | Accept a Bible with fewer than 66 books (a New Testament, or a sample). Missing books become a warning. |
@@ -103,6 +105,9 @@ tool/bin/bibles --validate DATABASE [--allow-partial]
 
 How `--output` is interpreted:
 
+- Without `--output`, the database goes into the repository's `bibles/` directory (created if missing), so
+  every conversion joins the collection unless you send it elsewhere. `--name` alone only changes the file name.
+
 - An existing directory, a path ending in `/`, or a path without a file extension is a **directory**; the file
   name is placed inside it. Missing directories are created (and removed again if the run fails).
 - Anything else (for example `build/kjv.db`) is a **full file path** and is used directly. `--name` cannot be
@@ -110,8 +115,8 @@ How `--output` is interpreted:
 - An existing output file is replaced, but only once the new database has been written and validated.
 
 ```sh
-tool/bin/bibles kjv.usfm                      # ./kjv.sqlite
-tool/bin/bibles kjv.usfm -n king-james        # ./king-james.sqlite
+tool/bin/bibles kjv.usfm                      # bibles/kjv.sqlite
+tool/bin/bibles kjv.usfm -n king-james        # bibles/king-james.sqlite
 tool/bin/bibles kjv.usfm -o build/            # ./build/kjv.sqlite
 tool/bin/bibles kjv.usfm -o build/bible.db    # ./build/bible.db
 ```

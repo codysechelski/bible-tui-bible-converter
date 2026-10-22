@@ -6,6 +6,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from bibles.cli import main
 from bibles.detect import SUPPORTED_FORMATS, FormatDetectionError, detect_format, sniff_content
@@ -137,8 +138,10 @@ class CliDetectionTests(DetectTestCase):
         stdout, stderr = io.StringIO(), io.StringIO()
         old_cwd = os.getcwd()
         os.chdir(self.tmp)
+        # The default output directory is the real bibles/ collection, so point it at the temporary directory.
         try:
-            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            with mock.patch("bibles.cli.COLLECTION_DIR", self.tmp / "bibles"), \
+                    contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
                 code = main(list(argv))
         finally:
             os.chdir(old_cwd)

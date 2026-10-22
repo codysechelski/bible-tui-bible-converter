@@ -6,6 +6,7 @@ import contextlib
 import importlib.util
 import io
 import os
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -237,30 +238,41 @@ class TuiQueryTests(unittest.TestCase):
 
 
 class CommandLineTests(unittest.TestCase):
-    """The installed wrapper, run as a user would, from another directory."""
+    """The wrapper, run as a user would, from another directory.
+
+    It runs from a copy of the repository layout (tool/ beside bibles/), so the default output never lands in
+    the real bibles/ directory.
+    """
 
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
-        self.tmp = Path(self._tmp.name)
+        root = Path(self._tmp.name)
+        self.collection = root / "repo" / "bibles"
+        self.wrapper = root / "repo" / "tool" / "bin" / "bibles"
+        ignore = shutil.ignore_patterns("__pycache__")
+        for part in ("bibles", "bin"):
+            shutil.copytree(TOOL_ROOT / part, root / "repo" / "tool" / part, ignore=ignore)
+        self.tmp = root / "work"
+        self.tmp.mkdir()
 
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
     def bibles(self, *argv: str) -> subprocess.CompletedProcess:
-        return subprocess.run([str(TOOL_ROOT / "bin" / "bibles"), *argv], cwd=self.tmp,
-                              capture_output=True, text=True)
+        return subprocess.run([str(self.wrapper), *argv], cwd=self.tmp, capture_output=True, text=True)
 
-    def test_default_output_file_name(self) -> None:
+    def test_default_output_goes_to_bibles_directory(self) -> None:
         result = self.bibles(str(SAMPLES / "kjv.usfm"), "--allow-partial")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertTrue((self.tmp / "kjv.sqlite").is_file())
+        self.assertTrue((self.collection / "kjv.sqlite").is_file())
+        self.assertEqual(os.listdir(self.tmp), [])
         output_line = next(line for line in result.stdout.splitlines() if line.startswith("Output: "))
-        self.assertEqual(Path(output_line[len("Output: "):]).resolve(), (self.tmp / "kjv.sqlite").resolve())
+        self.assertEqual(Path(output_line[len("Output: "):]).resolve(), (self.collection / "kjv.sqlite").resolve())
 
     def test_explicit_output_file_name(self) -> None:
         result = self.bibles(str(SAMPLES / "kjv.usj"), "--allow-partial", "-n", "king-james")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertTrue((self.tmp / "king-james.sqlite").is_file())
+        self.assertTrue((self.collection / "king-james.sqlite").is_file())
 
     def test_explicit_output_directory(self) -> None:
         result = self.bibles(str(SAMPLES / "kjv.osis.xml"), "--allow-partial", "-o", "build/")
@@ -277,6 +289,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("source file not found", result.stderr)
         self.assertEqual(os.listdir(self.tmp), [])
+        self.assertFalse(self.collection.exists())
 
     def test_unsupported_format_flag(self) -> None:
         result = self.bibles(str(SAMPLES / "kjv.usfm"), "--format", "docx")
@@ -295,7 +308,7 @@ class CommandLineTests(unittest.TestCase):
         result = self.bibles(str(SAMPLES / "kjv.usx"))
         self.assertEqual(result.returncode, 1)
         self.assertIn("validate failed", result.stderr)
-        self.assertFalse((self.tmp / "kjv.sqlite").exists())
+        self.assertFalse(self.collection.exists())
 
 
 if __name__ == "__main__":

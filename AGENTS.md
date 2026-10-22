@@ -4,7 +4,7 @@
 
 `bibles` is a command line tool that converts a text-formatted Bible file (USFM, USX, OSIS, VPL, USJ) into a
 SQLite database for the custom Bible terminal UI. The repository also collects the converted databases: the
-tooling lives under `tool/`, and the repository root holds the converted `.sqlite` files.
+tooling lives under `tool/`, and the converted `.sqlite` files live under `bibles/`.
 
 The reference project at `/Users/codysechelski/Developer/Projects/bible-esv` (read-only) defines the output
 schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and the consuming TUI
@@ -13,10 +13,11 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 
 ## Repository Map
 
-The repository root holds only the converted databases (`bible_<short name>.sqlite`), the README, AGENTS.md,
-CLAUDE.md, `.gitignore` and `.backlog/`. The README's "Converted Bibles" section records each database's source,
-download checksum and licence; add a row there and to `COLLECTION` in `tests/test_collection.py` whenever a
-database is added or reconverted. Everything else is under `tool/`, and the paths below are relative to it.
+The repository root has two directories, `tool/` (the converter) and `bibles/` (the converted databases,
+`bible_<short name>.sqlite`), plus the README, AGENTS.md, CLAUDE.md, `.gitignore` and `.backlog/`. The README's
+"Converted Bibles" section records each database's source, download checksum and licence; add a row there and to
+`COLLECTION` in `tests/test_collection.py` whenever a database is added or reconverted. The paths below are
+relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), not the database directory.
 
 - `bibles/cli.py` holds argument parsing, output path resolution and the output of a run; `bibles/__main__.py`
   makes `python3 -m bibles` work from `tool/`. `bin/bibles` is a bash wrapper that runs the package from any
@@ -48,8 +49,7 @@ database is added or reconverted. Everything else is under `tool/`, and the path
 - `docs/` holds Markdown documentation, linked from the README.
 - `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all five formats;
   `test_samples.py` converts the samples end to end through the CLI and the wrapper and reads the result with
-  the reference TUI's `BibleStore`. `test_collection.py` validates the committed databases at the repository
-  root.
+  the reference TUI's `BibleStore`. `test_collection.py` validates the committed databases in `bibles/`.
 - `.backlog/` (at the repository root) holds Backlog.md tasks; work is planned there.
 
 ## Commands
@@ -70,7 +70,9 @@ verification (`.agent/verification.json`) is intentionally disabled.
   (`from __future__ import annotations`, `typing.Optional`).
 - `main(argv)` returns an exit code instead of calling `sys.exit`, so tests can call it directly. User-facing
   failures raise `CliError` or `ConversionError` and exit 1; argparse usage errors and a bare invocation exit 2.
-- `--output` resolution: existing directory, trailing separator, or no file extension means directory;
+- `--output` resolution: without `--output` the database goes to `COLLECTION_DIR` (`bibles/` at the repository
+  root, found from the package's location, not the working directory); a relative `--output` is taken from the
+  working directory. An existing directory, trailing separator, or no file extension means directory;
   otherwise it is a full file path. `--name` with a full file path is an error. `--name` without an extension
   gets `.sqlite` appended.
 - A failed run must leave nothing behind: no database at the output path, no temporary file, and no directory

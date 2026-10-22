@@ -8,8 +8,9 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
-from bibles.cli import CliError, main, resolve_output_path
+from bibles.cli import COLLECTION_DIR, CliError, main, resolve_output_path
 
 TOOL_ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,24 +31,36 @@ class ResolveOutputPathTests(unittest.TestCase):
         self._tmp = tempfile.TemporaryDirectory()
         self.tmp = Path(self._tmp.name)
         self.source = Path("sources/kjv.usfm")
+        self.collection = self.tmp / "bibles"
+        patcher = mock.patch("bibles.cli.COLLECTION_DIR", self.collection)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
-    def test_defaults_to_source_stem_in_cwd(self) -> None:
-        self.assertEqual(resolve_output_path(self.source, cwd=self.tmp), self.tmp / "kjv.sqlite")
+    def test_collection_dir_is_bibles_at_the_repository_root(self) -> None:
+        self.assertEqual(COLLECTION_DIR, TOOL_ROOT.parent / "bibles")
+
+    def test_defaults_to_source_stem_in_collection(self) -> None:
+        path = resolve_output_path(self.source, cwd=Path("/nowhere"))
+        self.assertEqual(path, self.collection / "kjv.sqlite")
+
+    def test_relative_output_is_taken_from_cwd(self) -> None:
+        path = resolve_output_path(self.source, output="out/", cwd=self.tmp)
+        self.assertEqual(path, self.tmp / "out" / "kjv.sqlite")
 
     def test_default_replaces_only_last_suffix(self) -> None:
         path = resolve_output_path(Path("web.usx.xml"), cwd=self.tmp)
-        self.assertEqual(path, self.tmp / "web.usx.sqlite")
+        self.assertEqual(path, self.collection / "web.usx.sqlite")
 
     def test_explicit_name_is_used(self) -> None:
         path = resolve_output_path(self.source, name="bible.db", cwd=self.tmp)
-        self.assertEqual(path, self.tmp / "bible.db")
+        self.assertEqual(path, self.collection / "bible.db")
 
     def test_name_without_extension_gets_sqlite_suffix(self) -> None:
         path = resolve_output_path(self.source, name="king-james", cwd=self.tmp)
-        self.assertEqual(path, self.tmp / "king-james.sqlite")
+        self.assertEqual(path, self.collection / "king-james.sqlite")
 
     def test_name_that_is_a_path_is_rejected(self) -> None:
         with self.assertRaises(CliError):
@@ -88,6 +101,10 @@ class MainTests(unittest.TestCase):
         self.tmp = Path(self._tmp.name)
         self.source = self.tmp / "kjv.usfm"
         self.source.write_text(SAMPLE_USFM, encoding="utf-8")
+        self.collection = self.tmp / "bibles"
+        patcher = mock.patch("bibles.cli.COLLECTION_DIR", self.collection)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self._old_cwd = os.getcwd()
         os.chdir(self.tmp)
 
@@ -111,10 +128,11 @@ class MainTests(unittest.TestCase):
                        "--version", "--help"):
             self.assertIn(option, out)
 
-    def test_success_writes_database_in_cwd_and_reports_it(self) -> None:
+    def test_success_writes_database_in_collection_and_reports_it(self) -> None:
         code, out, _ = self.convert()
         self.assertEqual(code, 0)
-        output = Path.cwd() / "kjv.sqlite"
+        output = self.collection / "kjv.sqlite"
+        self.assertFalse((self.tmp / "kjv.sqlite").exists())
         self.assertTrue(output.is_file())
         self.assertIn(f"Output: {output}", out)
         self.assertIn("Format: usfm (detected from content)", out)
@@ -163,7 +181,8 @@ class MainTests(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in self.tmp.iterdir()), ["kjv.usfm"])
 
     def test_existing_output_is_replaced_only_on_success(self) -> None:
-        output = self.tmp / "kjv.sqlite"
+        self.collection.mkdir()
+        output = self.collection / "kjv.sqlite"
         output.write_text("previous")
         run_main(str(self.source))  # fails validation
         self.assertEqual(output.read_text(), "previous")

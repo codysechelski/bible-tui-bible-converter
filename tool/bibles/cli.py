@@ -14,6 +14,8 @@ from bibles.pipeline import ConversionError, ConversionResult, convert, parser_n
 from bibles.validate import ValidationReport, validate_database
 
 OUTPUT_SUFFIX = ".sqlite"
+# Where a conversion goes when no --output is given: the repository's bibles/ directory, beside tool/.
+COLLECTION_DIR = Path(__file__).resolve().parents[2] / "bibles"
 # How many parser warnings a run prints before summarizing the rest.
 MAX_WARNINGS = 20
 
@@ -36,7 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "output directory or full output file path; a path ending in a separator, an existing "
             "directory, or a path without a file extension is treated as a directory "
-            "(default: current working directory)"
+            "(default: the bibles/ directory at the repository root)"
         ),
     )
     parser.add_argument(
@@ -96,12 +98,15 @@ def resolve_output_path(
     name: Optional[str] = None,
     cwd: Optional[Path] = None,
 ) -> Path:
-    """Work out the database path from the source path and the optional output flags."""
+    """Work out the database path from the source path and the optional output flags.
+
+    Without --output the database goes into `COLLECTION_DIR`; a relative --output is taken from `cwd`.
+    """
     base_dir = cwd if cwd is not None else Path.cwd()
     file_name = normalize_file_name(name) if name is not None else default_file_name(source)
 
     if output is None:
-        return base_dir / file_name
+        return COLLECTION_DIR / file_name
 
     raw_output = os.fspath(output)
     output_path = Path(raw_output).expanduser()
