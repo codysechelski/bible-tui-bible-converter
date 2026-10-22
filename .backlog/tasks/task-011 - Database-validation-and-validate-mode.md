@@ -1,10 +1,11 @@
 ---
 id: TASK-011
 title: Database validation and validate mode
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:11'
+updated_date: '2026-10-22 14:48'
 labels:
   - validation
 dependencies:
