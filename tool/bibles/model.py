@@ -91,6 +91,23 @@ class Bible:
         self._verse_keys.add(key)
         return verse
 
+    def book(self, code: str) -> Optional[BibleBook]:
+        return self._book_index.get(code)
+
+    def add_book(self, bible_book: BibleBook) -> None:
+        """Add a whole book parsed into another `Bible`; its verse text is already normalized.
+
+        Raises `DuplicateVerseError` when the book was already added.
+        """
+        code = bible_book.code
+        if code in self._book_index:
+            raise DuplicateVerseError(f"{code} appears more than once")
+        self._book_index[code] = bible_book
+        self.books.append(bible_book)
+        for chapter in bible_book.chapters:
+            self._chapter_index[(code, chapter.number)] = chapter
+            self._verse_keys.update((code, chapter.number, verse.verse_number) for verse in chapter.verses)
+
     def verses(self) -> Iterator[Verse]:
         for bible_book in self.books:
             for chapter in bible_book.chapters:

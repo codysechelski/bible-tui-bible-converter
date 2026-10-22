@@ -1,4 +1,5 @@
-"""End-to-end tests over the real KJV samples in `samples/` (Ruth, Jonah and 3 John in five formats)."""
+"""End-to-end tests over the real samples in `samples/`: Ruth, Jonah and 3 John of the KJV in five formats,
+and of the ASV as RTF files."""
 
 from __future__ import annotations
 
@@ -12,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 from bibles.cli import main
@@ -19,6 +21,7 @@ from tests.test_writer import REFERENCE_DB, schema_description
 
 TOOL_ROOT = Path(__file__).resolve().parents[1]
 SAMPLES = TOOL_ROOT / "samples"
+RTF_SAMPLES = SAMPLES / "asv-rtf"
 REFERENCE_TUI = REFERENCE_DB.parent / "tui" / "bible_tui.py"
 
 SAMPLE_FILES = {
@@ -175,6 +178,53 @@ class SampleConversionTests(unittest.TestCase):
                 self.assertIn("FAIL  Book count: expected 66 books, found 3", out)
 
 
+class RtfSampleTests(unittest.TestCase):
+    """The ASV RTF sample (the same three books, one file each) as a folder and as a zip archive."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls._tmp = tempfile.TemporaryDirectory()
+        tmp = Path(cls._tmp.name)
+        cls.archive = tmp / "asv-rtf.zip"
+        with zipfile.ZipFile(cls.archive, "w", zipfile.ZIP_DEFLATED) as archive:
+            for path in sorted(RTF_SAMPLES.glob("*.rtf")):
+                archive.write(path, f"release/USX_1/{path.name}")
+        cls.outputs = {source: run_cli(str(path), "--allow-partial", "-o", str(tmp / f"{source}.sqlite"))
+                       for source, path in (("folder", RTF_SAMPLES), ("zip", cls.archive))}
+        cls.databases = {source: tmp / f"{source}.sqlite" for source in cls.outputs}
+        cls.usfm = tmp / "usfm.sqlite"
+        run_cli(str(SAMPLES / SAMPLE_FILES["usfm"]), "--allow-partial", "-o", str(cls.usfm))
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls._tmp.cleanup()
+
+    def test_folder_and_zip_convert(self) -> None:
+        inputs = {"folder": "Input: folder, 3 rtf files in .",
+                  "zip": "Input: zip archive, 3 rtf files in release/USX_1"}
+        for source, (code, out, err) in self.outputs.items():
+            with self.subTest(source=source):
+                self.assertEqual(code, 0, err)
+                self.assertIn(inputs[source], out)
+                self.assertIn("Format: rtf (detected from content)", out)
+                self.assertIn("Wrote 3 books, 9 chapters and 147 verses", out)
+                self.assertNotIn("Warning:", out)
+        self.assertEqual(verse_map(self.databases["zip"]), verse_map(self.databases["folder"]))
+
+    def test_same_references_as_the_kjv_and_asv_text(self) -> None:
+        verses = verse_map(self.databases["folder"])
+        self.assertEqual(set(verses), set(verse_map(self.usfm)))
+        self.assertEqual(verses[("ruth", 1, 2)], RUTH_1_2["usfm"])
+        self.assertEqual(verses[("ruth", 1, 1)][:58],
+                         "And it came to pass in the days when the judges judged, th")
+        self.assertEqual(verses[("3-john", 1, 14)],
+                         "but I hope shortly to see thee, and we shall speak face to face. Peace be unto thee. "
+                         "The friends salute thee. Salute the friends by name.")
+        for text in verses.values():
+            self.assertEqual(text, " ".join(text.split()))
+            self.assertNotRegex(text, r"[\\{}]")
+
+
 class TuiQueryTests(unittest.TestCase):
     """The queries the reference TUI runs work on a generated database."""
 
@@ -287,7 +337,7 @@ class CommandLineTests(unittest.TestCase):
     def test_missing_input_file(self) -> None:
         result = self.bibles("missing.usfm")
         self.assertEqual(result.returncode, 1)
-        self.assertIn("source file not found", result.stderr)
+        self.assertIn("source not found", result.stderr)
         self.assertEqual(os.listdir(self.tmp), [])
         self.assertFalse(self.collection.exists())
 

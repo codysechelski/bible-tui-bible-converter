@@ -203,7 +203,7 @@ class MainTests(unittest.TestCase):
     def test_missing_source_fails(self) -> None:
         code, _, err = run_main(str(self.tmp / "missing.usfm"))
         self.assertNotEqual(code, 0)
-        self.assertIn("source file not found", err)
+        self.assertIn("source not found", err)
 
 
 class ShellInvocationTests(unittest.TestCase):

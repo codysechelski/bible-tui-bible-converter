@@ -23,6 +23,7 @@ OSIS = (
 )
 VPL = "Gen 1:1 In the beginning God created.\nGen 1:2 And the earth was without form.\n"
 USJ = '{"type": "USJ", "version": "3.1", "content": [{"type": "book", "marker": "id", "code": "GEN"}]}'
+RTF = r"{\rtf1\ansi\ansicpg1252{\fonttbl{\f0 Times;}}{{\b 1} In the beginning God created.\par}}"
 
 POSITIVE = {
     "usfm": [("gen.usfm", USFM), ("gen.txt", "\ufeff" + USFM), ("noext", "\\c 1\n\\v 1 Text\n")],
@@ -34,6 +35,7 @@ POSITIVE = {
         ("dotted.txt", "GEN.1.1 In the beginning.\nGEN.1.2 And the earth.\n"),
     ],
     "usj": [("gen.json", USJ), ("gen.usj", "\ufeff" + USJ)],
+    "rtf": [("GEN.rtf", RTF), ("GEN.txt", "\n" + RTF)],
 }
 
 NEGATIVE = {
@@ -42,6 +44,7 @@ NEGATIVE = {
     "osis": ("feed.xml", "<rss><channel/></rss>"),
     "vpl": ("prose.txt", "In the beginning God created the heavens.\nGen 1:1 is quoted later.\n"),
     "usj": ("data.json", '{"type": "other", "content": []}'),
+    "rtf": ("braces.txt", "{rtf} is not a control word\n"),
 }
 
 
@@ -85,7 +88,7 @@ class ContentSniffingTests(DetectTestCase):
 class ExtensionTests(DetectTestCase):
     def test_content_wins_over_misleading_extension(self) -> None:
         cases = [("osis.usfm", OSIS, "osis"), ("usfm.usx", USFM, "usfm"), ("vpl.usj", VPL, "vpl"),
-                 ("usj.vpl", USJ, "usj"), ("usx.osis", USX, "usx")]
+                 ("usj.vpl", USJ, "usj"), ("usx.osis", USX, "usx"), ("rtf.usx", RTF, "rtf")]
         for name, content, expected in cases:
             with self.subTest(name=name):
                 detection = detect_format(self.make(name, content))
@@ -93,7 +96,8 @@ class ExtensionTests(DetectTestCase):
 
     def test_extension_used_when_content_is_inconclusive(self) -> None:
         for name, expected in (("a.usfm", "usfm"), ("b.SFM", "usfm"), ("c.usx", "usx"),
-                               ("d.osis", "osis"), ("e.vpl", "vpl"), ("f.usj", "usj")):
+                               ("d.osis", "osis"), ("e.vpl", "vpl"), ("f.usj", "usj"),
+                               ("g.RTF", "rtf")):
             with self.subTest(name=name):
                 detection = detect_format(self.make(name, "nothing recognisable\n"))
                 self.assertEqual((detection.format, detection.method), (expected, "extension"))

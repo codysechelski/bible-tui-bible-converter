@@ -1,7 +1,8 @@
 # bibles
 
-`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL or USJ) into a SQLite database that the custom
-Bible terminal UI can read. The database uses exactly the schema of the reference project
+`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL, USJ or RTF) into a SQLite database that the
+custom Bible terminal UI can read. The source can be a single file, a folder of book files, or the zip archive a
+Bible download usually comes as. The database uses exactly the schema of the reference project
 (`bible-esv/bible_esv.sqlite`), so the TUI opens it without changes.
 
 It is Python 3.9+ and standard library only, so it runs anywhere the TUI does.
@@ -45,13 +46,13 @@ Notes on the content:
 
 ### Adding a Bible
 
-1. Pick a source whose licence allows redistribution, and download it. For an eBible.org USFM zip, concatenate
-   the books into one file named after the translation's short name, which becomes the `version` the TUI
-   shows:
+1. Pick a source whose licence allows redistribution, and download it. Convert the downloaded zip as it is
+   (or the folder it unzips to). Without a Digital Bible Library `metadata.xml` in the bundle, the source
+   name becomes the `version` the TUI shows, so name the copy after the translation's short name:
 
    ```sh
-   unzip eng-web_usfm.zip -d eng-web && cat eng-web/*.usfm > WEB.usfm
-   tool/bin/bibles WEB.usfm -n bible_web       # writes bibles/bible_web.sqlite
+   cp eng-web_usfm.zip WEB.zip
+   tool/bin/bibles WEB.zip -n bible_web        # writes bibles/bible_web.sqlite (version WEB)
    ```
 
 2. Check the run's warnings: skipped books should be only non-canonical ones, and missing verses should be
@@ -66,6 +67,8 @@ Notes on the content:
 
 ```sh
 tool/bin/bibles kjv.usfm                      # writes bibles/kjv.sqlite
+tool/bin/bibles eng-kjv_usfm.zip -n kjv       # a whole download, one file per book, as it came
+tool/bin/bibles eng-kjv_usfm/ -n kjv          # the same, unzipped
 tool/bin/bibles --validate bibles/kjv.sqlite  # checks an existing database
 cd tool && python3 -m bibles ../kjv.usfm      # the same, as a module
 ```
@@ -89,16 +92,16 @@ Wrote 66 books, 1189 chapters and 31102 verses (version kjv)
 ## Usage
 
 ```sh
-tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj}] [--allow-partial]
+tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj,rtf}] [--allow-partial]
 tool/bin/bibles --validate DATABASE [--allow-partial]
 ```
 
 | Option | Meaning |
 | --- | --- |
-| `SOURCE` | Path to the source Bible file (required). With `--validate`, the database to check. |
+| `SOURCE` | The source Bible (required): a file, a folder of book files (subfolders included), or a zip archive of one. With `--validate`, the database to check. |
 | `-o, --output` | Output directory or full output file path, relative to the current directory. Defaults to `bibles/` at the repository root, wherever the command is run from. |
-| `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`; `.sqlite` is appended when the name has no extension. |
-| `-f, --format` | Force a format instead of detecting it: `usfm`, `usx`, `osis`, `vpl` or `usj`. |
+| `-n, --name` | Output file name inside the output directory. Defaults to the source base name (a file's or zip's name without its extension, a folder's name) with `.sqlite`; `.sqlite` is appended when the name has no extension. |
+| `-f, --format` | Force a format instead of detecting it: `usfm`, `usx`, `osis`, `vpl`, `usj` or `rtf`. For a folder or zip, only the files in that format are used. |
 | `--allow-partial` | Accept a Bible with fewer than 66 books (a New Testament, or a sample). Missing books become a warning. |
 | `--validate` | Validate an existing database instead of converting. Cannot be combined with `-o`, `-n` or `-f`. |
 | `--version`, `-h` | Print the version or the help. |
@@ -127,8 +130,9 @@ at the output path.
 
 ## Examples for each format
 
-The [`tool/samples/`](tool/samples/README.md) directory has the same three KJV books in every format. They
-hold 3 books rather than 66, hence `--allow-partial`; a whole Bible needs no flag.
+The [`tool/samples/`](tool/samples/README.md) directory has the same three KJV books in every format, and
+the same books of the ASV as RTF files in a folder. They hold 3 books rather than 66, hence `--allow-partial`;
+a whole Bible needs no flag.
 
 ```sh
 tool/bin/bibles tool/samples/kjv.usfm     --allow-partial -o build/kjv-usfm.sqlite   # USFM
@@ -136,15 +140,36 @@ tool/bin/bibles tool/samples/kjv.usx      --allow-partial -o build/kjv-usx.sqlit
 tool/bin/bibles tool/samples/kjv.osis.xml --allow-partial -o build/kjv-osis.sqlite   # OSIS
 tool/bin/bibles tool/samples/kjv.vpl.txt  --allow-partial -o build/kjv-vpl.sqlite    # VPL
 tool/bin/bibles tool/samples/kjv.usj      --allow-partial -o build/kjv-usj.sqlite    # USJ
+tool/bin/bibles tool/samples/asv-rtf/     --allow-partial -o build/asv-rtf.sqlite    # RTF, a folder of books
 ```
 
-eBible.org ships USFM as one file per book. Concatenate the files into one source; front matter, glossaries and
-the Apocrypha are skipped with a warning:
+## Folders and zip archives
+
+Bible downloads usually come as a zip with one file per book, next to metadata, stylesheets and licences (a
+Digital Bible Library bundle, an eBible.org zip). Give the zip itself, or the folder it unzips to:
 
 ```sh
-cat eng-kjv_usfm/*.usfm > kjv.usfm
-tool/bin/bibles kjv.usfm
+tool/bin/bibles "Biblia Livre Para Todos.zip" --allow-partial -n bible_blt
 ```
+
+```
+Source: Biblia Livre Para Todos.zip
+Input: zip archive, 27 usx files in release/USX_1; 5 other files ignored
+Format: usx (detected from content)
+...
+Wrote 27 books, 260 chapters and 7942 verses (version BLT)
+```
+
+- The folder and its subfolders are searched. Every file whose format is detected is a book file; the rest
+  (metadata, stylesheets, versification, licences) are ignored. A zip is unpacked into a temporary folder that
+  is removed when the run ends.
+- The book files must all be in one format; when they are not, the run lists what it found and `--format`
+  picks one.
+- Front matter, glossaries and the Apocrypha are skipped with a warning. A book found again in another file with
+  identical text is kept once (the KJV bundle carries every book twice); copies that differ fail the run.
+- A Digital Bible Library `metadata.xml` supplies the version (`BLT` above) and its name.
+
+See [folders and zip archives](tool/docs/sources.md) for the details, including the RTF layout.
 
 ## Supported formats
 
@@ -155,6 +180,7 @@ tool/bin/bibles kjv.usfm
 | [OSIS](https://crosswire.org/osis/) | `.osis`, `.xml` | Verse elements identified by `osisID` (`Gen.1.1`), as containers or `sID`/`eID` milestones, in any namespace. Version name from the header. |
 | VPL | `.vpl`, `.txt` | One verse per line: `GEN 1:1 text` or `GEN.1.1 text`. The book may be a USFM code, an OSIS code, a book name or an eBible.org code (`SOL`, `JOH`, ...). |
 | [USJ](https://docs.usfm.bible/usfm/latest/usj/) | `.usj`, `.json` | A JSON object with `"type": "USJ"` whose `content` holds book, chapter, verse, para, char and note nodes. |
+| RTF | `.rtf` | One book per file, as in the ASV bundle: headings such as `Ruth 1` start chapters, bold numbers start verses. See [RTF book files](tool/docs/sources.md#rtf-book-files). |
 
 ### Format detection
 
@@ -163,11 +189,12 @@ The content is checked first and always wins over the extension:
 - an XML root of `<usx>` is USX, and `<osis>` (or `<osisText>`, any namespace) is OSIS;
 - a JSON object with `"type": "USJ"` is USJ;
 - a line starting with a USFM marker such as `\id`, `\c` or `\v` is USFM;
-- lines starting with a reference such as `Gen 1:1` or `GEN.1.1` are VPL.
+- lines starting with a reference such as `Gen 1:1` or `GEN.1.1` are VPL;
+- a document starting with `{\rtf` is RTF.
 
-If the content is inconclusive, a format-specific extension (`.usfm`, `.sfm`, `.usx`, `.osis`, `.vpl`, `.usj`) is
-used; `.xml`, `.json` and `.txt` say nothing on their own. Otherwise the run fails, listing the supported
-formats. Use `--format` to force a format when detection guesses wrong; the output then says
+If the content is inconclusive, a format-specific extension (`.usfm`, `.sfm`, `.usx`, `.osis`, `.vpl`, `.usj`,
+`.rtf`) is used; `.xml`, `.json` and `.txt` say nothing on their own. Otherwise the run fails, listing the
+supported formats. Use `--format` to force a format when detection guesses wrong; the output then says
 `Format: usx (forced with --format)`.
 
 ### Known limitations
@@ -179,14 +206,17 @@ formats. Use `--format` to force a format when detection guesses wrong; the outp
 - **USFM.** Psalm titles (`\d`), speaker labels (`\sp`) and acrostic letters (`\qa`) are dropped as headings. A
   file that is not UTF-8 is read as Windows-1252 (or Latin-1) with a warning; the `\ide` marker is not used.
   Peripheral and sidebar content (`\periph`, `\esb`) is skipped.
-- **USX.** The same text rules as USFM. One document per run; to convert several book files, combine their
-  contents under one `<usx>` root. Sidebars, peripherals and milestones are skipped.
+- **USX.** The same text rules as USFM. Each file is one document; give a folder or zip to convert one file
+  per book. Sidebars, peripherals and milestones are skipped.
 - **OSIS.** Only text inside a verse element is kept, so Psalm titles (`<title type="psalm">`), headings and
   introductions are dropped. An `osisID` naming several verses uses the first.
 - **VPL.** VPL is already rendered text, so any decoration in the file stays in the verse (eBible.org's KJV
   writes added words as `[was]`). A line that is not a verse reference is skipped with a warning; a line with
   no text, or a `<range>` marker, is an absent verse.
 - **USJ.** Must be UTF-8 JSON. Both `marker` (the USJ specification) and `mark` are accepted.
+- **RTF.** Only the layout described in [RTF book files](tool/docs/sources.md#rtf-book-files) is understood, one
+  book per file. Textual notes, section headings, Psalm titles and the Psalm 119 acrostic letters are dropped,
+  but a line after a chapter's last verse (Habakkuk 3's subscription in the ASV) stays in that verse.
 
 ## Verse text
 
@@ -224,9 +254,9 @@ Metadata keys:
 
 | Key | Value |
 | --- | --- |
-| `version` | Short version name from the source (OSIS `osisIDWork`), otherwise the source file name without its extension. The TUI shows it. |
-| `version_name` | Full version name from the source (OSIS work title), otherwise `version`. |
-| `source` | Source file name and format, for example `kjv.usfm (usfm)`. |
+| `version` | Short version name from the source (OSIS `osisIDWork`, or a bundle's DBL `metadata.xml` abbreviation), otherwise the source name without its extension. The TUI shows it. |
+| `version_name` | Full version name from the source (OSIS work title, or the DBL bundle name), otherwise `version`. |
+| `source` | Source file, folder or zip name and format, for example `kjv.usfm (usfm)`. |
 | `created_at_utc` | When the database was written, ISO 8601 in UTC, for example `2026-10-22T14:30:05+00:00`. |
 | `book_count`, `chapter_count`, `verse_count` | The number of rows written. |
 
@@ -242,6 +272,7 @@ result. See [validation](tool/docs/validation.md).
 
 - [Verse text normalization](tool/docs/normalization.md): how headings, notes, poetry lines, whitespace, verse
   ranges and absent verses are handled.
+- [Folders and zip archives](tool/docs/sources.md): how book files are found and combined, and the RTF layout.
 - [Database validation](tool/docs/validation.md): every check, and which ones fail or only warn.
 - [Samples](tool/samples/README.md): where the sample files come from and how they differ.
 - [AGENTS.md](AGENTS.md): conventions and commands for contributors and coding agents.

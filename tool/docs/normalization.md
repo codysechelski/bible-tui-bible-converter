@@ -49,6 +49,12 @@ books resolve from OSIS codes (`Gen`, `1Sam`, `Ps`) or USFM codes.
 `MAR`, `JOH`, `PHI`, `JAM`, `1JO`, `2JO`, `3JO`). A line that is not a verse reference is skipped and
 reported as a warning.
 
+**RTF** (one book per file, see [RTF book files](sources.md#rtf-book-files)): heading paragraphs are dropped
+after they have started a chapter, and so are textual notes (a paragraph starting with a bold `chapter:verse`
+reference), Psalm 119 acrostic letters, text before a chapter's first verse (Psalm titles), and the document's
+font, style and information tables, pictures, footnotes and fields. Character formatting such as italics keeps
+its text. A verse whose only text is `*` is an omitted verse.
+
 A removed note leaves no text behind, so `word\f + \ft note\f*.` becomes `word.`.
 
 ## 2. Join lines and paragraphs

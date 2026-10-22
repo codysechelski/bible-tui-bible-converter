@@ -11,6 +11,7 @@ from typing import List, Optional, Sequence
 from bibles import __version__
 from bibles.detect import SUPPORTED_FORMATS, Detection
 from bibles.pipeline import ConversionError, ConversionResult, convert, parser_name
+from bibles.sources import BookFiles
 from bibles.validate import ValidationReport, validate_database
 
 OUTPUT_SUFFIX = ".sqlite"
@@ -27,10 +28,18 @@ class CliError(Exception):
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="bibles",
-        description="Convert a text-formatted Bible file into a SQLite database for the Bible TUI.",
+        description=(
+            "Convert a text-formatted Bible into a SQLite database for the Bible TUI. The source is a "
+            "file, a folder of book files, or a zip archive of one."
+        ),
     )
     parser.add_argument(
-        "source", type=Path, help="path to the source Bible file (with --validate: the database to check)"
+        "source",
+        type=Path,
+        help=(
+            "the source Bible: a file, a folder of book files (searched with its subfolders), or a "
+            "zip archive of one (with --validate: the database to check)"
+        ),
     )
     parser.add_argument(
         "-o",
@@ -46,14 +55,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--name",
         help=(
             f"output file name, used inside the output directory; {OUTPUT_SUFFIX} is appended when "
-            f"the name has no extension (default: source file base name + {OUTPUT_SUFFIX})"
+            f"the name has no extension (default: source base name + {OUTPUT_SUFFIX})"
         ),
     )
     parser.add_argument(
         "-f",
         "--format",
         choices=SUPPORTED_FORMATS,
-        help="force a specific input format instead of detecting it",
+        help=(
+            "force a specific input format instead of detecting it; for a folder or zip archive, "
+            "only the files in this format are used"
+        ),
     )
     parser.add_argument(
         "--allow-partial",
@@ -70,7 +82,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def default_file_name(source: Path) -> str:
-    return source.stem + OUTPUT_SUFFIX
+    # A folder's whole name is its base name; a file loses its extension.
+    return (source.name if source.is_dir() else source.stem) + OUTPUT_SUFFIX
 
 
 def normalize_file_name(name: str) -> str:
@@ -131,8 +144,8 @@ def _missing_parents(path: Path) -> List[Path]:
 
 def run(args: argparse.Namespace) -> ConversionResult:
     source: Path = args.source
-    if not source.is_file():
-        raise CliError(f"source file not found: {source}")
+    if not source.is_file() and not source.is_dir():
+        raise CliError(f"source not found: {source}")
 
     output_path = resolve_output_path(source, args.output, args.name)
     if output_path.is_dir():
@@ -160,7 +173,9 @@ def print_report(report: ValidationReport) -> None:
         print(line)
 
 
-def print_detection(detection: Detection) -> None:
+def print_detection(detection: Detection, files: Optional[BookFiles] = None) -> None:
+    if files is not None:
+        print(f"Input: {files.describe()}")
     print(f"Format: {detection.describe()}")
     print(f"Parser: {parser_name(detection.format)}")
 
@@ -197,7 +212,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         result = run(args)
     except ConversionError as error:
         if error.detection is not None:
-            print_detection(error.detection)
+            print_detection(error.detection, error.files)
         if error.report is not None:
             print_report(error.report)
         print(f"{parser.prog}: error: {error}", file=sys.stderr)
@@ -208,7 +223,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     metadata = result.metadata
-    print_detection(result.detection)
+    print_detection(result.detection, result.files)
     print_warnings(result.bible.warnings)
     print_report(result.validation)
     print(f"Output: {result.output}")

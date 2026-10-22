@@ -2,8 +2,9 @@
 
 ## Repo Purpose
 
-`bibles` is a command line tool that converts a text-formatted Bible file (USFM, USX, OSIS, VPL, USJ) into a
-SQLite database for the custom Bible terminal UI. The repository also collects the converted databases: the
+`bibles` is a command line tool that converts a text-formatted Bible (USFM, USX, OSIS, VPL, USJ, RTF), given
+as one file, a folder of book files or a zip archive of one, into a SQLite database for the custom Bible terminal
+UI. The repository also collects the converted databases: the
 tooling lives under `tool/`, and the converted `.sqlite` files live under `bibles/`.
 
 The reference project at `/Users/codysechelski/Developer/Projects/bible-esv` (read-only) defines the output
@@ -24,6 +25,10 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
   directory.
 - `bibles/pipeline.py` is the conversion: `convert()` runs detect, parse (which normalizes), write and validate,
   and raises `ConversionError` whose `stage` names the failing stage.
+- `bibles/sources.py` handles folder and zip sources: `open_source` extracts a zip to a temporary folder for the
+  run, `find_book_files` detects each file's format, ignores the rest and reads a DBL `metadata.xml`.
+  `parse_files` (`bibles/parsers/__init__.py`) parses each book file and merges the books, skipping identical
+  repeats. Documented in `docs/sources.md`.
 - `bibles/books.py` is the single source of truth for the 66 canonical books (USFM and OSIS codes, names, slug,
   testament, sort order, chapter count). `book_for_code` is strict USFM; `book_for_osis` and `find_book` (VPL)
   accept more spellings. Codes outside the 66 raise `UnknownBookError`; the parsers catch it and skip the book
@@ -32,8 +37,9 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
   format-specific extensions are a fallback, `--format` bypasses detection.
 - `bibles/parsers/` has one module per format, registered in `PARSERS`; `parse_file(path, format)` returns a
   `Bible` or raises `ParseError`. USFM, USX and USJ translate their input into the events of
-  `parsers/markers.py` (`MarkerEvents`), which applies the shared rules; OSIS and VPL feed `VerseCollector`
-  (`parsers/base.py`) directly. Fix text handling in the shared layer, not in one front end, so the formats stay
+  `parsers/markers.py` (`MarkerEvents`), which applies the shared rules; OSIS, VPL and RTF feed `VerseCollector`
+  (`parsers/base.py`) directly. The RTF parser understands one layout (the ASV bundle's, one book per file),
+  described in `docs/sources.md`. Fix text handling in the shared layer, not in one front end, so the formats stay
   identical.
 - `bibles/model.py` holds the in-memory `Bible` (books, chapters, verses, version, warnings); verses are added
   with `Bible.add_verse`, which applies `bibles/normalize.py`. The rules are documented in
@@ -44,12 +50,14 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
   `validate=False` or `allow_partial=True`.
 - `bibles/validate.py` runs every check and returns a `ValidationReport` (pass/warn/fail per check). Checks are
   listed in `docs/validation.md`.
-- `samples/` holds real KJV excerpts (Ruth, Jonah, 3 John) in all five formats; `samples/README.md` records
-  where each came from. Regenerate them the same way rather than hand-editing.
+- `samples/` holds real KJV excerpts (Ruth, Jonah, 3 John) in the five text formats, and the same ASV books as
+  RTF files in `samples/asv-rtf/`; `samples/README.md` records where each came from. Regenerate them the same
+  way rather than hand-editing.
 - `docs/` holds Markdown documentation, linked from the README.
-- `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all five formats;
-  `test_samples.py` converts the samples end to end through the CLI and the wrapper and reads the result with
-  the reference TUI's `BibleStore`. `test_collection.py` validates the committed databases in `bibles/`.
+- `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all six formats (RTF, one book per
+  file, has only its Psalm); `test_samples.py` converts the samples end to end through the CLI and the wrapper
+  and reads the result with the reference TUI's `BibleStore`. `test_sources.py` covers folder and zip sources.
+  `test_collection.py` validates the committed databases in `bibles/`.
 - `.backlog/` (at the repository root) holds Backlog.md tasks; work is planned there.
 
 ## Commands
@@ -75,7 +83,7 @@ verification (`.agent/verification.json`) is intentionally disabled.
   working directory. An existing directory, trailing separator, or no file extension means directory;
   otherwise it is a full file path. `--name` with a full file path is an error. `--name` without an extension
   gets `.sqlite` appended.
-- A failed run must leave nothing behind: no database at the output path, no temporary file, and no directory
-  the run created.
+- A failed run must leave nothing behind: no database at the output path, no temporary file, no extracted zip
+  contents, and no directory the run created.
 - Validation is strict by default (66 books). `--allow-partial` only relaxes the book count, order and
   testament totals; every other check is unchanged.

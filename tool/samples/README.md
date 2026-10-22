@@ -1,7 +1,7 @@
 # Sample Bibles
 
 The same three books of the King James Version (Ruth, Jonah and 3 John: 3 books, 9 chapters, 147 verses) in
-each supported format. They are real files from eBible.org, cut down to three books, and the test suite
+each text format, plus the same books of the ASV as RTF. They are real files from eBible.org, cut down to three books, and the test suite
 (`tests/test_samples.py`) converts every one of them end to end.
 
 | File | Format | Where it comes from |
@@ -11,6 +11,13 @@ each supported format. They are real files from eBible.org, cut down to three bo
 | `kjv.usj` | USJ 3.1 | Generated from the same USFM files by usfm-grammar 3.2.1 (`USFMParser.to_usj`) |
 | `kjv.osis.xml` | OSIS 2.1.1 | eBible.org's OSIS export of `eng-kjv` (as mirrored in [open-bibles](https://github.com/seven1m/open-bibles) `eng-kjv.osis.xml`), with every other book `div` removed |
 | `kjv.vpl.txt` | VPL | eBible.org `eng-kjv_vpl.zip`: the `RUT`, `JON` and `3JO` lines of `eng-kjv_vpl.txt`, unchanged |
+
+`asv-rtf/` holds the same three books of the American Standard Version (1901) as RTF, one file per book:
+`RUT.rtf`, `JON.rtf` and `3JN.rtf`, copied unchanged from `release/USX_1/` of the bundle
+`American Standard Version of 1901 [eng] ASV.zip` (SHA-256
+`10bf3a168ed56ff189fc91e9874f56c035b4869b464cc87f3b2d5746df9233d1`), a Digital Bible Library style bundle whose
+`USX_1` folder holds RTF rather than USX. The test suite converts the folder, and a zip built from it, end to
+end. The ASV is in the public domain.
 
 The King James Version is in the public domain (outside the United Kingdom, where the Crown holds rights to it).
 eBible.org distributes these files as public domain.
@@ -35,4 +42,5 @@ tool/bin/bibles tool/samples/kjv.usx --allow-partial -o build/kjv-usx.sqlite
 tool/bin/bibles tool/samples/kjv.osis.xml --allow-partial -o build/
 tool/bin/bibles tool/samples/kjv.vpl.txt --allow-partial -o build/
 tool/bin/bibles tool/samples/kjv.usj --allow-partial -o build/kjv-usj.sqlite
+tool/bin/bibles tool/samples/asv-rtf/ --allow-partial -o build/asv-rtf.sqlite
 ```

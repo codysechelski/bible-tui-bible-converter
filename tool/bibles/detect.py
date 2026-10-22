@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-SUPPORTED_FORMATS = ("usfm", "usx", "osis", "vpl", "usj")
+SUPPORTED_FORMATS = ("usfm", "usx", "osis", "vpl", "usj", "rtf")
 
 EXTENSION_FORMATS = {
     ".usfm": "usfm",
@@ -22,6 +22,7 @@ EXTENSION_FORMATS = {
     ".osis": "osis",
     ".vpl": "vpl",
     ".usj": "usj",
+    ".rtf": "rtf",
 }
 
 # How much of the file the text and XML sniffers look at.
@@ -100,6 +101,8 @@ def sniff_content(path: Path) -> Optional[str]:
         head = file.read(SNIFF_BYTES)
     text = head.decode("utf-8-sig", errors="replace")
     start = text.lstrip()[:1]
+    if text.lstrip().startswith("{\\rtf"):
+        return "rtf"
     if start == "<":
         return _sniff_xml(text)
     if start in ("{", "["):

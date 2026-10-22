@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from bibles.books import book_for_osis, find_book, BOOKS, UnknownBookError
-from bibles.parsers import ParseError, parse_file
+from bibles.parsers import ParseError, parse_file, parse_files, rtf
 from bibles.parsers.osis import parse_osis_id
 
 PSALM_23_1 = "The LORD is my shepherd; I shall not want."
@@ -124,6 +124,18 @@ USJ = json.dumps({
         ]},
     ],
 })
+
+# RTF holds one book per file, so it has only the Psalm. The layout follows the ASV bundle's RTF files.
+RTF_HEADER = (r"{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\froman Times New Roman;}}"
+              r"{\stylesheet{\s0 Normal;}{\s2 heading 2;}{\s6 heading 6;}}{\info{\title Psalms}}" "\n")
+RTF = RTF_HEADER + r"""{\s2 \afs21{\b Psalms\par\pard\plain\hyphpar}\par\pard\plain\hyphpar} 123 {\par\pard\hyphpar }{\page }
+{\s2 \afs21{\b Psalms 23\par\pard\plain\hyphpar}\par\pard\plain\hyphpar}
+{\s6 \afs21{\b The Lord Is My Shepherd\par\pard\plain\hyphpar}\par\pard\plain\hyphpar}
+{A Psalm of David.\par\pard\plain\hyphpar}
+{{\b 1} The LORD is my shepherd;\par\pard\plain\hyphpar} {I shall not want.\par\pard\plain\hyphpar}
+{{\b 2} He makes me lie down in green pastures.\par\pard\plain\hyphpar}
+{He leads me beside still waters.\par\pard\plain\hyphpar}
+}"""
 
 SAMPLES = {"usfm": ("sample.usfm", USFM), "usx": ("sample.usx", USX), "osis": ("sample.xml", OSIS),
            "vpl": ("sample.txt", VPL), "usj": ("sample.json", USJ)}
@@ -416,6 +428,99 @@ class UsjTests(ParserTestCase):
             self.parse("usj", '{"type": "other"}')
         with self.assertRaisesRegex(ParseError, "no verses found"):
             self.parse("usj", '{"type": "USJ", "content": []}')
+
+
+class RtfTests(ParserTestCase):
+    def rtf(self, body: str, name: str = "PSA.rtf"):
+        return self.parse("rtf", RTF_HEADER + body + "}", name)
+
+    def test_psalm_matches_the_other_formats(self) -> None:
+        bible = self.parse("rtf", RTF, "PSA.rtf")
+        self.assertEqual([(v.reference, v.text) for v in bible.verses()], EXPECTED[:2])
+        self.assertEqual(bible.warnings, [])
+
+    def test_book_from_the_title_when_the_file_name_is_not_a_code(self) -> None:
+        bible = self.parse("rtf", RTF, "psalms of david.rtf")
+        self.assertEqual([v.reference for v in bible.verses()], ["PSA 23:1", "PSA 23:2"])
+
+    def test_book_outside_the_66_is_skipped(self) -> None:
+        body = r"{\s2 {\b Tobit\par}}{\s2 {\b Tobit 1\par}}{{\b 1} The book of the words of Tobit.\par}"
+        bible = rtf.parse(self.write("TOB.rtf", RTF_HEADER + body + "}"))
+        self.assertEqual(bible.books, [])
+        self.assertEqual(bible.warnings, ["skipped book TOB: not one of the 66 canonical books"])
+
+    def test_notes_acrostics_and_omitted_verses_are_left_out(self) -> None:
+        bible = self.rtf(
+            r"{\s2 {\b Psalms\par}}{\s2 {\b Psalms 1\par}}"
+            r"{{\b 1} One.\par}{\u1489? BETH.\par}{{\b 2} Two, {\b 3} * {\b 4} Four.\par}"
+            r"{{\b } {\b 1:3 }Many ancient authorities insert v. 3, {\i Three. }\par}{{\b 5} Five.\par}"
+        )
+        self.assertEqual([(v.reference, v.text) for v in bible.verses()],
+                         [("PSA 1:1", "One."), ("PSA 1:2", "Two,"), ("PSA 1:4", "Four."), ("PSA 1:5", "Five.")])
+        self.assertEqual(bible.warnings, ["PSA 1:3 has no text and was left out"])
+
+    def test_escapes_and_skipped_destinations(self) -> None:
+        bible = self.rtf(
+            r"{\s2 {\b Psalms\par}}{\s2 {\b Psalms 1\par}}"
+            r"{{\b 1} Naomi\u8217?s caf\'e9{\*\bkmkstart x}\~and\tab tea\uc0\u8212 ok\par}"
+        )
+        self.assertEqual([v.text for v in bible.verses()], ["Naomi\u2019s caf\u00e9\u00a0and tea\u2014ok"])
+
+    def test_adjacent_bold_numbers_are_separate_verses(self) -> None:
+        bible = self.rtf(r"{\s2 {\b Psalms\par}}{\s2 {\b Psalms 1\par}}{{\b 1} One. {\b 2}{\b 3} Three.\par}")
+        self.assertEqual([(v.reference, v.text) for v in bible.verses()], [("PSA 1:1", "One."), ("PSA 1:3", "Three.")])
+        self.assertEqual(bible.warnings, ["PSA 1:2 has no text and was left out"])
+
+    def test_section_heading_that_ends_in_a_number_is_not_a_chapter(self) -> None:
+        bible = self.rtf(r"{\s2 {\b Psalms\par}}{\s2 {\b Psalms 2\par}}{\s6 {\b Book 3\par}}{{\b 1} Why?\par}")
+        self.assertEqual([v.reference for v in bible.verses()], ["PSA 2:1"])
+
+    def test_one_chapter_book_without_a_chapter_heading(self) -> None:
+        bible = self.parse("rtf", RTF_HEADER + r"{{\b 1} The vision of Obadiah.\par}}", "OBA.rtf")
+        self.assertEqual([v.reference for v in bible.verses()], ["OBA 1:1"])
+
+    def test_malformed_documents(self) -> None:
+        with self.assertRaisesRegex(ParseError, "not an RTF document"):
+            self.parse("rtf", "plain text", "PSA.rtf")
+        with self.assertRaisesRegex(ParseError, r"PSA\.rtf: unbalanced '\{'"):
+            self.parse("rtf", r"{\rtf1 {{\b 1} text\par}", "PSA.rtf")
+        with self.assertRaisesRegex(ParseError, "no verses found"):
+            self.rtf(r"{\s2 {\b Psalms\par}}", "PSA.rtf")
+
+
+class ParseFilesTests(ParserTestCase):
+    def files(self, *items):
+        return [(self.write(name.replace("/", "_"), content), name) for name, content in items]
+
+    def test_books_from_several_files_are_merged_in_file_order(self) -> None:
+        jhn = "\\id JHN\n\\c 11\n\\p\n\\v 35 Jesus wept.\n"
+        bible = parse_files(self.files(("a/PSA.usfm", USFM.split("\\id JHN")[0]), ("a/JHN.usfm", jhn)), "usfm")
+        self.assertEqual([(v.reference, v.text) for v in bible.verses()], EXPECTED)
+
+    def test_identical_repeat_is_skipped_and_differing_copy_fails(self) -> None:
+        jhn = "\\id JHN\n\\c 11\n\\p\n\\v 35 Jesus wept.\n"
+        bible = parse_files(self.files(("one/JHN.usfm", jhn), ("two/JHN.usfm", jhn)), "usfm")
+        self.assertEqual(len(list(bible.verses())), 1)
+        self.assertEqual(bible.warnings,
+                         ["1 book in two repeats one with identical text and was skipped (JHN)"])
+        with self.assertRaisesRegex(ParseError, "JHN is in both one/JHN.usfm and two/JHN.usfm, and the copies differ"):
+            parse_files(self.files(("one/JHN.usfm", jhn), ("two/JHN.usfm", jhn.replace("wept", "cried"))), "usfm")
+
+    def test_file_without_canonical_books_is_allowed_but_not_alone(self) -> None:
+        tobit = "\\id TOB\n\\c 1\n\\p\n\\v 1 Tobit.\n"
+        jhn = "\\id JHN\n\\c 11\n\\p\n\\v 35 Jesus wept.\n"
+        bible = parse_files(self.files(("TOB.usfm", tobit), ("JHN.usfm", jhn)), "usfm")
+        self.assertEqual([v.reference for v in bible.verses()], ["JHN 11:35"])
+        self.assertIn("skipped book TOB: not one of the 66 canonical books", bible.warnings)
+        with self.assertRaisesRegex(ParseError, "no verses found in any of the 1 usfm files"):
+            parse_files(self.files(("TOB.usfm", tobit)), "usfm")
+
+    def test_errors_name_the_file_by_its_display_name(self) -> None:
+        files = self.files(("release/USX_1/JHN.usfm", "\\id JHN\n\\c 11\n\\v"))
+        with self.assertRaises(ParseError) as caught:
+            parse_files(files, "usfm")
+        self.assertIn("release/USX_1/JHN.usfm, line 3", str(caught.exception))
+        self.assertNotIn(str(self.tmp), str(caught.exception))
 
 
 class ParseFileTests(ParserTestCase):
