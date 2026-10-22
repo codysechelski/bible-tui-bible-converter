@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:39'
+updated_date: '2026-10-22 14:47'
 labels:
   - parsing
 dependencies:
@@ -25,12 +25,12 @@ Two details matter for correctness. A blank line means the verse was not present
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The parser reads a VPL file and produces normalized books, chapters and verses through the shared model
-- [ ] #2 References are parsed from a leading BOOK CHAPTER:VERSE token and from a leading BOOK.CHAPTER.VERSE token, and the book code resolves through the canonical book reference data
-- [ ] #3 A line that is not a verse reference is reported rather than silently dropped, so the run output makes the problem visible
-- [ ] #4 A blank line is treated as an absent verse and does not create an empty verse row
-- [ ] #5 A verse range is either expanded into its component verses or kept on the first verse, consistent with the policy written down in the normalization documentation
-- [ ] #6 Automated tests cover both reference forms, a blank line, a verse range and a line that is not a verse
+- [x] #1 The parser reads a VPL file and produces normalized books, chapters and verses through the shared model
+- [x] #2 References are parsed from a leading BOOK CHAPTER:VERSE token and from a leading BOOK.CHAPTER.VERSE token, and the book code resolves through the canonical book reference data
+- [x] #3 A line that is not a verse reference is reported rather than silently dropped, so the run output makes the problem visible
+- [x] #4 A blank line is treated as an absent verse and does not create an empty verse row
+- [x] #5 A verse range is either expanded into its component verses or kept on the first verse, consistent with the policy written down in the normalization documentation
+- [x] #6 Automated tests cover both reference forms, a blank line, a verse range and a line that is not a verse
 <!-- AC:END -->
 
 ## Definition of Done
@@ -55,3 +55,21 @@ Two details matter for correctness. A blank line means the verse was not present
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/parsers/vpl.py` and `find_book` in books.py (USFM code, OSIS code, canonical/common name, or eBible alias SOL/EZE/JOE/MAR/JOH/PHI/JAM/1JO/2JO/3JO, found in the real eBible VPL).
+
+- `BOOK C:V text` and `BOOK.C.V text`; ranges (`C:V-W`) are kept on the first verse; `<range>` lines and references with no text are absent verses; blank lines skipped.
+- Design decision (please review): a line that is not a verse reference is skipped and recorded in `Bible.warnings` (to be printed by the pipeline, TASK-014) rather than failing the run. Unknown book codes and duplicate verses are ParseErrors with the line number.
+- Detector (TASK-005) now also recognizes the dotted form.
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 110 tests OK (tests/test_parsers.py is new, incl. one passage in all five formats producing identical verses). Real-data smoke test (scratchpad, not committed): eBible.org World English Bible (engwebp) USFM, all 66 book files, parsed with 0 errors (31,098 verses, 5 warnings for verses WEB omits, e.g. ACT 8:37); the eBible VPL edition parsed to the same 31,098 references and wrote a 66-book / 1,189-chapter database through write_database. Text matched USFM except Psalm titles (\\d) and Song of Solomon speaker labels (\\sp), which eBible's VPL keeps and our policy drops, and one source-faithful spacing difference (PSA 68:32). eBible no longer serves USX/OSIS downloads at the usual URLs, so USX/OSIS/USJ are covered by fixtures only. Committed together in c0e1769 (shared core + cross-format test). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the VPL parser with range, blank-line and bad-line handling.
+<!-- SECTION:FINAL_SUMMARY:END -->
