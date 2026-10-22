@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:28'
+updated_date: '2026-10-22 14:30'
 labels:
   - core
 dependencies:
@@ -27,12 +27,12 @@ The schema stores one text column per verse with no place for headings, footnote
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 A shared in memory representation holds books, chapters and verses with book code, chapter number, verse number and verse text
-- [ ] #2 Normalization removes non verse content from verse text, including headings, section titles, book introductions, footnote and endnote markers, cross references and figure markers
-- [ ] #3 Poetry and paragraph lines within one verse are joined into a single verse text using a consistent documented separator
-- [ ] #4 Whitespace is normalized so that verse text has no leading or trailing whitespace, no doubled spaces and no stray newlines, and verse text is never empty
-- [ ] #5 The normalization rules are written down in the repository so the behaviour is discoverable without reading the code
-- [ ] #6 Automated tests cover the rules with representative snippets, including a verse split across poetry lines and a verse containing a footnote
+- [x] #1 A shared in memory representation holds books, chapters and verses with book code, chapter number, verse number and verse text
+- [x] #2 Normalization removes non verse content from verse text, including headings, section titles, book introductions, footnote and endnote markers, cross references and figure markers
+- [x] #3 Poetry and paragraph lines within one verse are joined into a single verse text using a consistent documented separator
+- [x] #4 Whitespace is normalized so that verse text has no leading or trailing whitespace, no doubled spaces and no stray newlines, and verse text is never empty
+- [x] #5 The normalization rules are written down in the repository so the behaviour is discoverable without reading the code
+- [x] #6 Automated tests cover the rules with representative snippets, including a verse split across poetry lines and a verse containing a footnote
 <!-- AC:END -->
 
 ## Definition of Done
@@ -57,3 +57,23 @@ The schema stores one text column per verse with no place for headings, footnote
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/model.py` (`Bible` -> `BibleBook` -> `Chapter` -> `Verse(book_code, chapter_number, verse_number, text)`; `Bible.add_verse(code, chapter, verse, fragments)` resolves the book, normalizes text, raises `DuplicateVerseError` on repeats) and `bibles/normalize.py` (`NON_VERSE_BLOCK_MARKERS`, `DROPPED_INLINE_MARKERS` shared by USFM/USX/USJ via USFM marker names; `OSIS_DROPPED_ELEMENTS`/`OSIS_DROPPED_DIV_TYPES`; `normalize_verse_text` joins fragments with a single space, collapses whitespace, raises `EmptyVerseError`). Rules documented in docs/normalization.md, linked from README.
+
+Design decisions (please review):
+- Separator between poetry/paragraph lines is a single space, matching the reference ESV db (which has no newlines in any verse).
+- Psalm superscriptions (\d) are treated as headings and dropped. The ESV reference db actually includes them (and even the section heading) in Ps 23:1, so this differs from the reference text; flip by removing "d" from NON_VERSE_BLOCK_MARKERS if you want them kept.
+- No-break spaces inside text are preserved; punctuation is never altered (no 'space before punctuation' cleanup, so French typography survives).
+- Markup stripping itself is per-parser (TASK-006..010); this task only fixes the vocabulary and the text rules, and its tests cover the post-strip snippets (footnote removal, poetry split).
+
+Verification: `python3 -m py_compile bibles/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 45 tests OK (10 new). DoD #7 N/A (no UI). No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the shared in-memory Bible model and verse text normalization rules, documented in docs/normalization.md.
+<!-- SECTION:FINAL_SUMMARY:END -->
