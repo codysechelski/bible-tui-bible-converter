@@ -3,7 +3,7 @@
 The rules are documented in `docs/normalization.md`. In short: parsers drop non verse blocks and
 inline content using the marker sets below, collect the remaining text of a verse as one fragment per
 line or paragraph, and pass the fragments to `normalize_verse_text`, which joins them with a single
-space and cleans up whitespace.
+space, removes paragraph marks and cleans up whitespace.
 """
 
 from __future__ import annotations
@@ -48,6 +48,11 @@ LINE_SEPARATOR = " "
 _COLLAPSIBLE_WHITESPACE = re.compile(r"[^\S   ]+")
 _LEVEL_SUFFIX = re.compile(r"\d+$")
 
+# Characters removed from verse text: the pilcrow `¶` that some editions (eBible.org's KJV) keep as a
+# paragraph mark at the start of a verse. It is layout, not verse text, and the OSIS export of the same
+# Bible already leaves it out.
+_REMOVED_CHARACTERS = re.compile("\u00b6")
+
 
 class EmptyVerseError(ValueError):
     """A verse whose text is empty after normalization."""
@@ -74,6 +79,7 @@ def normalize_verse_text(fragments: Union[str, Iterable[str]], location: str = "
     if isinstance(fragments, str):
         fragments = [fragments]
     text = LINE_SEPARATOR.join(fragments)
+    text = _REMOVED_CHARACTERS.sub("", text)
     text = _COLLAPSIBLE_WHITESPACE.sub(" ", text).strip()
     if not text:
         raise EmptyVerseError(f"{location} has no text after normalization")

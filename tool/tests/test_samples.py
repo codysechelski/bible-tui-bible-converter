@@ -150,6 +150,7 @@ class SampleConversionTests(unittest.TestCase):
                     self.assertEqual(text, " ".join(text.split()))
                     self.assertNotIn("\\", text)
                     self.assertNotIn("strong", text)
+                    self.assertNotIn("¶", text)
 
     def test_formats_from_the_same_source_have_identical_text(self) -> None:
         usfm = verse_map(self.databases["usfm"])

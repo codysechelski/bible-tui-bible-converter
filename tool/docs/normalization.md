@@ -70,12 +70,14 @@ newline or other marker is kept.
 
 becomes `He makes me lie down in green pastures. He leads me beside still waters.`
 
-## 3. Normalize whitespace
+## 3. Normalize whitespace and paragraph marks
 
 - Each run of whitespace (spaces, tabs, newlines and other Unicode spaces) becomes one space.
 - No-break spaces (U+00A0, U+2007, U+202F) inside the text are kept, because some translations use them
   on purpose, for example before French punctuation.
 - Leading and trailing whitespace is removed.
+- The pilcrow `¶`, which some editions (eBible.org's KJV) keep as a paragraph mark at the start of a
+  verse, is removed. It marks layout, not text.
 - Punctuation is not changed.
 
 ## 4. Verse numbering

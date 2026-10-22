@@ -39,6 +39,13 @@ class NormalizeVerseTextTests(unittest.TestCase):
         self.assertEqual(normalize_verse_text("Dieu ; il"), "Dieu ; il")
         self.assertEqual(normalize_verse_text(" amen "), "amen")
 
+    def test_paragraph_marks_are_removed(self) -> None:
+        # eBible.org's KJV: "\\v 6 ¶ And God said, ..."
+        self.assertEqual(normalize_verse_text("¶ And God said,"), "And God said,")
+        self.assertEqual(normalize_verse_text(["waters.", "¶ And"]), "waters. And")
+        with self.assertRaises(EmptyVerseError):
+            normalize_verse_text(" ¶ ")
+
     def test_empty_verse_raises_named_error(self) -> None:
         for fragments in ("", "  \n ", [], ["", "\t"]):
             with self.assertRaises(EmptyVerseError):

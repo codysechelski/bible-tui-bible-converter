@@ -48,7 +48,7 @@ Both copyright pages shipped in the zips (`copr.htm`) state the text is public d
 Notes on the content:
 
 - The KJV zip also holds the Apocrypha and front matter; those books are skipped, leaving the 66. The `¶`
-  paragraph marks that eBible.org keeps in the text are kept.
+  paragraph marks that eBible.org keeps at the start of some verses are removed.
 - The ASV leaves out 16 New Testament verses that later manuscripts add (Matthew 17:21, Acts 8:37 and others).
   They are absent rather than empty, so validation warns about the verse gaps and the totals.
 

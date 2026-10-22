@@ -28,7 +28,8 @@ USFM, USX and USJ come from the same source and produce identical verse text. Th
 eBible.org's own exports and differ in their text, not in their markup:
 
 - The OSIS file is a slightly different KJV edition (for example `Bethlehemjudah` instead of
-  `Beth-lehem-judah`) and leaves out the paragraph mark `¶` that begins some verses.
+  `Beth-lehem-judah`). It also leaves out the paragraph mark `¶` that begins some verses in the other files;
+  the converter removes that mark anyway, so it makes no difference to the output.
 - The VPL file marks words the translators added with brackets (`the man [was] Elimelech`), where the other
   formats use the `\add` marker, whose text is kept without brackets.
 
