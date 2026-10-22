@@ -1,10 +1,11 @@
 ---
 id: TASK-003
 title: Shared verse model and text normalization rules
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:10'
+updated_date: '2026-10-22 14:28'
 labels:
   - core
 dependencies:
