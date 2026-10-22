@@ -13,6 +13,9 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 
 - `bibles/` is the Python package. `bibles/cli.py` holds argument parsing and output path resolution;
   `bibles/__main__.py` makes `python3 -m bibles` work.
+- `bibles/books.py` is the single source of truth for the 66 canonical books (USFM code, names, slug,
+  testament, sort order, chapter count). Parsers resolve books with `book_for_code`, which raises
+  `UnknownBookError` for any code outside the 66 (deuterocanonical books included).
 - `bin/bibles` is a bash wrapper that runs the package from any directory.
 - `tests/` contains `unittest` tests.
 - `.backlog/` holds Backlog.md tasks; work is planned there.
