@@ -1,45 +1,59 @@
 # bibles
 
-> **Status:** early scaffold. The command line surface is in place, but no input format is parsed yet and
-> no database is written. Full documentation is tracked in TASK-013.
+`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL or USJ) into a SQLite database that the custom
+Bible terminal UI can read. The database uses exactly the schema of the reference project
+(`bible-esv/bible_esv.sqlite`), so the TUI opens it without changes.
 
-`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL or USJ) into a SQLite database that the
-custom Bible terminal UI can read. It is Python 3 and standard library only, so it runs anywhere the TUI does.
+It is Python 3.9+ and standard library only, so it runs anywhere the TUI does.
+
+## Quick start
+
+```sh
+./bin/bibles kjv.usfm                       # writes ./kjv.sqlite
+./bin/bibles --validate kjv.sqlite          # checks an existing database
+python3 -m bibles kjv.usfm                  # the same, from the repository root
+```
+
+A run reports each stage:
+
+```
+Source: kjv.usfm
+Format: usfm (detected from content)
+Parser: bibles.parsers.usfm
+Warning: skipped book TOB: not one of the 66 canonical books
+Validating: /home/me/kjv.sqlite
+  PASS  Schema tables: metadata, books, chapters, verses
+  PASS  SQLite integrity: ok
+  ...
+Validation passed: 15 checks, 0 failed, 0 warnings
+Output: /home/me/kjv.sqlite
+Wrote 66 books, 1189 chapters and 31102 verses (version kjv)
+```
 
 ## Usage
 
 ```sh
-./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj}]
-# or, from the repository root
-python3 -m bibles SOURCE ...
+./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj}] [--allow-partial]
+./bin/bibles --validate DATABASE [--allow-partial]
 ```
 
 | Option | Meaning |
 | --- | --- |
-| `SOURCE` | Path to the source Bible file (required). |
+| `SOURCE` | Path to the source Bible file (required). With `--validate`, the database to check. |
 | `-o, --output` | Output directory or full output file path. Defaults to the current working directory. |
-| `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`. `.sqlite` is appended when the name has no extension. |
-| `-f, --format` | Force a specific input format instead of detecting it (`usfm`, `usx`, `osis`, `vpl`, `usj`). |
-| `--validate` | Validate an existing database (`SOURCE`) instead of converting. |
+| `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`; `.sqlite` is appended when the name has no extension. |
+| `-f, --format` | Force a format instead of detecting it: `usfm`, `usx`, `osis`, `vpl` or `usj`. |
+| `--allow-partial` | Accept a Bible with fewer than 66 books (a New Testament, or a sample). Missing books become a warning. |
+| `--validate` | Validate an existing database instead of converting. Cannot be combined with `-o`, `-n` or `-f`. |
+| `--version`, `-h` | Print the version or the help. |
 
 How `--output` is interpreted:
 
-- An existing directory, a path ending in `/`, or a path without a file extension is a **directory**; the
-  file name is placed inside it. Missing directories are created.
+- An existing directory, a path ending in `/`, or a path without a file extension is a **directory**; the file
+  name is placed inside it. Missing directories are created (and removed again if the run fails).
 - Anything else (for example `build/kjv.db`) is a **full file path** and is used directly. `--name` cannot be
   combined with a full file path.
-
-How the input format is detected:
-
-- The file content is checked first and always wins over the extension: an XML root of `<usx>` is USX and
-  `<osis>` is OSIS, a JSON object with `"type": "USJ"` is USJ, a line starting with a USFM marker such as `\id`,
-  `\c` or `\v` is USFM, and lines starting with a reference such as `Gen 1:1` are VPL.
-- If the content is inconclusive, a format-specific extension (`.usfm`, `.sfm`, `.usx`, `.osis`, `.vpl`, `.usj`)
-  is used. `.xml`, `.json` and `.txt` say nothing on their own.
-- Otherwise the run fails with exit status 1 and lists the supported formats. Use `--format` to override
-  detection; the output shows whether the format was detected or forced.
-
-Examples:
+- An existing output file is replaced, but only once the new database has been written and validated.
 
 ```sh
 ./bin/bibles kjv.usfm                      # ./kjv.sqlite
@@ -48,29 +62,139 @@ Examples:
 ./bin/bibles kjv.usfm -o build/bible.db    # ./build/bible.db
 ```
 
-Running with no arguments prints usage and exits with status 2; a successful run exits with status 0.
+Exit status: 0 on success (warnings allowed), 1 when the conversion or validation fails, 2 for a usage error
+or no arguments. A failure names its stage (`detect`, `parse`, `write` or `validate`), and no database is left
+at the output path.
 
-## Validating a database
+## Examples for each format
+
+The [`samples/`](samples/README.md) directory has the same three KJV books in every format. They hold 3 books
+rather than 66, hence `--allow-partial`; a whole Bible needs no flag.
 
 ```sh
-./bin/bibles --validate bible.sqlite
+./bin/bibles samples/kjv.usfm     --allow-partial -o build/kjv-usfm.sqlite   # USFM
+./bin/bibles samples/kjv.usx      --allow-partial -o build/kjv-usx.sqlite    # USX
+./bin/bibles samples/kjv.osis.xml --allow-partial -o build/kjv-osis.sqlite   # OSIS
+./bin/bibles samples/kjv.vpl.txt  --allow-partial -o build/kjv-vpl.sqlite    # VPL
+./bin/bibles samples/kjv.usj      --allow-partial -o build/kjv-usj.sqlite    # USJ
 ```
 
-Runs every check (integrity, foreign keys, 66 books in canonical order, contiguous chapters, duplicate and
-empty verses, and more), lists each result, and exits 1 if any check fails. Conversions run the same checks
-before writing. See [validation](docs/validation.md).
+eBible.org ships USFM as one file per book. Concatenate the files into one source; front matter, glossaries and
+the Apocrypha are skipped with a warning:
+
+```sh
+cat eng-kjv_usfm/*.usfm > kjv.usfm
+./bin/bibles kjv.usfm
+```
+
+## Supported formats
+
+| Format | Typical files | What is read |
+| --- | --- | --- |
+| [USFM](https://ubsicap.github.io/usfm/) | `.usfm`, `.sfm` | `\id` starts a book, `\c` a chapter, `\v` a verse; the verse runs until the next verse, chapter or book. Several books may follow each other in one file. |
+| [USX](https://ubsicap.github.io/usx/) | `.usx`, `.xml` | A `<usx>` document: `<book code>`, `<chapter number>` / `sid`, `<verse number>` / `sid`, with `eid` end milestones. USX 2 and 3. |
+| [OSIS](https://crosswire.org/osis/) | `.osis`, `.xml` | Verse elements identified by `osisID` (`Gen.1.1`), as containers or `sID`/`eID` milestones, in any namespace. Version name from the header. |
+| VPL | `.vpl`, `.txt` | One verse per line: `GEN 1:1 text` or `GEN.1.1 text`. The book may be a USFM code, an OSIS code, a book name or an eBible.org code (`SOL`, `JOH`, ...). |
+| [USJ](https://docs.usfm.bible/usfm/latest/usj/) | `.usj`, `.json` | A JSON object with `"type": "USJ"` whose `content` holds book, chapter, verse, para, char and note nodes. |
+
+### Format detection
+
+The content is checked first and always wins over the extension:
+
+- an XML root of `<usx>` is USX, and `<osis>` (or `<osisText>`, any namespace) is OSIS;
+- a JSON object with `"type": "USJ"` is USJ;
+- a line starting with a USFM marker such as `\id`, `\c` or `\v` is USFM;
+- lines starting with a reference such as `Gen 1:1` or `GEN.1.1` are VPL.
+
+If the content is inconclusive, a format-specific extension (`.usfm`, `.sfm`, `.usx`, `.osis`, `.vpl`, `.usj`) is
+used; `.xml`, `.json` and `.txt` say nothing on their own. Otherwise the run fails, listing the supported
+formats. Use `--format` to force a format when detection guesses wrong; the output then says
+`Format: usx (forced with --format)`.
+
+### Known limitations
+
+- **All formats.** Only the 66 books of the Protestant canon are written; any other book (Apocrypha,
+  front matter, glossary) is skipped with a warning. A verse range is stored on its first verse and the later
+  verses are absent. A verse a translation omits is left out with a warning. The whole source is read into
+  memory, which is fine for a Bible (a full USJ Bible is about 40 MB).
+- **USFM.** Psalm titles (`\d`), speaker labels (`\sp`) and acrostic letters (`\qa`) are dropped as headings. A
+  file that is not UTF-8 is read as Windows-1252 (or Latin-1) with a warning; the `\ide` marker is not used.
+  Peripheral and sidebar content (`\periph`, `\esb`) is skipped.
+- **USX.** The same text rules as USFM. One document per run; to convert several book files, combine their
+  contents under one `<usx>` root. Sidebars, peripherals and milestones are skipped.
+- **OSIS.** Only text inside a verse element is kept, so Psalm titles (`<title type="psalm">`), headings and
+  introductions are dropped. An `osisID` naming several verses uses the first.
+- **VPL.** VPL is already rendered text, so any decoration in the file stays in the verse (eBible.org's KJV
+  writes added words as `[was]`). A line that is not a verse reference is skipped with a warning; a line with
+  no text, or a `<range>` marker, is an absent verse.
+- **USJ.** Must be UTF-8 JSON. Both `marker` (the USJ specification) and `mark` are accepted.
+
+## Verse text
+
+The schema stores one plain text column per verse, so every parser applies the same rules (see
+[normalization](docs/normalization.md) for the full list):
+
+- Headings, titles, book introductions, footnotes, endnotes, cross references and figures are removed.
+- Character formatting (`\nd LORD\nd*`, `<char style="wj">`, `<w>`) keeps its text and loses its markup; word
+  attributes such as Strong's numbers are dropped.
+- Poetry lines and paragraphs within a verse are joined with a single space.
+- Whitespace is collapsed to single spaces and trimmed; no-break spaces inside the text are kept. Punctuation
+  is never changed. No verse is ever empty.
+
+Because USFM, USX and USJ share one marker handler, the same Bible in those formats produces identical text;
+the test suite checks this with real files.
+
+## Output schema
+
+The database matches the reference schema exactly (a test compares the two):
+
+| Table | Columns | Notes |
+| --- | --- | --- |
+| `metadata` | `key TEXT PRIMARY KEY`, `value TEXT NOT NULL` | One row per key, listed below. |
+| `books` | `id INTEGER PRIMARY KEY`, `sort_order INTEGER NOT NULL UNIQUE`, `canonical_name TEXT NOT NULL UNIQUE`, `common_name TEXT NOT NULL`, `slug TEXT NOT NULL UNIQUE`, `testament TEXT NOT NULL CHECK (testament IN ('old', 'new'))` | `id` equals `sort_order` (1 to 66; Old Testament 1 to 39). `canonical_name` is for example `I Samuel`, `common_name` `1 Samuel`, `slug` `1-samuel`. |
+| `chapters` | `id INTEGER PRIMARY KEY`, `book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE`, `chapter_number INTEGER NOT NULL` | `UNIQUE (book_id, chapter_number)`. Numbered from 1 with no gaps. |
+| `verses` | `id INTEGER PRIMARY KEY`, `book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE`, `chapter_id INTEGER NOT NULL REFERENCES chapters(id) ON DELETE CASCADE`, `chapter_number INTEGER NOT NULL`, `verse_number INTEGER NOT NULL`, `text TEXT NOT NULL` | `UNIQUE (book_id, chapter_number, verse_number)`. `chapter_number` repeats the chapter row's number for direct lookups. |
+
+Relationships: each chapter belongs to a book; each verse belongs to a book and a chapter, and deleting a book
+or chapter deletes its rows. Indexes: `idx_books_testament_order (testament, sort_order)`,
+`idx_chapters_book_number (book_id, chapter_number)`,
+`idx_verses_book_chapter_verse (book_id, chapter_number, verse_number)` and
+`idx_verses_chapter_number (chapter_id, verse_number)`.
+
+Metadata keys:
+
+| Key | Value |
+| --- | --- |
+| `version` | Short version name from the source (OSIS `osisIDWork`), otherwise the source file name without its extension. The TUI shows it. |
+| `version_name` | Full version name from the source (OSIS work title), otherwise `version`. |
+| `source` | Source file name and format, for example `kjv.usfm (usfm)`. |
+| `created_at_utc` | When the database was written, ISO 8601 in UTC, for example `2026-10-22T14:30:05+00:00`. |
+| `book_count`, `chapter_count`, `verse_count` | The number of rows written. |
+
+## Validation
+
+Every conversion validates the database before moving it into place, and `--validate` checks an existing one:
+SQLite integrity, foreign keys, metadata, 66 books in canonical order with the right names and testaments,
+contiguous chapters, chapters with verses, duplicate and empty verses, and verse to chapter links fail; verse
+gaps, unusual chapter counts and totals different from the reference only warn. Every check is listed with its
+result. See [validation](docs/validation.md).
 
 ## Documentation
 
-- [Verse text normalization](docs/normalization.md): how headings, notes, poetry lines and whitespace are
-  handled so every input format produces the same verse text.
+- [Verse text normalization](docs/normalization.md): how headings, notes, poetry lines, whitespace, verse
+  ranges and absent verses are handled.
 - [Database validation](docs/validation.md): every check, and which ones fail or only warn.
+- [Samples](samples/README.md): where the sample files come from and how they differ.
+- [AGENTS.md](AGENTS.md): conventions and commands for contributors and coding agents.
 
 ## Development
 
 Requires Python 3.9 or newer (developed on 3.12). No third-party packages.
 
 ```sh
-python3 -m unittest discover -s tests -t .   # run the test suite
-python3 -m py_compile bibles/*.py tests/*.py # syntax check
+python3 -m unittest discover -s tests -t .                  # run the test suite
+python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py  # syntax check
 ```
+
+Some tests compare against the reference project at `../bible-esv` (`bible_esv.sqlite` and `tui/bible_tui.py`);
+they are skipped when it is not present.

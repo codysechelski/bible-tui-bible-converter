@@ -7,42 +7,49 @@ SQLite database for the custom Bible terminal UI.
 
 The reference project at `/Users/codysechelski/Developer/Projects/bible-esv` (read-only) defines the output
 schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and the consuming TUI
-(`tui/bible_tui.py`).
+(`tui/bible_tui.py`). Schema parity is enforced by tests that read it (`tests/test_writer.py`,
+`tests/test_samples.py`); they skip when the project is absent.
 
 ## Repository Map
 
-- `bibles/` is the Python package. `bibles/cli.py` holds argument parsing and output path resolution;
-  `bibles/__main__.py` makes `python3 -m bibles` work.
-- `bibles/books.py` is the single source of truth for the 66 canonical books (USFM code, names, slug,
-  testament, sort order, chapter count). Parsers resolve books with `book_for_code`, which raises
-  `UnknownBookError` for any code outside the 66 (deuterocanonical books included).
-- `bibles/model.py` holds the in-memory `Bible` every parser builds; parsers add verses with
-  `Bible.add_verse`, which applies the shared text rules in `bibles/normalize.py`. Those rules are documented in
-  `docs/normalization.md`; keep the doc and the marker sets in sync.
-- `bibles/writer.py` writes a `Bible` to SQLite with `write_database`. `SCHEMA` is copied from the reference
-  project and a test compares it with `bible_esv.sqlite`; never change it on its own. The database is built in a
-  temporary file beside the output, validated, and moved into place only when complete and valid. Book ids
-  equal sort order. Tests that write partial Bibles pass `validate=False`.
-- `bibles/validate.py` runs every check and returns a `ValidationReport` (pass/warn/fail per check); verse gaps
-  and unusual chapter counts only warn. `bibles --validate DB` prints it. Checks are listed in `docs/validation.md`.
+- `bibles/cli.py` holds argument parsing, output path resolution and the output of a run; `bibles/__main__.py`
+  makes `python3 -m bibles` work. `bin/bibles` is a bash wrapper that runs the package from any directory.
+- `bibles/pipeline.py` is the conversion: `convert()` runs detect, parse (which normalizes), write and validate,
+  and raises `ConversionError` whose `stage` names the failing stage.
+- `bibles/books.py` is the single source of truth for the 66 canonical books (USFM and OSIS codes, names, slug,
+  testament, sort order, chapter count). `book_for_code` is strict USFM; `book_for_osis` and `find_book` (VPL)
+  accept more spellings. Codes outside the 66 raise `UnknownBookError`; the parsers catch it and skip the book
+  with a warning (`VerseCollector.skip_book`).
 - `bibles/detect.py` owns `SUPPORTED_FORMATS` and `detect_format`: content sniffing wins over the extension,
-  format-specific extensions are a fallback, `--format` bypasses detection. The CLI turns
-  `FormatDetectionError` into a `CliError`.
+  format-specific extensions are a fallback, `--format` bypasses detection.
 - `bibles/parsers/` has one module per format, registered in `PARSERS`; `parse_file(path, format)` returns a
   `Bible` or raises `ParseError`. USFM, USX and USJ translate their input into the events of
   `parsers/markers.py` (`MarkerEvents`), which applies the shared rules; OSIS and VPL feed `VerseCollector`
   (`parsers/base.py`) directly. Fix text handling in the shared layer, not in one front end, so the formats stay
-  identical (`tests/test_parsers.py` checks one passage in all five formats).
+  identical.
+- `bibles/model.py` holds the in-memory `Bible` (books, chapters, verses, version, warnings); verses are added
+  with `Bible.add_verse`, which applies `bibles/normalize.py`. The rules are documented in
+  `docs/normalization.md`; keep the doc and the marker sets in sync.
+- `bibles/writer.py` writes a `Bible` with `write_database`. `SCHEMA` is copied from the reference project; never
+  change it on its own. The database is built in a temporary file beside the output, validated, and moved into
+  place only when complete and valid. Book ids equal sort order. Tests that write partial Bibles pass
+  `validate=False` or `allow_partial=True`.
+- `bibles/validate.py` runs every check and returns a `ValidationReport` (pass/warn/fail per check). Checks are
+  listed in `docs/validation.md`.
+- `samples/` holds real KJV excerpts (Ruth, Jonah, 3 John) in all five formats; `samples/README.md` records
+  where each came from. Regenerate them the same way rather than hand-editing.
 - `docs/` holds Markdown documentation, linked from the README.
-- `bin/bibles` is a bash wrapper that runs the package from any directory.
-- `tests/` contains `unittest` tests.
+- `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all five formats;
+  `test_samples.py` converts the samples end to end through the CLI and the wrapper and reads the result with
+  the reference TUI's `BibleStore`.
 - `.backlog/` holds Backlog.md tasks; work is planned there.
 
 ## Commands
 
-- Run the CLI: `./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f FORMAT]`
+- Convert: `./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f FORMAT] [--allow-partial]`
+- Validate an existing database: `./bin/bibles --validate DATABASE [--allow-partial]`
 - Run tests: `python3 -m unittest discover -s tests -t .`
-- Syntax check: `python3 -m py_compile bibles/*.py tests/*.py`
+- Syntax check: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py`
 
 No linter or formatter is installed; `py_compile` plus the test suite is the static check. Automated
 verification (`.agent/verification.json`) is intentionally disabled.
@@ -52,10 +59,11 @@ verification (`.agent/verification.json`) is intentionally disabled.
 - Python 3 standard library only, matching the reference project. Keep it compatible with Python 3.9+
   (`from __future__ import annotations`, `typing.Optional`).
 - `main(argv)` returns an exit code instead of calling `sys.exit`, so tests can call it directly. User-facing
-  failures raise `CliError` and exit 1; argparse usage errors and a bare invocation exit 2.
+  failures raise `CliError` or `ConversionError` and exit 1; argparse usage errors and a bare invocation exit 2.
 - `--output` resolution: existing directory, trailing separator, or no file extension means directory;
   otherwise it is a full file path. `--name` with a full file path is an error. `--name` without an extension
   gets `.sqlite` appended.
-- The CLI currently resolves the output path and creates its parent directory, but does not write a database.
-  The conversion pipeline (TASK-014) wires parsers to `write_database`, which already guarantees no partial or
-  empty database is left behind on failure.
+- A failed run must leave nothing behind: no database at the output path, no temporary file, and no directory
+  the run created.
+- Validation is strict by default (66 books). `--allow-partial` only relaxes the book count, order and
+  testament totals; every other check is unchanged.

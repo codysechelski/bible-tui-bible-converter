@@ -14,6 +14,10 @@ in `bibles/validate.py` and follow the reference project's `tools/build_sqlite.p
   It exits 0 when every check passes or only warns, and 1 when any check fails. `--output`, `--name` and
   `--format` cannot be combined with `--validate`.
 
+- **Partial Bibles.** With `--allow-partial` (for conversions and `--validate`), a database with fewer than 66
+  books passes: the book count becomes a warning, and the 1..66 sort order and 39/27 testament totals are not
+  required. Each book must still have the right names, slug and testament, and every other check is unchanged.
+
 Every check runs and is listed with its result, for example:
 
 ```
@@ -34,7 +38,7 @@ Validation passed: 15 checks, 0 failed, 2 warnings
 | SQLite integrity | `PRAGMA integrity_check` is not `ok` | |
 | Foreign keys | `PRAGMA foreign_key_check` reports a violation | |
 | Metadata | a required key (`version`, `version_name`, `source`, `created_at_utc`, `book_count`, `chapter_count`, `verse_count`) is missing or blank | |
-| Book count | there are not exactly 66 books | |
+| Book count | there are not exactly 66 books | there are fewer than 66 books and `--allow-partial` is given |
 | Book order and names | sort order is not 1..66, or a book's canonical name, common name or slug differs from `bibles/books.py` | |
 | Testament split | the split is not 39 old / 27 new, or a book has the wrong testament | |
 | Chapter numbering | a book's chapters do not run from 1 with no gaps | |

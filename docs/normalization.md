@@ -87,5 +87,7 @@ becomes `He makes me lie down in green pastures. He leads me beside still waters
 - `Bible.add_verse` raises `EmptyVerseError` for an empty verse, naming it (for example `JHN 11:35`); the
   parsers avoid this by leaving absent verses out as described above. The tool never writes an empty verse.
 - Adding the same book, chapter and verse twice raises `DuplicateVerseError`.
-- A book code outside the 66 canonical books raises `UnknownBookError` (see `bibles/books.py`).
+- A book outside the 66 canonical books (Apocrypha, front matter, glossary) is skipped with a warning such as
+  `skipped book TOB: not one of the 66 canonical books`; `bibles/books.py` raises `UnknownBookError` and the
+  parsers catch it.
 - Parsers raise `ParseError` naming the file and, for USFM and VPL, the line.
