@@ -27,7 +27,7 @@ out which one you have.
 translation, and on its page download the file in the **USFM** row (for example `eng-web_usfm.zip` for the
 World English Bible).
 
-[open.bible](https://www.open.bible/bibles) is another usefule source.
+[open.bible](https://www.open.bible/bibles) is another great source for open Bibles.
 
 Keep the file zipped; the tool reads the zip directly. An unzipped folder works too.
 
