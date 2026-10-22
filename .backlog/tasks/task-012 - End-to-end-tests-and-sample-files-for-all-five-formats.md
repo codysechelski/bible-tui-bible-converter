@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:58'
+updated_date: '2026-10-22 15:10'
 labels:
   - testing
 dependencies:
@@ -30,12 +30,12 @@ The tests need real sample files, one per format, for the same translation so th
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The repository contains a small sample file for each of the five supported formats, covering the same translation
-- [ ] #2 Each sample converts to a database whose schema matches the reference schema and whose books, chapters and verses match the expected content of that sample
-- [ ] #3 Converting the same Bible expressed in two different formats yields identical verse text for the references they share
-- [ ] #4 The command line path is exercised end to end, covering the default output file name, an explicit output file name, an explicit output directory, and a failure case such as a missing input file or an unsupported format, each with the expected exit status
-- [ ] #5 A generated database can be opened and read by the queries the reference terminal UI uses, joining books, chapters and verses, without error
-- [ ] #6 The command that runs the test suite is documented in the repository
+- [x] #1 The repository contains a small sample file for each of the five supported formats, covering the same translation
+- [x] #2 Each sample converts to a database whose schema matches the reference schema and whose books, chapters and verses match the expected content of that sample
+- [x] #3 Converting the same Bible expressed in two different formats yields identical verse text for the references they share
+- [x] #4 The command line path is exercised end to end, covering the default output file name, an explicit output file name, an explicit output directory, and a failure case such as a missing input file or an unsupported format, each with the expected exit status
+- [x] #5 A generated database can be opened and read by the queries the reference terminal UI uses, joining books, chapters and verses, without error
+- [x] #6 The command that runs the test suite is documented in the repository
 <!-- AC:END -->
 
 ## Definition of Done
@@ -60,3 +60,21 @@ The tests need real sample files, one per format, for the same translation so th
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `samples/` with Ruth, Jonah and 3 John (3 books, 9 chapters, 147 verses) of the KJV in all five formats, all real eBible.org material: USFM = eBible's three book files unchanged; USX/USJ = usfm-grammar 3.2.1 conversions of those files (independent converter, used only to generate the samples, not a dependency); OSIS = eBible's eng-kjv OSIS (via the open-bibles mirror) with other books removed; VPL = eBible's lines unchanged. Provenance, licence (public domain) and expected differences in samples/README.md.
+
+`tests/test_samples.py` (18 tests): every sample converts through the CLI with its format detected; schema equals the reference db; books, per-chapter verse counts and spot texts match; USFM, USX and USJ produce identical text for all 147 verses; OSIS and VPL share every reference; footnotes do not leak; strict validation fails and --allow-partial passes; the reference TUI's own BibleStore (imported from bible-esv/tui/bible_tui.py) and copies of its queries read the database; the bin/bibles wrapper covers default name, -n, -o dir, -o file, missing input (1), unsupported --format (2), undetectable input (1) and strict validation failure (1), each leaving nothing behind.
+
+Note (please review): the samples are 3 whole books, so converting them needs --allow-partial (added in TASK-014). AC #3 identical-text comparison is USFM vs USX vs USJ; eBible's OSIS and VPL are separate exports whose text differs by edition/brackets, so they are compared on references only. Test command documented in README and AGENTS.md.
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 160 tests OK; all files parse with the Python 3.9 grammar (only 3.12 is installed, so 3.9 was not run). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added real KJV samples in all five formats and end-to-end tests through the CLI, wrapper and reference TUI.
+<!-- SECTION:FINAL_SUMMARY:END -->
