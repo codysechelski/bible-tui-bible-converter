@@ -13,7 +13,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv/tools/build_sqlite.py
 priority: medium
 type: feature
-ordinal: 11000
+ordinal: 11
 ---
 
 ## Description
