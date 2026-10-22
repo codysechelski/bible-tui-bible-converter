@@ -1,9 +1,11 @@
 ---
 id: TASK-002
 title: Canonical 66-book reference data
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:08'
+updated_date: '2026-10-22 14:26'
 labels:
   - core
 dependencies: []
