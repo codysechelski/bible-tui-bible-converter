@@ -16,7 +16,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv/bible_esv.sqlite
 priority: high
 type: feature
-ordinal: 4000
+ordinal: 4
 ---
 
 ## Description
