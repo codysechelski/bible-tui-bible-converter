@@ -1,11 +1,11 @@
 ---
 id: TASK-003
 title: Shared verse model and text normalization rules
-status: Ready for Testing
+status: Done
 assignee:
   - '@cody'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:30'
+updated_date: '2026-10-22 14:42'
 labels:
   - core
 dependencies:
@@ -14,7 +14,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: high
 type: feature
-ordinal: 3
+ordinal: 250
 ---
 
 ## Description
