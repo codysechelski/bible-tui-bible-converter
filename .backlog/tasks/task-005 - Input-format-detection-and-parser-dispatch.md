@@ -4,18 +4,11 @@ title: Input format detection and parser dispatch
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:10'
+updated_date: '2026-10-22 14:11'
 labels:
   - cli
   - parsing
-dependencies:
-  - TASK-001
-  - TASK-003
-  - TASK-006
-  - TASK-007
-  - TASK-008
-  - TASK-009
-  - TASK-010
+dependencies: []
 priority: high
 type: feature
 ordinal: 5000
