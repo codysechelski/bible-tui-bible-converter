@@ -1,10 +1,11 @@
 ---
 id: TASK-012
 title: End to end tests and sample files for all five formats
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:12'
+updated_date: '2026-10-22 14:58'
 labels:
   - testing
 dependencies:
