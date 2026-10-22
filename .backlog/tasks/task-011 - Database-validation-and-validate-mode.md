@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:48'
+updated_date: '2026-10-22 14:51'
 labels:
   - validation
 dependencies:
@@ -27,11 +27,11 @@ The reference project validates its database thoroughly before shipping it: an i
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Validation runs automatically at the end of every conversion and reports any problem it finds
-- [ ] #2 Checks cover SQLite integrity, foreign keys, a book count of 66 with contiguous sort order and the correct testament split, contiguous chapter and verse numbering within each book, no duplicate book chapter verse references, and no empty verse text
-- [ ] #3 A translation that legitimately omits verses is reported as a warning rather than a failure, and the totals from the reference project are used as a sanity check only
-- [ ] #4 A validate mode accepts the path to an existing database, validates it without converting anything, and exits with a non zero status when validation fails
-- [ ] #5 Validation output lists every check that was performed together with its result
+- [x] #1 Validation runs automatically at the end of every conversion and reports any problem it finds
+- [x] #2 Checks cover SQLite integrity, foreign keys, a book count of 66 with contiguous sort order and the correct testament split, contiguous chapter and verse numbering within each book, no duplicate book chapter verse references, and no empty verse text
+- [x] #3 A translation that legitimately omits verses is reported as a warning rather than a failure, and the totals from the reference project are used as a sanity check only
+- [x] #4 A validate mode accepts the path to an existing database, validates it without converting anything, and exits with a non zero status when validation fails
+- [x] #5 Validation output lists every check that was performed together with its result
 <!-- AC:END -->
 
 ## Definition of Done
@@ -56,3 +56,26 @@ The reference project validates its database thoroughly before shipping it: an i
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/validate.py` (`validate_database(path) -> ValidationReport`, `require_valid`, `DatabaseValidationError`) and `bibles --validate DB` (exit 0 pass/warn, 1 fail, 2 when combined with -o/-n/-f). Checks documented in docs/validation.md, linked from README.
+
+- Validation runs inside `write_database` on the temporary file before `os.replace`, so a failing database never reaches the output path. `write_database` now returns `WriteResult(metadata, validation)`; the pipeline (TASK-014) should print `result.validation.lines()` and catch `DatabaseValidationError` (its `.report` has every check).
+- 15 checks, all run and listed; a missing table stops early.
+
+Design decisions (please review):
+- Fail: integrity, FK, required metadata, book count != 66, book order/names/slugs differ from books.py, testament split, chapter gaps, chapters with no verses, duplicates, verse/chapter mismatch, empty text.
+- Warn only: verse gaps (omitted verses, ranges), chapter count differing from the usual count (Hebrew versification: Joel 4, Malachi 3), totals differing from the ESV reference (1189/31104).
+- A Bible missing books (e.g. NT-only) FAILS validation and therefore is not written. This follows AC #2 but blocks NT-only translations; relaxing it to a warning would need the writer to keep book ids = sort order (it already does).
+- Missing verses at the end of a chapter cannot be detected (no per-chapter verse counts in the reference data), e.g. WEB's ROM 16:25-27.
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 134 tests OK (24 new). Manual: `./bin/bibles --validate bible-esv/bible_esv.sqlite` -> 15 PASS, exit 0; on the real WEB database built from eBible VPL -> pass with 2 warnings (4 omitted verses; totals 31098 vs 31104); on README.md -> FAIL, exit 1. DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added full database validation, run during every write and available as bibles --validate.
+<!-- SECTION:FINAL_SUMMARY:END -->
