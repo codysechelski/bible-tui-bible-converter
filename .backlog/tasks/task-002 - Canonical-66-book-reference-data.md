@@ -1,11 +1,11 @@
 ---
 id: TASK-002
 title: Canonical 66-book reference data
-status: Ready for Testing
+status: Done
 assignee:
   - '@cody'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:27'
+updated_date: '2026-10-22 14:40'
 labels:
   - core
 dependencies: []
@@ -14,7 +14,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv/bible_esv.sqlite
 priority: high
 type: feature
-ordinal: 2
+ordinal: 500
 ---
 
 ## Description
