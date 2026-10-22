@@ -1,6 +1,6 @@
 ---
 id: TASK-005
-title: Input format detection and parser dispatch
+title: Input format detection
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:08'
@@ -8,7 +8,8 @@ updated_date: '2026-10-22 14:11'
 labels:
   - cli
   - parsing
-dependencies: []
+dependencies:
+  - TASK-001
 priority: high
 type: feature
 ordinal: 5000
@@ -21,7 +22,7 @@ The user hands the tool one file path and expects the right parser to run withou
 
 File extensions are only a hint. USFM books are distributed with a .usfm extension, USX and OSIS files are often .xml, VPL files are often .txt, and USJ files are often .json, so extension alone is not reliable. The content itself is a stronger signal: USX and OSIS are both XML but have distinct root elements, USJ is JSON, USFM is plain text containing backslash markers, and VPL is plain text whose lines begin with a book chapter verse reference.
 
-This task builds the detection layer and the dispatch from a detected format to a parser, plus the escape hatch for when detection guesses wrong.
+This task builds the detection layer only. It returns which of the five supported formats a file appears to be, so that the conversion pipeline can pick the right parser. It also owns the flag that lets a user force a specific format when detection guesses wrong.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -31,6 +32,11 @@ This task builds the detection layer and the dispatch from a detected format to 
 - [ ] #3 An unsupported or undetectable file produces a clear error that names the supported formats and exits with a non zero status
 - [ ] #4 A flag is available to force a specific parser for a file that is detected incorrectly, and the forced format is reported in the run output
 - [ ] #5 Automated tests include at least one positive and one negative sample for each of the five formats
+- [ ] #6 Detection identifies the format from the file extension and from content sniffing, and content wins when the extension is missing or misleading
+- [ ] #7 Content sniffing distinguishes USX from OSIS by their XML root elements, recognises USJ by JSON shape, recognises USFM by backslash markers, and recognises VPL by a leading book chapter verse reference
+- [ ] #8 An unsupported or undetectable file produces a clear error that names the supported formats and exits with a non zero status
+- [ ] #9 A flag is available to force a specific format for a file that is detected incorrectly, and the forced format is reported in the run output
+- [ ] #10 Automated tests include at least one positive and one negative sample for each of the five formats
 <!-- AC:END -->
 
 ## Definition of Done
