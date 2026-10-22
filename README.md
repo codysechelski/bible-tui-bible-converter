@@ -39,6 +39,11 @@ Examples:
 
 Running with no arguments prints usage and exits with status 2; a successful run exits with status 0.
 
+## Documentation
+
+- [Verse text normalization](docs/normalization.md): how headings, notes, poetry lines and whitespace are
+  handled so every input format produces the same verse text.
+
 ## Development
 
 Requires Python 3.9 or newer (developed on 3.12). No third-party packages.

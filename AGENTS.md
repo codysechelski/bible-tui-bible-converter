@@ -16,6 +16,10 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 - `bibles/books.py` is the single source of truth for the 66 canonical books (USFM code, names, slug,
   testament, sort order, chapter count). Parsers resolve books with `book_for_code`, which raises
   `UnknownBookError` for any code outside the 66 (deuterocanonical books included).
+- `bibles/model.py` holds the in-memory `Bible` every parser builds; parsers add verses with
+  `Bible.add_verse`, which applies the shared text rules in `bibles/normalize.py`. Those rules are documented in
+  `docs/normalization.md`; keep the doc and the marker sets in sync.
+- `docs/` holds Markdown documentation, linked from the README.
 - `bin/bibles` is a bash wrapper that runs the package from any directory.
 - `tests/` contains `unittest` tests.
 - `.backlog/` holds Backlog.md tasks; work is planned there.
