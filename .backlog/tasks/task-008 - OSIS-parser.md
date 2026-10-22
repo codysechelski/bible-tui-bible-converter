@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:39'
+updated_date: '2026-10-22 14:47'
 labels:
   - parsing
 dependencies:
@@ -25,13 +25,13 @@ OSIS files use a namespaced root element and often carry extra markup for notes 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The parser reads an OSIS file and produces normalized books, chapters and verses through the shared model
-- [ ] #2 Verses are identified from reference elements using the osisID book chapter verse value, and the book code resolves through the canonical book reference data
-- [ ] #3 Text that is not inside a verse reference, such as headings and introductions, is excluded from verse text
-- [ ] #4 Word level markup and cross reference markup are removed or inlined consistently with the documented normalization policy
-- [ ] #5 A file that uses a non default OSIS namespace still parses
-- [ ] #6 An OSIS file with no verse references produces a clear error rather than an empty database
-- [ ] #7 Automated tests cover an OSIS excerpt with verse references, a heading and a note
+- [x] #1 The parser reads an OSIS file and produces normalized books, chapters and verses through the shared model
+- [x] #2 Verses are identified from reference elements using the osisID book chapter verse value, and the book code resolves through the canonical book reference data
+- [x] #3 Text that is not inside a verse reference, such as headings and introductions, is excluded from verse text
+- [x] #4 Word level markup and cross reference markup are removed or inlined consistently with the documented normalization policy
+- [x] #5 A file that uses a non default OSIS namespace still parses
+- [x] #6 An OSIS file with no verse references produces a clear error rather than an empty database
+- [x] #7 Automated tests cover an OSIS excerpt with verse references, a heading and a note
 <!-- AC:END -->
 
 ## Definition of Done
@@ -56,3 +56,22 @@ OSIS files use a namespaced root element and often carry extra markup for notes 
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/parsers/osis.py` and OSIS book codes (`Book.osis_code`, `book_for_osis`, also accepts USFM codes) in books.py.
+
+- Verses as containers or sID/eID milestones; osisID parsed as book.chapter.verse (work prefix, !segment and ranges/lists use the first verse). Only text inside a verse is kept.
+- title, note, figure, speaker, header and div type introduction/front/back are dropped; w, transChange, divineName etc. keep their text; p, l, lg, lb, list/item separate fragments.
+- Namespaces are ignored (default, custom prefix, or none). Root must be osis/osisText; malformed XML, non-OSIS root or no verse references -> ParseError.
+- version from osisText@osisIDWork, version_name from header/work/title.
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 110 tests OK (tests/test_parsers.py is new, incl. one passage in all five formats producing identical verses). Real-data smoke test (scratchpad, not committed): eBible.org World English Bible (engwebp) USFM, all 66 book files, parsed with 0 errors (31,098 verses, 5 warnings for verses WEB omits, e.g. ACT 8:37); the eBible VPL edition parsed to the same 31,098 references and wrote a 66-book / 1,189-chapter database through write_database. Text matched USFM except Psalm titles (\\d) and Song of Solomon speaker labels (\\sp), which eBible's VPL keeps and our policy drops, and one source-faithful spacing difference (PSA 68:32). eBible no longer serves USX/OSIS downloads at the usual URLs, so USX/OSIS/USJ are covered by fixtures only. Committed together in c0e1769 (shared core + cross-format test). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the OSIS parser with OSIS book codes.
+<!-- SECTION:FINAL_SUMMARY:END -->
