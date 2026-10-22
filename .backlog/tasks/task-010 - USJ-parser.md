@@ -11,7 +11,7 @@ dependencies:
   - TASK-003
 priority: high
 type: feature
-ordinal: 10000
+ordinal: 9
 ---
 
 ## Description
