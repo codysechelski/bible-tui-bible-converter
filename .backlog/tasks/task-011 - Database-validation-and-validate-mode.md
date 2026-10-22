@@ -7,7 +7,8 @@ created_date: '2026-10-22 14:09'
 updated_date: '2026-10-22 14:11'
 labels:
   - validation
-dependencies: []
+dependencies:
+  - TASK-004
 references:
   - /Users/codysechelski/Developer/Projects/bible-esv/tools/build_sqlite.py
 priority: medium
