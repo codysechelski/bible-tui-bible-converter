@@ -7,7 +7,7 @@ status: Ready for Testing
 assignee:
   - '@cody'
 created_date: '2026-10-22 15:01'
-updated_date: '2026-10-22 16:06'
+updated_date: '2026-10-22 16:07'
 labels:
   - repo-layout
 dependencies: []
@@ -54,5 +54,5 @@ Create a single new top-level folder that holds all of the tooling, so the repos
 - [ ] #16 All work is committed using Conventional Commits, authored as Cody (the project owner), never as the agent itself
 - [ ] #17 Commits are pushed to the remote repo
 - [ ] #18 The task is moved to "Ready for Testing"
-- [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
+- [x] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
