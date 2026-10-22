@@ -1,7 +1,7 @@
 project_name: "backlog"
 default_status: "To Do"
 statuses: ["To Do", "In Progress", "Ready for Testing", "Done"]
-labels: ["cli", "core", "parsing", "schema", "validation", "testing"]
+labels: ["cli", "core", "parsing", "schema", "validation", "testing", "repo-layout"]
 priorities: ["High", "Medium", "Low"]
 types: ["bug", "feature", "enhancement", "task", "chore", "docs", "spike"]
 definition_of_done:
