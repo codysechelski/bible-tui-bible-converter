@@ -35,7 +35,7 @@ The CLI must accept the path to a single source file, an optional output locatio
 - [x] #5 When the output location is omitted, the database is written to the current working directory
 - [x] #6 A missing output directory is created rather than causing a failure
 - [x] #7 Running the CLI with no arguments prints usage and exits with a non zero status, and a successful run exits with status 0
-- [ ] #8 The project has a README placeholder that states the intended usage, and the tool runs on the Python version available in the environment
+- [x] #8 The project has a README placeholder that states the intended usage, and the tool runs on the Python version available in the environment
 <!-- AC:END -->
 
 ## Definition of Done
