@@ -27,12 +27,12 @@ eBible.org's own exports and differ in their text, not in their markup:
 
 ## Converting them
 
-The samples hold three books, not 66, so they need `--allow-partial`:
+The samples hold three books, not 66, so they need `--allow-partial`. From the repository root:
 
 ```sh
-./bin/bibles samples/kjv.usfm --allow-partial -o build/
-./bin/bibles samples/kjv.usx --allow-partial -o build/kjv-usx.sqlite
-./bin/bibles samples/kjv.osis.xml --allow-partial -o build/
-./bin/bibles samples/kjv.vpl.txt --allow-partial -o build/
-./bin/bibles samples/kjv.usj --allow-partial -o build/kjv-usj.sqlite
+tool/bin/bibles tool/samples/kjv.usfm --allow-partial -o build/
+tool/bin/bibles tool/samples/kjv.usx --allow-partial -o build/kjv-usx.sqlite
+tool/bin/bibles tool/samples/kjv.osis.xml --allow-partial -o build/
+tool/bin/bibles tool/samples/kjv.vpl.txt --allow-partial -o build/
+tool/bin/bibles tool/samples/kjv.usj --allow-partial -o build/kjv-usj.sqlite
 ```

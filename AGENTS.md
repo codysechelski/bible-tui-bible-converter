@@ -3,17 +3,22 @@
 ## Repo Purpose
 
 `bibles` is a command line tool that converts a text-formatted Bible file (USFM, USX, OSIS, VPL, USJ) into a
-SQLite database for the custom Bible terminal UI.
+SQLite database for the custom Bible terminal UI. The repository also collects the converted databases: the
+tooling lives under `tool/`, and the repository root holds the converted `.sqlite` files.
 
 The reference project at `/Users/codysechelski/Developer/Projects/bible-esv` (read-only) defines the output
 schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and the consuming TUI
-(`tui/bible_tui.py`). Schema parity is enforced by tests that read it (`tests/test_writer.py`,
-`tests/test_samples.py`); they skip when the project is absent.
+(`tui/bible_tui.py`). Schema parity is enforced by tests that read it (`tool/tests/test_writer.py`,
+`tool/tests/test_samples.py`); they skip when the project is absent.
 
 ## Repository Map
 
+The repository root holds only the converted databases, the README, AGENTS.md, CLAUDE.md, `.gitignore` and
+`.backlog/`. Everything else is under `tool/`, and the paths below are relative to it.
+
 - `bibles/cli.py` holds argument parsing, output path resolution and the output of a run; `bibles/__main__.py`
-  makes `python3 -m bibles` work. `bin/bibles` is a bash wrapper that runs the package from any directory.
+  makes `python3 -m bibles` work from `tool/`. `bin/bibles` is a bash wrapper that runs the package from any
+  directory.
 - `bibles/pipeline.py` is the conversion: `convert()` runs detect, parse (which normalizes), write and validate,
   and raises `ConversionError` whose `stage` names the failing stage.
 - `bibles/books.py` is the single source of truth for the 66 canonical books (USFM and OSIS codes, names, slug,
@@ -42,14 +47,16 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 - `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all five formats;
   `test_samples.py` converts the samples end to end through the CLI and the wrapper and reads the result with
   the reference TUI's `BibleStore`.
-- `.backlog/` holds Backlog.md tasks; work is planned there.
+- `.backlog/` (at the repository root) holds Backlog.md tasks; work is planned there.
 
 ## Commands
 
-- Convert: `./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f FORMAT] [--allow-partial]`
-- Validate an existing database: `./bin/bibles --validate DATABASE [--allow-partial]`
-- Run tests: `python3 -m unittest discover -s tests -t .`
-- Syntax check: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py`
+Run from the repository root:
+
+- Convert: `tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f FORMAT] [--allow-partial]`
+- Validate an existing database: `tool/bin/bibles --validate DATABASE [--allow-partial]`
+- Run tests: `python3 -m unittest discover -s tool/tests -t tool`
+- Syntax check: `python3 -m py_compile tool/bibles/*.py tool/bibles/parsers/*.py tool/tests/*.py`
 
 No linter or formatter is installed; `py_compile` plus the test suite is the static check. Automated
 verification (`.agent/verification.json`) is intentionally disabled.

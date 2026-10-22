@@ -11,7 +11,7 @@ from pathlib import Path
 
 from bibles.cli import CliError, main, resolve_output_path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+TOOL_ROOT = Path(__file__).resolve().parents[1]
 
 
 def run_main(*argv: str) -> tuple[int, str, str]:
@@ -190,7 +190,7 @@ class MainTests(unittest.TestCase):
 class ShellInvocationTests(unittest.TestCase):
     def test_module_runs_from_shell(self) -> None:
         result = subprocess.run(
-            [sys.executable, "-m", "bibles", "--help"], cwd=REPO_ROOT, capture_output=True, text=True
+            [sys.executable, "-m", "bibles", "--help"], cwd=TOOL_ROOT, capture_output=True, text=True
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("usage: bibles", result.stdout)
@@ -198,7 +198,7 @@ class ShellInvocationTests(unittest.TestCase):
     def test_wrapper_script_runs_from_any_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
-                [str(REPO_ROOT / "bin" / "bibles")], cwd=tmp, capture_output=True, text=True
+                [str(TOOL_ROOT / "bin" / "bibles")], cwd=tmp, capture_output=True, text=True
             )
         self.assertEqual(result.returncode, 2)
         self.assertIn("usage: bibles", result.stderr)

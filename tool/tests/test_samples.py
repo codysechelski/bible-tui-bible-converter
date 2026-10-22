@@ -16,8 +16,8 @@ from pathlib import Path
 from bibles.cli import main
 from tests.test_writer import REFERENCE_DB, schema_description
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SAMPLES = REPO_ROOT / "samples"
+TOOL_ROOT = Path(__file__).resolve().parents[1]
+SAMPLES = TOOL_ROOT / "samples"
 REFERENCE_TUI = REFERENCE_DB.parent / "tui" / "bible_tui.py"
 
 SAMPLE_FILES = {
@@ -247,7 +247,7 @@ class CommandLineTests(unittest.TestCase):
         self._tmp.cleanup()
 
     def bibles(self, *argv: str) -> subprocess.CompletedProcess:
-        return subprocess.run([str(REPO_ROOT / "bin" / "bibles"), *argv], cwd=self.tmp,
+        return subprocess.run([str(TOOL_ROOT / "bin" / "bibles"), *argv], cwd=self.tmp,
                               capture_output=True, text=True)
 
     def test_default_output_file_name(self) -> None:

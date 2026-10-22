@@ -6,12 +6,23 @@ Bible terminal UI can read. The database uses exactly the schema of the referenc
 
 It is Python 3.9+ and standard library only, so it runs anywhere the TUI does.
 
+## Repository layout
+
+The repository is both the converter and a collection of the databases it produces:
+
+- The repository root holds the converted `.sqlite` Bible databases, ready to open.
+- [`tool/`](tool) holds the converter: the `bibles` package, the `tool/bin/bibles` wrapper, the tests, the
+  [documentation](tool/docs) and the [samples](tool/samples/README.md).
+
+The commands below are run from the repository root. The wrapper works from any directory, and
+`python3 -m bibles` works from inside `tool/`.
+
 ## Quick start
 
 ```sh
-./bin/bibles kjv.usfm                       # writes ./kjv.sqlite
-./bin/bibles --validate kjv.sqlite          # checks an existing database
-python3 -m bibles kjv.usfm                  # the same, from the repository root
+tool/bin/bibles kjv.usfm                      # writes ./kjv.sqlite
+tool/bin/bibles --validate kjv.sqlite         # checks an existing database
+cd tool && python3 -m bibles ../kjv.usfm      # the same, as a module (writes tool/kjv.sqlite)
 ```
 
 A run reports each stage:
@@ -33,8 +44,8 @@ Wrote 66 books, 1189 chapters and 31102 verses (version kjv)
 ## Usage
 
 ```sh
-./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj}] [--allow-partial]
-./bin/bibles --validate DATABASE [--allow-partial]
+tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj}] [--allow-partial]
+tool/bin/bibles --validate DATABASE [--allow-partial]
 ```
 
 | Option | Meaning |
@@ -56,10 +67,10 @@ How `--output` is interpreted:
 - An existing output file is replaced, but only once the new database has been written and validated.
 
 ```sh
-./bin/bibles kjv.usfm                      # ./kjv.sqlite
-./bin/bibles kjv.usfm -n king-james        # ./king-james.sqlite
-./bin/bibles kjv.usfm -o build/            # ./build/kjv.sqlite
-./bin/bibles kjv.usfm -o build/bible.db    # ./build/bible.db
+tool/bin/bibles kjv.usfm                      # ./kjv.sqlite
+tool/bin/bibles kjv.usfm -n king-james        # ./king-james.sqlite
+tool/bin/bibles kjv.usfm -o build/            # ./build/kjv.sqlite
+tool/bin/bibles kjv.usfm -o build/bible.db    # ./build/bible.db
 ```
 
 Exit status: 0 on success (warnings allowed), 1 when the conversion or validation fails, 2 for a usage error
@@ -68,15 +79,15 @@ at the output path.
 
 ## Examples for each format
 
-The [`samples/`](samples/README.md) directory has the same three KJV books in every format. They hold 3 books
-rather than 66, hence `--allow-partial`; a whole Bible needs no flag.
+The [`tool/samples/`](tool/samples/README.md) directory has the same three KJV books in every format. They
+hold 3 books rather than 66, hence `--allow-partial`; a whole Bible needs no flag.
 
 ```sh
-./bin/bibles samples/kjv.usfm     --allow-partial -o build/kjv-usfm.sqlite   # USFM
-./bin/bibles samples/kjv.usx      --allow-partial -o build/kjv-usx.sqlite    # USX
-./bin/bibles samples/kjv.osis.xml --allow-partial -o build/kjv-osis.sqlite   # OSIS
-./bin/bibles samples/kjv.vpl.txt  --allow-partial -o build/kjv-vpl.sqlite    # VPL
-./bin/bibles samples/kjv.usj      --allow-partial -o build/kjv-usj.sqlite    # USJ
+tool/bin/bibles tool/samples/kjv.usfm     --allow-partial -o build/kjv-usfm.sqlite   # USFM
+tool/bin/bibles tool/samples/kjv.usx      --allow-partial -o build/kjv-usx.sqlite    # USX
+tool/bin/bibles tool/samples/kjv.osis.xml --allow-partial -o build/kjv-osis.sqlite   # OSIS
+tool/bin/bibles tool/samples/kjv.vpl.txt  --allow-partial -o build/kjv-vpl.sqlite    # VPL
+tool/bin/bibles tool/samples/kjv.usj      --allow-partial -o build/kjv-usj.sqlite    # USJ
 ```
 
 eBible.org ships USFM as one file per book. Concatenate the files into one source; front matter, glossaries and
@@ -84,7 +95,7 @@ the Apocrypha are skipped with a warning:
 
 ```sh
 cat eng-kjv_usfm/*.usfm > kjv.usfm
-./bin/bibles kjv.usfm
+tool/bin/bibles kjv.usfm
 ```
 
 ## Supported formats
@@ -132,7 +143,7 @@ formats. Use `--format` to force a format when detection guesses wrong; the outp
 ## Verse text
 
 The schema stores one plain text column per verse, so every parser applies the same rules (see
-[normalization](docs/normalization.md) for the full list):
+[normalization](tool/docs/normalization.md) for the full list):
 
 - Headings, titles, book introductions, footnotes, endnotes, cross references and figures are removed.
 - Character formatting (`\nd LORD\nd*`, `<char style="wj">`, `<w>`) keeps its text and loses its markup; word
@@ -177,14 +188,14 @@ Every conversion validates the database before moving it into place, and `--vali
 SQLite integrity, foreign keys, metadata, 66 books in canonical order with the right names and testaments,
 contiguous chapters, chapters with verses, duplicate and empty verses, and verse to chapter links fail; verse
 gaps, unusual chapter counts and totals different from the reference only warn. Every check is listed with its
-result. See [validation](docs/validation.md).
+result. See [validation](tool/docs/validation.md).
 
 ## Documentation
 
-- [Verse text normalization](docs/normalization.md): how headings, notes, poetry lines, whitespace, verse
+- [Verse text normalization](tool/docs/normalization.md): how headings, notes, poetry lines, whitespace, verse
   ranges and absent verses are handled.
-- [Database validation](docs/validation.md): every check, and which ones fail or only warn.
-- [Samples](samples/README.md): where the sample files come from and how they differ.
+- [Database validation](tool/docs/validation.md): every check, and which ones fail or only warn.
+- [Samples](tool/samples/README.md): where the sample files come from and how they differ.
 - [AGENTS.md](AGENTS.md): conventions and commands for contributors and coding agents.
 
 ## Development
@@ -192,8 +203,8 @@ result. See [validation](docs/validation.md).
 Requires Python 3.9 or newer (developed on 3.12). No third-party packages.
 
 ```sh
-python3 -m unittest discover -s tests -t .                  # run the test suite
-python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py  # syntax check
+python3 -m unittest discover -s tool/tests -t tool                               # run the test suite
+python3 -m py_compile tool/bibles/*.py tool/bibles/parsers/*.py tool/tests/*.py  # syntax check
 ```
 
 Some tests compare against the reference project at `../bible-esv` (`bible_esv.sqlite` and `tui/bible_tui.py`);

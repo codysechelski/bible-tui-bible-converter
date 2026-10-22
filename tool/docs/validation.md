@@ -8,7 +8,7 @@ in `bibles/validate.py` and follow the reference project's `tools/build_sqlite.p
 - **Validate mode** checks an existing database without converting anything:
 
   ```sh
-  ./bin/bibles --validate path/to/bible.sqlite
+  tool/bin/bibles --validate path/to/bible.sqlite
   ```
 
   It exits 0 when every check passes or only warns, and 1 when any check fails. `--output`, `--name` and
