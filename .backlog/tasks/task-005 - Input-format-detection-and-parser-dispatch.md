@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:34'
+updated_date: '2026-10-22 14:36'
 labels:
   - cli
   - parsing
@@ -28,11 +28,11 @@ This task builds the detection layer only. It returns which of the five supporte
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Detection identifies the format from the file extension and from content sniffing, and content wins when the extension is missing or misleading
-- [ ] #2 Content sniffing distinguishes USX from OSIS by their XML root elements, recognises USJ by JSON shape, recognises USFM by backslash markers, and recognises VPL by a leading book chapter verse reference
-- [ ] #3 An unsupported or undetectable file produces a clear error that names the supported formats and exits with a non zero status
-- [ ] #4 A flag is available to force a specific parser for a file that is detected incorrectly, and the forced format is reported in the run output
-- [ ] #5 Automated tests include at least one positive and one negative sample for each of the five formats
+- [x] #1 Detection identifies the format from the file extension and from content sniffing, and content wins when the extension is missing or misleading
+- [x] #2 Content sniffing distinguishes USX from OSIS by their XML root elements, recognises USJ by JSON shape, recognises USFM by backslash markers, and recognises VPL by a leading book chapter verse reference
+- [x] #3 An unsupported or undetectable file produces a clear error that names the supported formats and exits with a non zero status
+- [x] #4 A flag is available to force a specific parser for a file that is detected incorrectly, and the forced format is reported in the run output
+- [x] #5 Automated tests include at least one positive and one negative sample for each of the five formats
 <!-- AC:END -->
 
 ## Definition of Done
@@ -57,3 +57,26 @@ This task builds the detection layer only. It returns which of the five supporte
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/detect.py` (`SUPPORTED_FORMATS`, `detect_format(path, forced=None) -> Detection(format, method)`, `sniff_content`, `FormatDetectionError`). The CLI now detects before creating the output directory and prints e.g. `Format: osis (detected from content)` or `Format: vpl (forced with --format)`.
+
+Rules:
+- Content first (first 64 KiB, BOM tolerated): XML root `usx` -> usx, `osis`/`osisText` (any namespace prefix) -> osis, other XML -> none; JSON object with type USJ -> usj (whole file parsed); a line starting with a common USFM marker (\\id, \\c, \\v, \\p, \\h, \\mt, \\toc, \\q, \\s, \\usfm, \\ide) -> usfm; first non-empty line plus at least half of the first 20 matching `Book C:V text` -> vpl.
+- Fallback when content is inconclusive: .usfm/.sfm/.usx/.osis/.vpl/.usj. .xml/.json/.txt never decide on their own.
+- Otherwise exit 1 with the supported formats listed and a hint to use --format. Unreadable files raise 'cannot read'.
+
+Design decisions (please review):
+- An unrecognisable file with a format-specific extension (e.g. junk in a .usfm) is accepted by extension and left for the parser to reject, rather than failing detection.
+- Parser dispatch itself lives in TASK-014; this task only returns the format.
+
+Verification: `python3 -m py_compile bibles/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 73 tests OK (14 new: positive and negative samples for all five formats, misleading extensions, extension fallback, forced format, CLI reporting and exit codes). Manual: `./bin/bibles tests/test_detect.py -o ...` -> exit 1 with the supported-formats message. README updated with the detection rules. DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added content-first input format detection with extension fallback and --format override, reported in the CLI output.
+<!-- SECTION:FINAL_SUMMARY:END -->
