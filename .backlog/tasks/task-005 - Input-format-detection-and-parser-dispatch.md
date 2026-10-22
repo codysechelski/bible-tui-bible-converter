@@ -4,7 +4,7 @@ title: Input format detection
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:11'
+updated_date: '2026-10-22 14:13'
 labels:
   - cli
   - parsing
@@ -32,11 +32,6 @@ This task builds the detection layer only. It returns which of the five supporte
 - [ ] #3 An unsupported or undetectable file produces a clear error that names the supported formats and exits with a non zero status
 - [ ] #4 A flag is available to force a specific parser for a file that is detected incorrectly, and the forced format is reported in the run output
 - [ ] #5 Automated tests include at least one positive and one negative sample for each of the five formats
-- [ ] #6 Detection identifies the format from the file extension and from content sniffing, and content wins when the extension is missing or misleading
-- [ ] #7 Content sniffing distinguishes USX from OSIS by their XML root elements, recognises USJ by JSON shape, recognises USFM by backslash markers, and recognises VPL by a leading book chapter verse reference
-- [ ] #8 An unsupported or undetectable file produces a clear error that names the supported formats and exits with a non zero status
-- [ ] #9 A flag is available to force a specific format for a file that is detected incorrectly, and the forced format is reported in the run output
-- [ ] #10 Automated tests include at least one positive and one negative sample for each of the five formats
 <!-- AC:END -->
 
 ## Definition of Done
