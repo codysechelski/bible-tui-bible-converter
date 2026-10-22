@@ -9,7 +9,7 @@ out which one you have.
 ## What you need
 
 - **Python 3.9 or newer.** macOS and Linux usually have it already. To check, open a terminal (on a Mac:
-  press ⌘ Space, type *Terminal* and press Return) and type:
+  press ⌘ Space, type _Terminal_ and press Return) and type:
 
   ```sh
   python3 --version
@@ -26,6 +26,8 @@ out which one you have.
 [eBible.org](https://ebible.org/download.php) has hundreds of translations that are free to download. Choose a
 translation, and on its page download the file in the **USFM** row (for example `eng-web_usfm.zip` for the
 World English Bible).
+
+[open.bible](https://www.open.bible/bibles) is another usefule source.
 
 Keep the file zipped; the tool reads the zip directly. An unzipped folder works too.
 
