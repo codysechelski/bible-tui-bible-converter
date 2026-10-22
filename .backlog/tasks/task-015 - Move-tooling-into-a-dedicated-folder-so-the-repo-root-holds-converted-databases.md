@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 15:01'
-updated_date: '2026-10-22 15:35'
+updated_date: '2026-10-22 16:04'
 labels:
   - repo-layout
 dependencies: []
@@ -26,12 +26,12 @@ Create a single new top-level folder that holds all of the tooling, so the repos
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All tooling lives under a single new top-level folder (the `bibles` package, the `bin/bibles` wrapper, `tests/` and `docs/`), and the repository root holds no tooling source files
-- [ ] #2 `bin/bibles` still runs from any working directory after the move, and `python3 -m bibles` still works from the new package root, with output path handling unchanged
-- [ ] #3 The test suite still passes when run with the documented command, updated for the new layout
-- [ ] #4 README and AGENTS.md describe the new layout: where the tooling lives, the updated run and test commands, and that the repository root holds the converted databases
-- [ ] #5 A converted database written to the repository root is a trackable file rather than an ignored one, and the existing ignore rules for generated caches (`__pycache__/`, `*.pyc`) still apply
-- [ ] #6 The move is recorded as renames in git history rather than deletions and re-additions, and no tool behaviour changes as a result of the move
+- [x] #1 All tooling lives under a single new top-level folder (the `bibles` package, the `bin/bibles` wrapper, `tests/` and `docs/`), and the repository root holds no tooling source files
+- [x] #2 `bin/bibles` still runs from any working directory after the move, and `python3 -m bibles` still works from the new package root, with output path handling unchanged
+- [x] #3 The test suite still passes when run with the documented command, updated for the new layout
+- [x] #4 README and AGENTS.md describe the new layout: where the tooling lives, the updated run and test commands, and that the repository root holds the converted databases
+- [x] #5 A converted database written to the repository root is a trackable file rather than an ignored one, and the existing ignore rules for generated caches (`__pycache__/`, `*.pyc`) still apply
+- [x] #6 The move is recorded as renames in git history rather than deletions and re-additions, and no tool behaviour changes as a result of the move
 <!-- AC:END -->
 
 ## Definition of Done
