@@ -4,9 +4,11 @@ title: VPL parser
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:08'
+updated_date: '2026-10-22 14:10'
 labels:
   - parsing
-dependencies: []
+dependencies:
+  - TASK-003
 priority: high
 type: feature
 ordinal: 9000
