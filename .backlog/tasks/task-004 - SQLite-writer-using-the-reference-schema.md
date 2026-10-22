@@ -4,9 +4,12 @@ title: SQLite writer using the reference schema
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:08'
+updated_date: '2026-10-22 14:10'
 labels:
   - schema
-dependencies: []
+dependencies:
+  - TASK-002
+  - TASK-003
 references:
   - /Users/codysechelski/Developer/Projects/bible-esv
   - /Users/codysechelski/Developer/Projects/bible-esv/tools/build_sqlite.py
