@@ -1,11 +1,11 @@
 ---
 id: TASK-001
 title: Scaffold project and CLI entry point
-status: Ready for Testing
+status: Done
 assignee:
   - '@cody'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:21'
+updated_date: '2026-10-22 14:40'
 labels:
   - cli
 dependencies: []
@@ -13,7 +13,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: high
 type: chore
-ordinal: 1
+ordinal: 1000
 ---
 
 ## Description
