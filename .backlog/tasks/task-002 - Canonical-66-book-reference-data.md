@@ -60,3 +60,19 @@ This task builds that list once, in one place, so every parser resolves books th
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/books.py`: `BOOKS` (66 frozen `Book` records in canonical order), `book_for_code` (case/whitespace-insensitive USFM lookup) and `UnknownBookError(ValueError)` carrying `.code`. `common_name`/`slugify` copy the reference `tools/build_sqlite.py` rules verbatim; testament is derived from sort order (<=39 old).
+
+Design decision (please review): deuterocanonical/apocrypha codes (TOB, SIR, ...) raise UnknownBookError like any other unknown code. Whether the pipeline skips them with a warning or fails is left to TASK-014.
+
+Verification: `python3 -m py_compile bibles/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 35 tests OK (13 new), including a read-only comparison of all 66 books + chapter counts against bible_esv.sqlite (skipped if that file is absent). README unchanged: no user-visible behavior. DoD #7 N/A (no UI). No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the canonical 66-book table and lookup in bibles/books.py with tests that confirm it matches the reference database.
+<!-- SECTION:FINAL_SUMMARY:END -->
