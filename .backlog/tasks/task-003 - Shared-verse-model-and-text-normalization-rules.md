@@ -13,7 +13,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: high
 type: feature
-ordinal: 3000
+ordinal: 3
 ---
 
 ## Description
