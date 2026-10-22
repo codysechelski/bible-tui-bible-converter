@@ -32,8 +32,10 @@ _XML_PROLOG = re.compile(r"\s*(<\?.*?\?>|<!--.*?-->|<!DOCTYPE[^>]*>)", re.DOTALL
 _USFM_MARKER = re.compile(
     r"^[ \t]*\\(?:id|usfm|ide|h|toc\d|mt\d?|c|v|p|q\d?|s\d?)(?:\s|$)", re.MULTILINE
 )
-# "Gen 1:1 ...", "GEN 1:1 ...", "1 John 3:16 ...", "Song of Solomon 2:1 ...".
-_VPL_LINE = re.compile(r"^\s*(?:[1-3]\s?)?[A-Za-z][A-Za-z.]*(?: [A-Za-z][A-Za-z.]*)*\s+\d+:\d+\s+\S")
+# "Gen 1:1 ...", "GEN 1:1 ...", "GEN.1.1 ...", "1 John 3:16 ...", "Song of Solomon 2:1 ...".
+_VPL_LINE = re.compile(
+    r"^\s*(?:[1-3]\s?)?[A-Za-z][A-Za-z]*(?: [A-Za-z][A-Za-z]*)*(?:\s+\d+:\d+|\.\d+\.\d+)\s+\S"
+)
 _VPL_SAMPLE_LINES = 20
 
 

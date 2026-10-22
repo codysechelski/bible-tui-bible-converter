@@ -2,8 +2,9 @@
 
 Every parser must produce the same verse text for the same Bible, whatever the source format. The database
 stores one plain text column per verse, so anything that is not verse text is removed and the rest is
-flattened to a single line. The rules live in `bibles/normalize.py`; parsers add verses through
-`Bible.add_verse` in `bibles/model.py`, which applies them.
+flattened to a single line. The rules live in `bibles/normalize.py`. The parsers in `bibles/parsers/` apply
+them: USFM, USX and USJ all feed one shared marker handler (`bibles/parsers/markers.py`), so the three produce
+identical text, and every parser adds verses through `Bible.add_verse` in `bibles/model.py`.
 
 The output matches the reference ESV database: one line per verse, poetry lines joined with a space, no
 newlines, no doubled spaces, no leading or trailing whitespace, and no empty verses.
@@ -20,7 +21,7 @@ headings.
 | --- | --- |
 | Identification and headers | `id`, `ide`, `h`, `toc#`, `toca#`, `rem`, `sts`, `usfm` |
 | Book titles | `mt#`, `mte#` |
-| Headings and titles | `ms#`, `mr`, `s#`, `sr`, `r`, `sp`, `sd#`, `d`, `cl`, `cd`, `lit` |
+| Headings and titles | `ms#`, `mr`, `s#`, `sr`, `r`, `sp`, `sd#`, `d`, `cl`, `cd`, `lit`, `qa` (acrostic letters) |
 | Book introductions | `imt#`, `imte#`, `is#`, `ip`, `ipi`, `im`, `imi`, `ipq`, `imq`, `ipr`, `iq#`, `ib`, `ili#`, `iot`, `io#`, `iex`, `ie` |
 
 **Inline content dropped** (`DROPPED_INLINE_MARKERS`), together with everything inside it:
@@ -38,9 +39,15 @@ the verse; only the markup is removed. For `\w word|lemma="..."\w*` only `word` 
 
 **OSIS**: `title`, `note` (footnotes and cross references), `figure` and `speaker` elements are removed with
 their content, as are `div` elements of type `introduction`, `front` and `back`
-(`OSIS_DROPPED_ELEMENTS`, `OSIS_DROPPED_DIV_TYPES`). Text inside other elements is kept.
+(`OSIS_DROPPED_ELEMENTS`, `OSIS_DROPPED_DIV_TYPES`) and the `header`. Only text inside a verse is kept, whether
+the verse is a container (`<verse osisID="Gen.1.1">...</verse>`) or a milestone pair (`sID` ... `eID`). Word
+markup such as `<w>`, `<transChange>` and `<divineName>` keeps its text. The OSIS namespace is ignored, and
+books resolve from OSIS codes (`Gen`, `1Sam`, `Ps`) or USFM codes.
 
-**VPL** has no markup; only the whitespace rules apply.
+**VPL** has no markup; only the whitespace rules apply. Each line is `BOOK C:V text` or `BOOK.C.V text`, where
+`BOOK` is a USFM code, an OSIS code, a book name or one of eBible.org's alternative codes (`SOL`, `EZE`, `JOE`,
+`MAR`, `JOH`, `PHI`, `JAM`, `1JO`, `2JO`, `3JO`). A line that is not a verse reference is skipped and
+reported as a warning.
 
 A removed note leaves no text behind, so `word\f + \ft note\f*.` becomes `word.`.
 
@@ -65,9 +72,20 @@ becomes `He makes me lie down in green pastures. He leads me beside still waters
 - Leading and trailing whitespace is removed.
 - Punctuation is not changed.
 
-## 4. Errors
+## 4. Verse numbering
 
-- A verse whose text is empty after these rules raises `EmptyVerseError`, naming the verse (for example
-  `JHN 11:35`). The tool never writes an empty verse.
+- **Verse ranges** are kept on the first verse. `\v 1-2 text`, `GEN 1:1-2 text` and
+  `<verse osisID="Gen.1.1 Gen.1.2">` all store the whole text as verse 1, and verse 2 is absent. In VPL the
+  later verses of a range carry a `<range>` marker, which is skipped.
+- **Verse segments** (`\v 3a`, `\v 3b`) are joined into one verse, separated like poetry lines.
+- **Absent verses**: a verse with no text after these rules (for example a verse a translation omits, leaving
+  only a footnote) is left out and reported as a warning such as `ACT 8:37 has no text and was left out`.
+  A blank VPL line, or a VPL reference with no text, is an absent verse and is not reported.
+
+## 5. Errors
+
+- `Bible.add_verse` raises `EmptyVerseError` for an empty verse, naming it (for example `JHN 11:35`); the
+  parsers avoid this by leaving absent verses out as described above. The tool never writes an empty verse.
 - Adding the same book, chapter and verse twice raises `DuplicateVerseError`.
 - A book code outside the 66 canonical books raises `UnknownBookError` (see `bibles/books.py`).
+- Parsers raise `ParseError` naming the file and, for USFM and VPL, the line.

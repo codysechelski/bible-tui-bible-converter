@@ -55,7 +55,7 @@ class MarkerRuleTests(unittest.TestCase):
         self.assertEqual(marker_base("IMT"), "imt")
 
     def test_non_verse_blocks(self) -> None:
-        for marker in ("id", "h", "toc1", "mt1", "ms", "s", "s2", "r", "sp", "d", "cl", "is1", "ip", "imt2"):
+        for marker in ("id", "h", "toc1", "mt1", "ms", "s", "s2", "r", "sp", "d", "cl", "is1", "ip", "imt2", "qa"):
             self.assertTrue(is_non_verse_block(marker), marker)
         for marker in ("p", "m", "q1", "q2", "pi", "li1", "b", "nb", "v", "c"):
             self.assertFalse(is_non_verse_block(marker), marker)

@@ -24,7 +24,7 @@ NON_VERSE_BLOCK_MARKERS = frozenset(
         # book titles
         "mt", "mte",
         # headings and titles
-        "ms", "mr", "s", "sr", "r", "sp", "sd", "d", "cl", "cd", "lit",
+        "ms", "mr", "s", "sr", "r", "sp", "sd", "d", "cl", "cd", "lit", "qa",
         # book introductions
         "imt", "imte", "is", "ip", "ipi", "im", "imi", "ipq", "imq", "ipr", "iq", "ib", "ili", "iot",
         "io", "iex", "ie",

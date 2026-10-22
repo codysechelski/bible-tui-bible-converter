@@ -46,12 +46,14 @@ class Bible:
     """Books, chapters and verses in the order the parser added them.
 
     `version` (a short abbreviation such as "KJV") and `version_name` are set by parsers whose format
-    supplies them; the writer derives a fallback when they are left as None.
+    supplies them; the writer derives a fallback when they are left as None. `warnings` holds
+    problems a parser worked around (for example a skipped line) so the run output can show them.
     """
 
     books: List[BibleBook] = field(default_factory=list)
     version: Optional[str] = None
     version_name: Optional[str] = None
+    warnings: List[str] = field(default_factory=list)
     _book_index: Dict[str, BibleBook] = field(default_factory=dict, repr=False, compare=False)
     _chapter_index: Dict[tuple, Chapter] = field(default_factory=dict, repr=False, compare=False)
     _verse_keys: set = field(default_factory=set, repr=False, compare=False)

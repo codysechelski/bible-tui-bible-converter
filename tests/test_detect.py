@@ -30,6 +30,7 @@ POSITIVE = {
     "vpl": [
         ("kjv.txt", VPL),
         ("kjv.vpl", "GEN 1:1 In the beginning.\n1 John 1:1 That which was.\nSong of Solomon 1:1 The song.\n"),
+        ("dotted.txt", "GEN.1.1 In the beginning.\nGEN.1.2 And the earth.\n"),
     ],
     "usj": [("gen.json", USJ), ("gen.usj", "\ufeff" + USJ)],
 }

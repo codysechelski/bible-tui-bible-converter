@@ -25,6 +25,11 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 - `bibles/detect.py` owns `SUPPORTED_FORMATS` and `detect_format`: content sniffing wins over the extension,
   format-specific extensions are a fallback, `--format` bypasses detection. The CLI turns
   `FormatDetectionError` into a `CliError`.
+- `bibles/parsers/` has one module per format, registered in `PARSERS`; `parse_file(path, format)` returns a
+  `Bible` or raises `ParseError`. USFM, USX and USJ translate their input into the events of
+  `parsers/markers.py` (`MarkerEvents`), which applies the shared rules; OSIS and VPL feed `VerseCollector`
+  (`parsers/base.py`) directly. Fix text handling in the shared layer, not in one front end, so the formats stay
+  identical (`tests/test_parsers.py` checks one passage in all five formats).
 - `docs/` holds Markdown documentation, linked from the README.
 - `bin/bibles` is a bash wrapper that runs the package from any directory.
 - `tests/` contains `unittest` tests.
