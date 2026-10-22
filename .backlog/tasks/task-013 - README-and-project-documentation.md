@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:58'
+updated_date: '2026-10-22 15:10'
 labels:
   - cli
 dependencies:
@@ -28,12 +28,12 @@ The README is the main deliverable. An agent facing file such as AGENTS.md shoul
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The README documents how to run the tool and shows a complete example invocation for each of the five supported formats
-- [ ] #2 The README documents the output schema, listing the tables, their columns, their relationships, and the metadata keys
-- [ ] #3 The README documents the supported formats, explains how format detection works, and explains how to force a specific format
-- [ ] #4 The README documents the verse text normalization policy and lists the known limitations of each format
-- [ ] #5 An AGENTS.md file records the repository conventions, the commands for running the tests and the validation, and the location of the reference project used for schema parity
-- [ ] #6 Any supporting documentation files are linked from the README
+- [x] #1 The README documents how to run the tool and shows a complete example invocation for each of the five supported formats
+- [x] #2 The README documents the output schema, listing the tables, their columns, their relationships, and the metadata keys
+- [x] #3 The README documents the supported formats, explains how format detection works, and explains how to force a specific format
+- [x] #4 The README documents the verse text normalization policy and lists the known limitations of each format
+- [x] #5 An AGENTS.md file records the repository conventions, the commands for running the tests and the validation, and the location of the reference project used for schema parity
+- [x] #6 Any supporting documentation files are linked from the README
 <!-- AC:END -->
 
 ## Definition of Done
@@ -58,3 +58,19 @@ The README is the main deliverable. An agent facing file such as AGENTS.md shoul
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Rewrote README.md: quick start with sample output, usage and options (incl. --allow-partial, --validate), output path rules, exit statuses, an example for each format using samples/, the eBible concatenation recipe, a supported-formats table, detection and --format, known limitations per format, the verse text rules, the full output schema (tables, columns, constraints, relationships, indexes, metadata keys), validation, and links to docs/normalization.md, docs/validation.md, samples/README.md and AGENTS.md. Rewrote AGENTS.md (repo map incl. pipeline and samples, commands for tests/validation/syntax check, reference project location and how parity is tested, conventions). Brought docs/normalization.md and docs/validation.md in line with book skipping and --allow-partial.
+
+Every README example was run for real: the five sample commands (exit 0, database written), the four output-naming examples and --validate on a full KJV built with the cat recipe (66/1189/31102, validation passed).
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 160 tests OK; all files parse with the Python 3.9 grammar (only 3.12 is installed, so 3.9 was not run). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Documented usage, formats, detection, schema, normalization, limitations and validation in the README and AGENTS.md.
+<!-- SECTION:FINAL_SUMMARY:END -->
