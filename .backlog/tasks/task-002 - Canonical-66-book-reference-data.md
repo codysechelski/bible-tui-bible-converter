@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:26'
+updated_date: '2026-10-22 14:27'
 labels:
   - core
 dependencies: []
@@ -29,13 +29,13 @@ This task builds that list once, in one place, so every parser resolves books th
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 A single source of truth lists all 66 books with USFM code, canonical name, common name, slug, testament, and sort order
-- [ ] #2 Sort order is exactly 1 through 66 with the Old Testament occupying 1 through 39 and the New Testament 40 through 66
-- [ ] #3 Common names convert a leading Roman numeral prefix to Arabic numerals and map Revelation of John to Revelation
-- [ ] #4 Slugs are the lowercased, dash separated common name and match the reference project for all 66 books, including numbered books such as 1-samuel and 3-john
-- [ ] #5 Each book also records its expected chapter count, matching the reference project, for example Psalms 150 and Revelation 22
-- [ ] #6 A USFM book code that is not in the 66 book list produces a clear, named error rather than a silently skipped book
-- [ ] #7 Automated tests cover the naming, slug and testament rules for all 66 books and confirm agreement with the reference database
+- [x] #1 A single source of truth lists all 66 books with USFM code, canonical name, common name, slug, testament, and sort order
+- [x] #2 Sort order is exactly 1 through 66 with the Old Testament occupying 1 through 39 and the New Testament 40 through 66
+- [x] #3 Common names convert a leading Roman numeral prefix to Arabic numerals and map Revelation of John to Revelation
+- [x] #4 Slugs are the lowercased, dash separated common name and match the reference project for all 66 books, including numbered books such as 1-samuel and 3-john
+- [x] #5 Each book also records its expected chapter count, matching the reference project, for example Psalms 150 and Revelation 22
+- [x] #6 A USFM book code that is not in the 66 book list produces a clear, named error rather than a silently skipped book
+- [x] #7 Automated tests cover the naming, slug and testament rules for all 66 books and confirm agreement with the reference database
 <!-- AC:END -->
 
 ## Definition of Done
