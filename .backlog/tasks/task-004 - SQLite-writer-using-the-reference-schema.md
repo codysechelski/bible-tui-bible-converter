@@ -1,11 +1,11 @@
 ---
 id: TASK-004
 title: SQLite writer using the reference schema
-status: Ready for Testing
+status: Done
 assignee:
   - '@cody'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:33'
+updated_date: '2026-10-22 14:42'
 labels:
   - schema
 dependencies:
@@ -17,7 +17,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv/bible_esv.sqlite
 priority: high
 type: feature
-ordinal: 4
+ordinal: 125
 ---
 
 ## Description
