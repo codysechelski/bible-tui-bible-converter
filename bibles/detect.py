@@ -34,7 +34,7 @@ _USFM_MARKER = re.compile(
 )
 # "Gen 1:1 ...", "GEN 1:1 ...", "GEN.1.1 ...", "1 John 3:16 ...", "Song of Solomon 2:1 ...".
 _VPL_LINE = re.compile(
-    r"^\s*(?:[1-3]\s?)?[A-Za-z][A-Za-z]*(?: [A-Za-z][A-Za-z]*)*(?:\s+\d+:\d+|\.\d+\.\d+)\s+\S"
+    r"^\s*(?:[1-4]\s?)?[A-Za-z][A-Za-z]*(?: [A-Za-z][A-Za-z]*)*(?:\s+\d+:\d+|\.\d+\.\d+)\s+\S"
 )
 _VPL_SAMPLE_LINES = 20
 

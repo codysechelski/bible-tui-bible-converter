@@ -6,13 +6,16 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Optional, Sequence, Tuple
+from typing import List, Optional, Sequence
 
 from bibles import __version__
-from bibles.detect import SUPPORTED_FORMATS, Detection, FormatDetectionError, detect_format
+from bibles.detect import SUPPORTED_FORMATS, Detection
+from bibles.pipeline import ConversionError, ConversionResult, convert, parser_name
 from bibles.validate import ValidationReport, validate_database
 
 OUTPUT_SUFFIX = ".sqlite"
+# How many parser warnings a run prints before summarizing the rest.
+MAX_WARNINGS = 20
 
 
 class CliError(Exception):
@@ -49,6 +52,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--format",
         choices=SUPPORTED_FORMATS,
         help="force a specific input format instead of detecting it",
+    )
+    parser.add_argument(
+        "--allow-partial",
+        action="store_true",
+        help="accept a Bible with fewer than 66 books (missing books are reported as a warning)",
     )
     parser.add_argument(
         "--validate",
@@ -106,7 +114,17 @@ def resolve_output_path(
     return output_path
 
 
-def run(args: argparse.Namespace) -> Tuple[Detection, Path]:
+def _missing_parents(path: Path) -> List[Path]:
+    """The ancestors of `path` that do not exist yet, nearest first."""
+    missing = []
+    for parent in path.parents:
+        if parent.exists():
+            break
+        missing.append(parent)
+    return missing
+
+
+def run(args: argparse.Namespace) -> ConversionResult:
     source: Path = args.source
     if not source.is_file():
         raise CliError(f"source file not found: {source}")
@@ -114,12 +132,21 @@ def run(args: argparse.Namespace) -> Tuple[Detection, Path]:
     output_path = resolve_output_path(source, args.output, args.name)
     if output_path.is_dir():
         raise CliError(f"output path is a directory: {output_path}")
-    try:
-        detection = detect_format(source, args.format)
-    except FormatDetectionError as error:
-        raise CliError(str(error)) from error
+    if output_path.exists() and output_path.resolve() == source.resolve():
+        raise CliError(f"output path is the source file: {output_path}")
+
+    created = _missing_parents(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    return detection, output_path
+    try:
+        return convert(source, output_path, args.format, args.allow_partial)
+    except BaseException:
+        # Leave no trace of a failed run: remove directories this run created, if still empty.
+        for directory in created:
+            try:
+                directory.rmdir()
+            except OSError:
+                break
+        raise
 
 
 def print_report(report: ValidationReport) -> None:
@@ -128,10 +155,22 @@ def print_report(report: ValidationReport) -> None:
         print(line)
 
 
+def print_detection(detection: Detection) -> None:
+    print(f"Format: {detection.describe()}")
+    print(f"Parser: {parser_name(detection.format)}")
+
+
+def print_warnings(warnings: Sequence[str]) -> None:
+    for warning in warnings[:MAX_WARNINGS]:
+        print(f"Warning: {warning}")
+    if len(warnings) > MAX_WARNINGS:
+        print(f"Warning: ... and {len(warnings) - MAX_WARNINGS} more warnings")
+
+
 def validate_command(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     if args.output is not None or args.name is not None or args.format is not None:
         parser.error("--validate cannot be combined with --output, --name or --format")
-    report = validate_database(args.source)
+    report = validate_database(args.source, args.allow_partial)
     print_report(report)
     return 0 if report.ok else 1
 
@@ -147,14 +186,29 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
     if args.validate:
         return validate_command(parser, args)
+
+    print(f"Source: {args.source}")
     try:
-        detection, output_path = run(args)
+        result = run(args)
+    except ConversionError as error:
+        if error.detection is not None:
+            print_detection(error.detection)
+        if error.report is not None:
+            print_report(error.report)
+        print(f"{parser.prog}: error: {error}", file=sys.stderr)
+        print(f"{parser.prog}: no database was written", file=sys.stderr)
+        return 1
     except CliError as error:
         print(f"{parser.prog}: error: {error}", file=sys.stderr)
         return 1
 
-    print(f"Source: {args.source}")
-    print(f"Format: {detection.describe()}")
-    print(f"Output: {output_path}")
-    print("Conversion is not implemented yet; no database was written.")
+    metadata = result.metadata
+    print_detection(result.detection)
+    print_warnings(result.bible.warnings)
+    print_report(result.validation)
+    print(f"Output: {result.output}")
+    print(
+        f"Wrote {metadata['book_count']} books, {metadata['chapter_count']} chapters and "
+        f"{metadata['verse_count']} verses (version {metadata['version']})"
+    )
     return 0

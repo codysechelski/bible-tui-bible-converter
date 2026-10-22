@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Optional, Tuple
 
-from bibles.books import book_for_osis
+from bibles.books import UnknownBookError, book_for_osis
 from bibles.model import Bible
 from bibles.normalize import OSIS_DROPPED_DIV_TYPES, OSIS_DROPPED_ELEMENTS
 from bibles.parsers.base import ParseError, VerseCollector, parse_number
@@ -76,7 +76,11 @@ class _Walker:
             collector.text(element.tail)
 
     def start_verse(self, osis_id: str) -> None:
-        code, chapter, verse = parse_osis_id(osis_id)
+        try:
+            code, chapter, verse = parse_osis_id(osis_id)
+        except UnknownBookError as error:
+            self.collector.skip_book(error.code)
+            return
         self.collector.start_verse(verse, code, chapter)
         self.verse_count += 1
 

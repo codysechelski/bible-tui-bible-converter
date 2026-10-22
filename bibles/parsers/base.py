@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from bibles.books import book_for_code
+from bibles.books import UnknownBookError, book_for_code
 from bibles.model import Bible
 from bibles.normalize import EmptyVerseError, normalize_verse_text
 
@@ -68,6 +68,9 @@ class VerseCollector:
         self.chapter: Optional[int] = None
         self._verse: Optional[Tuple[str, int, int]] = None
         self._fragments: List[str] = []
+        # True while inside a book that is not one of the 66 (Apocrypha, front matter, glossary).
+        self.skipping = False
+        self._skipped: List[str] = []
 
     @property
     def in_verse(self) -> bool:
@@ -75,11 +78,27 @@ class VerseCollector:
 
     def start_book(self, code: str) -> None:
         self.end_verse()
-        self.book_code = book_for_code(code).usfm_code
         self.chapter = None
+        try:
+            self.book_code = book_for_code(code).usfm_code
+        except UnknownBookError:
+            self.skip_book(code)
+            return
+        self.skipping = False
+
+    def skip_book(self, code: str) -> None:
+        """Ignore everything until the next book, and warn once per skipped book code."""
+        self.end_verse()
+        self.book_code, self.chapter, self.skipping = None, None, True
+        key = code.strip().upper() or "(no code)"
+        if key not in self._skipped:
+            self._skipped.append(key)
+            self.bible.warnings.append(f"skipped book {key}: not one of the 66 canonical books")
 
     def start_chapter(self, number: int) -> None:
         self.end_verse()
+        if self.skipping:
+            return
         if self.book_code is None:
             raise ValueError(f"chapter {number} appears before any book")
         self.chapter = number
@@ -88,8 +107,16 @@ class VerseCollector:
                     chapter: Optional[int] = None, segment: bool = False) -> None:
         """Open a verse. `segment` marks a later part of a split verse (`3b`), which continues the
         open verse of the same number instead of being a duplicate."""
-        if book_code is not None and book_for_code(book_code).usfm_code != self.book_code:
-            self.start_book(book_code)
+        if book_code is not None:
+            try:
+                code = book_for_code(book_code).usfm_code
+            except UnknownBookError:
+                self.skip_book(book_code)
+                return
+            if code != self.book_code or self.skipping:
+                self.start_book(code)
+        if self.skipping:
+            return
         if chapter is not None and chapter != self.chapter:
             self.start_chapter(chapter)
         if self.book_code is None or self.chapter is None:

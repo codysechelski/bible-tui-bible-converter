@@ -79,18 +79,25 @@ class ResolveOutputPathTests(unittest.TestCase):
             resolve_output_path(self.source, output="bible.db", name="other.db", cwd=self.tmp)
 
 
+SAMPLE_USFM = "\\id GEN\n\\c 1\n\\p\n\\v 1 In the beginning.\n\\v 2 And the earth.\n"
+
+
 class MainTests(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.tmp = Path(self._tmp.name)
         self.source = self.tmp / "kjv.usfm"
-        self.source.write_text("\\id GEN\n", encoding="utf-8")
+        self.source.write_text(SAMPLE_USFM, encoding="utf-8")
         self._old_cwd = os.getcwd()
         os.chdir(self.tmp)
 
     def tearDown(self) -> None:
         os.chdir(self._old_cwd)
         self._tmp.cleanup()
+
+    def convert(self, *argv: str) -> tuple:
+        # One book is a partial Bible, so these runs allow it.
+        return run_main(str(self.source), "--allow-partial", *argv)
 
     def test_no_arguments_prints_usage_and_fails(self) -> None:
         code, _, err = run_main()
@@ -100,30 +107,74 @@ class MainTests(unittest.TestCase):
     def test_help_lists_every_option(self) -> None:
         code, out, _ = run_main("--help")
         self.assertEqual(code, 0)
-        for option in ("source", "--output", "--name", "--format", "--version", "--help"):
+        for option in ("source", "--output", "--name", "--format", "--allow-partial", "--validate",
+                       "--version", "--help"):
             self.assertIn(option, out)
 
-    def test_success_exits_zero_and_reports_output_in_cwd(self) -> None:
-        code, out, _ = run_main(str(self.source))
+    def test_success_writes_database_in_cwd_and_reports_it(self) -> None:
+        code, out, _ = self.convert()
         self.assertEqual(code, 0)
-        self.assertIn(f"Output: {Path.cwd() / 'kjv.sqlite'}", out)
+        output = Path.cwd() / "kjv.sqlite"
+        self.assertTrue(output.is_file())
+        self.assertIn(f"Output: {output}", out)
         self.assertIn("Format: usfm (detected from content)", out)
+        self.assertIn("Parser: bibles.parsers.usfm", out)
+        self.assertIn("WARN  Book count: 1 of 66 books (partial Bible allowed)", out)
+        self.assertIn("Wrote 1 books, 1 chapters and 2 verses (version kjv)", out)
 
     def test_missing_output_directory_is_created(self) -> None:
-        code, out, _ = run_main(str(self.source), "--output", "nested/dir/")
+        code, out, _ = self.convert("--output", "nested/dir/")
         self.assertEqual(code, 0)
-        self.assertTrue((self.tmp / "nested" / "dir").is_dir())
+        self.assertTrue((self.tmp / "nested" / "dir" / "kjv.sqlite").is_file())
         self.assertIn("kjv.sqlite", out)
 
     def test_parent_of_full_file_path_is_created(self) -> None:
-        code, _, _ = run_main(str(self.source), "-o", "deep/path/bible.db")
+        code, _, _ = self.convert("-o", "deep/path/bible.db")
         self.assertEqual(code, 0)
-        self.assertTrue((self.tmp / "deep" / "path").is_dir())
+        self.assertTrue((self.tmp / "deep" / "path" / "bible.db").is_file())
 
     def test_forced_format_is_reported(self) -> None:
-        code, out, _ = run_main(str(self.source), "--format", "usx")
+        code, out, _ = self.convert("--format", "usfm")
         self.assertEqual(code, 0)
+        self.assertIn("Format: usfm (forced with --format)", out)
+
+    def test_wrong_forced_format_fails_in_parse_stage(self) -> None:
+        code, out, err = self.convert("--format", "usx", "-o", "new/dir/")
+        self.assertEqual(code, 1)
         self.assertIn("Format: usx (forced with --format)", out)
+        self.assertIn("Parser: bibles.parsers.usx", out)
+        self.assertIn("error: parse failed:", err)
+        self.assertIn("no database was written", err)
+        self.assertFalse((self.tmp / "new").exists())
+
+    def test_source_without_verses_fails_and_leaves_nothing(self) -> None:
+        self.source.write_text("\\id GEN\n\\h Genesis\n", encoding="utf-8")
+        code, _, err = self.convert()
+        self.assertEqual(code, 1)
+        self.assertIn("parse failed:", err)
+        self.assertIn("no verses found", err)
+        self.assertEqual(sorted(p.name for p in self.tmp.iterdir()), ["kjv.usfm"])
+
+    def test_partial_bible_fails_validation_without_allow_partial(self) -> None:
+        code, out, err = run_main(str(self.source))
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL  Book count: expected 66 books, found 1", out)
+        self.assertIn("error: validate failed: database validation failed: Book count", err)
+        self.assertEqual(sorted(p.name for p in self.tmp.iterdir()), ["kjv.usfm"])
+
+    def test_existing_output_is_replaced_only_on_success(self) -> None:
+        output = self.tmp / "kjv.sqlite"
+        output.write_text("previous")
+        run_main(str(self.source))  # fails validation
+        self.assertEqual(output.read_text(), "previous")
+        self.assertEqual(self.convert()[0], 0)
+        self.assertNotEqual(output.read_bytes(), b"previous")
+
+    def test_output_cannot_be_the_source(self) -> None:
+        code, _, err = self.convert("-o", str(self.source))
+        self.assertEqual(code, 1)
+        self.assertIn("output path is the source file", err)
+        self.assertEqual(self.source.read_text(encoding="utf-8"), SAMPLE_USFM)
 
     def test_unknown_format_is_rejected(self) -> None:
         code, _, err = run_main(str(self.source), "--format", "docx")
@@ -134,10 +185,6 @@ class MainTests(unittest.TestCase):
         code, _, err = run_main(str(self.tmp / "missing.usfm"))
         self.assertNotEqual(code, 0)
         self.assertIn("source file not found", err)
-
-    def test_no_database_is_written_yet(self) -> None:
-        run_main(str(self.source))
-        self.assertFalse((self.tmp / "kjv.sqlite").exists())
 
 
 class ShellInvocationTests(unittest.TestCase):

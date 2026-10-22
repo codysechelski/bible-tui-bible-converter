@@ -217,7 +217,6 @@ class UsfmTests(ParserTestCase):
 
     def test_errors_name_file_and_line(self) -> None:
         cases = [
-            ("\\id XYZ\n\\c 1\n", "line 1: unknown book code 'XYZ'"),
             ("\\id GEN\n\\v 1 No chapter.\n", "line 2: verse 1 appears before any book and chapter"),
             ("\\id GEN\n\\c 1\n\\p\n\\v 1 A.\n\\v 1 Again.\n", "line 5: GEN 1:1 appears more than once"),
             ("\\id GEN\n\\c x\n", "line 2: invalid chapter number 'x'"),
@@ -231,6 +230,15 @@ class UsfmTests(ParserTestCase):
     def test_no_verses(self) -> None:
         with self.assertRaisesRegex(ParseError, "no verses found"):
             self.parse("usfm", "\\id GEN\n\\h Genesis\n")
+
+    def test_books_outside_the_66_are_skipped_with_warning(self) -> None:
+        source = ("\\id FRT Front matter\n\\p Preface.\n\\id GEN\n\\c 1\n\\p\n\\v 1 Genesis.\n"
+                  "\\id TOB\n\\c 1\n\\p\n\\v 1 Tobit.\n\\id tob\n\\c 2\n\\v 1 Again.\n"
+                  "\\id REV\n\\c 1\n\\p\n\\v 1 Revelation.\n")
+        bible = self.parse("usfm", source)
+        self.assertEqual([v.reference for v in bible.verses()], ["GEN 1:1", "REV 1:1"])
+        self.assertEqual(bible.warnings, ["skipped book FRT: not one of the 66 canonical books",
+                                          "skipped book TOB: not one of the 66 canonical books"])
 
 
 class UsxTests(ParserTestCase):
@@ -256,6 +264,13 @@ class UsxTests(ParserTestCase):
         source = ('<usx><book code="REV"/><chapter number="1"/><para style="p"><verse number="1"/>R.</para>'
                   '<book code="GEN"/><chapter number="1"/><para style="p"><verse number="1"/>G.</para></usx>')
         self.assertEqual([b.code for b in self.parse("usx", source).books], ["REV", "GEN"])
+
+    def test_books_outside_the_66_are_skipped(self) -> None:
+        source = ('<usx><book code="SIR"/><chapter number="1"/><para style="p"><verse number="1"/>Sirach.</para>'
+                  '<book code="MAT"/><chapter number="1"/><para style="p"><verse number="1"/>Matthew.</para></usx>')
+        bible = self.parse("usx", source)
+        self.assertEqual([v.reference for v in bible.verses()], ["MAT 1:1"])
+        self.assertEqual(bible.warnings, ["skipped book SIR: not one of the 66 canonical books"])
 
     def test_non_usx_xml_is_rejected(self) -> None:
         with self.assertRaisesRegex(ParseError, r"not a USX document \(root element is <osis>"):
@@ -298,6 +313,15 @@ class OsisTests(ParserTestCase):
         with self.assertRaises(ValueError):
             parse_osis_id("Gen.1")
 
+    def test_books_outside_the_66_are_skipped(self) -> None:
+        source = ('<osis><osisText><div type="book" osisID="Tob"><chapter osisID="Tob.1">'
+                  '<verse osisID="Tob.1.1">Tobit.</verse></chapter></div>'
+                  '<div type="book" osisID="Matt"><chapter osisID="Matt.1">'
+                  '<verse osisID="Matt.1.1">Matthew.</verse></chapter></div></osisText></osis>')
+        bible = self.parse("osis", source)
+        self.assertEqual([v.reference for v in bible.verses()], ["MAT 1:1"])
+        self.assertEqual(bible.warnings, ["skipped book TOB: not one of the 66 canonical books"])
+
     def test_no_verse_references(self) -> None:
         source = '<osis><osisText><div type="book" osisID="Gen"><p>Only text.</p></div></osisText></osis>'
         with self.assertRaisesRegex(ParseError, "contains no verse references"):
@@ -332,9 +356,11 @@ class VplTests(ParserTestCase):
         self.assertEqual(len(bible.warnings), 1)
         self.assertIn("line 1: not a verse reference", bible.warnings[0])
 
-    def test_unknown_book_and_duplicate_are_errors(self) -> None:
-        with self.assertRaisesRegex(ParseError, "line 2: unknown book code 'TOB'"):
-            self.parse("vpl", "GEN 1:1 Text.\nTOB 1:1 Text.\n")
+    def test_unknown_book_is_skipped_and_duplicate_is_an_error(self) -> None:
+        bible = self.parse("vpl", "GEN 1:1 Text.\nTOB 1:1 Tobit.\nTOB 1:2 More.\n4ES 1:1 Esdras.\nGEN 1:2 Two.\n")
+        self.assertEqual([v.reference for v in bible.verses()], ["GEN 1:1", "GEN 1:2"])
+        self.assertEqual(bible.warnings, ["skipped book TOB: not one of the 66 canonical books",
+                                          "skipped book 4ES: not one of the 66 canonical books"])
         with self.assertRaisesRegex(ParseError, "line 2: GEN 1:1 appears more than once"):
             self.parse("vpl", "GEN 1:1 Text.\nGEN 1:1 Again.\n")
 
@@ -368,6 +394,17 @@ class UsjTests(ParserTestCase):
             {"type": "para", "marker": "p", "content": [{"type": "verse", "number": "1"}, "G."]},
         ]})
         self.assertEqual([b.code for b in self.parse("usj", source).books], ["REV", "GEN"])
+
+    def test_books_outside_the_66_are_skipped(self) -> None:
+        source = json.dumps({"type": "USJ", "content": [
+            {"type": "book", "code": "GLO"}, {"type": "chapter", "number": "1"},
+            {"type": "para", "marker": "p", "content": [{"type": "verse", "number": "1"}, "Glossary."]},
+            {"type": "book", "code": "GEN"}, {"type": "chapter", "number": "1"},
+            {"type": "para", "marker": "p", "content": [{"type": "verse", "number": "1"}, "G."]},
+        ]})
+        bible = self.parse("usj", source)
+        self.assertEqual([v.reference for v in bible.verses()], ["GEN 1:1"])
+        self.assertEqual(bible.warnings, ["skipped book GLO: not one of the 66 canonical books"])
 
     def test_malformed_json_names_file_and_failure(self) -> None:
         path = self.write("broken.json", '{"type": "USJ", "content": [\n  {"type": "book",\n')

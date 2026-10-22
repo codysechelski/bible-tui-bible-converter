@@ -145,21 +145,24 @@ class CliDetectionTests(DetectTestCase):
         return code, stdout.getvalue(), stderr.getvalue()
 
     def test_detected_format_is_reported(self) -> None:
-        code, out, _ = self.run_cli(str(self.make("kjv.xml", OSIS)))
-        self.assertEqual(code, 0)
+        # The sample has no verses, so the run fails after detection but still reports the format.
+        code, out, err = self.run_cli(str(self.make("kjv.xml", OSIS)))
+        self.assertEqual(code, 1)
         self.assertIn("Format: osis (detected from content)", out)
+        self.assertIn("parse failed", err)
 
     def test_undetectable_file_exits_non_zero_and_names_formats(self) -> None:
         code, out, err = self.run_cli(str(self.make("notes.txt", "hello\n")), "-o", "out/")
         self.assertEqual(code, 1)
-        self.assertEqual(out, "")
-        self.assertIn("could not detect the format", err)
+        self.assertNotIn("Format:", out)
+        self.assertIn("detect failed: could not detect the format", err)
         self.assertIn("usfm, usx, osis, vpl, usj", err)
         self.assertIn("--format", err)
         self.assertFalse((self.tmp / "out").exists())
 
     def test_forced_format_overrides_detection(self) -> None:
-        code, out, _ = self.run_cli(str(self.make("notes.txt", "hello\n")), "--format", "vpl")
+        code, out, _ = self.run_cli(str(self.make("notes.txt", "GEN 1:1 Text.\n")), "--format", "vpl",
+                                    "--allow-partial")
         self.assertEqual(code, 0)
         self.assertIn("Format: vpl (forced with --format)", out)
 

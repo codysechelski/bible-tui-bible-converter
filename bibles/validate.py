@@ -103,18 +103,21 @@ def _metadata(conn: sqlite3.Connection) -> CheckResult:
                    f"{len(REQUIRED_METADATA)} required keys present")
 
 
-def _books(conn: sqlite3.Connection) -> List[CheckResult]:
+def _books(conn: sqlite3.Connection, allow_partial: bool) -> List[CheckResult]:
     rows = conn.execute(
         "SELECT sort_order, canonical_name, common_name, slug, testament FROM books ORDER BY sort_order"
     ).fetchall()
     expected = {book.sort_order: book for book in BOOKS}
 
-    count = CheckResult("Book count", PASS, "66 books") if len(rows) == 66 else CheckResult(
-        "Book count", FAIL, f"expected 66 books, found {len(rows)}"
-    )
+    if len(rows) == 66:
+        count = CheckResult("Book count", PASS, "66 books")
+    elif allow_partial and rows:
+        count = CheckResult("Book count", WARN, f"{len(rows)} of 66 books (partial Bible allowed)")
+    else:
+        count = CheckResult("Book count", FAIL, f"expected 66 books, found {len(rows)}")
 
     orders = [row[0] for row in rows]
-    order_problems = [] if orders == list(range(1, len(rows) + 1)) and len(rows) == 66 else [
+    order_problems = [] if allow_partial or orders == list(range(1, 67)) else [
         f"sort orders are {_examples([str(o) for o in orders]) or 'empty'}, expected 1..66"
     ]
     for order, canonical, common, slug, _ in rows:
@@ -130,9 +133,9 @@ def _books(conn: sqlite3.Connection) -> List[CheckResult]:
     wrong = [row[1] for row in rows
              if row[4] != (OLD_TESTAMENT if row[0] <= OLD_TESTAMENT_BOOK_COUNT else NEW_TESTAMENT)]
     split_problems = [f"{name} has the wrong testament" for name in wrong]
-    if (old, new) != (39, 27):
+    if (old, new) != (39, 27) and not allow_partial:
         split_problems.insert(0, f"{old} old / {new} new, expected 39 / 27")
-    split = _result("Testament split", split_problems, "39 old, 27 new")
+    split = _result("Testament split", split_problems, f"{old} old, {new} new")
     return [count, order, split]
 
 
@@ -217,8 +220,12 @@ def _totals(conn: sqlite3.Connection) -> CheckResult:
     return CheckResult("Totals against reference", PASS if same else WARN, detail)
 
 
-def validate_database(path: Path) -> ValidationReport:
-    """Run every check on the database at `path` (opened read-only) and return the report."""
+def validate_database(path: Path, allow_partial: bool = False) -> ValidationReport:
+    """Run every check on the database at `path` (opened read-only) and return the report.
+
+    With `allow_partial`, a database with fewer than 66 books (a New Testament, or a sample) only
+    warns about the missing books; every other check is unchanged.
+    """
     report = ValidationReport(Path(path))
     if not Path(path).is_file():
         report.checks.append(CheckResult("Database file", FAIL, f"not found: {path}"))
@@ -241,22 +248,23 @@ def validate_database(path: Path) -> ValidationReport:
             return report
 
         steps: List[Callable[[sqlite3.Connection], object]] = [
-            _integrity, _foreign_keys, _metadata, _books, _chapters, _verses, _totals,
+            _integrity, _foreign_keys, _metadata, lambda c: _books(c, allow_partial), _chapters, _verses,
+            _totals,
         ]
         for step in steps:
             try:
                 result = step(conn)
             except sqlite3.Error as error:
-                result = CheckResult(step.__name__.strip("_").replace("_", " ").capitalize(), FAIL, str(error))
+                result = CheckResult("Database query", FAIL, str(error))
             report.checks.extend(result if isinstance(result, list) else [result])
         return report
     finally:
         conn.close()
 
 
-def require_valid(path: Path) -> ValidationReport:
+def require_valid(path: Path, allow_partial: bool = False) -> ValidationReport:
     """Validate `path` and raise `DatabaseValidationError` when any check fails."""
-    report = validate_database(path)
+    report = validate_database(path, allow_partial)
     if not report.ok:
         raise DatabaseValidationError(report)
     return report

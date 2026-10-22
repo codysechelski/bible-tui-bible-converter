@@ -2,7 +2,7 @@
 
 Each line is `BOOK C:V text` or `BOOK.C.V text`. The book may be a USFM code, an OSIS code or a book
 name. A line with no text, or a `<range>` marker, is an absent verse. A line that is not a verse
-reference is reported as a warning and skipped.
+reference, or a verse of a book outside the 66, is reported as a warning and skipped.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from bibles.parsers.base import ParseError, VerseCollector, read_text
 
 _REFERENCE = re.compile(
     r"""^\s*
-    (?P<book>(?:[1-3]\s?)?[A-Za-z][A-Za-z.]*?(?:\s[A-Za-z][A-Za-z.]*?)*?)
+    (?P<book>(?:[1-4]\s?)?[A-Za-z][A-Za-z.]*?(?:\s[A-Za-z][A-Za-z.]*?)*?)
     (?:\s+|\.)
     (?P<chapter>\d+)[:.](?P<verse>\d+)(?:-\d+)?[a-z]?
     (?:\s+(?P<text>.*?))?\s*$""",
@@ -33,12 +33,15 @@ def parse_text(text: str, bible: Bible, name: str = "<vpl>") -> Bible:
             continue
         match = _REFERENCE.match(line)
         if not match:
-            bible.warnings.append(f"{name}, line {line_number}: not a verse reference, skipped: {line.strip()[:60]!r}")
+            bible.warnings.append(
+                f"{Path(name).name}, line {line_number}: not a verse reference, skipped: {line.strip()[:60]!r}"
+            )
             continue
         try:
             book = find_book(match.group("book"))
         except UnknownBookError as error:
-            raise ParseError(f"{name}, line {line_number}: {error}") from error
+            collector.skip_book(error.code)
+            continue
         verse_text = match.group("text") or ""
         if not verse_text or verse_text.lower() == RANGE_MARKER:
             continue  # an absent verse, or a later verse of a range kept on its first verse

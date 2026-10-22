@@ -141,11 +141,12 @@ def write_database(
     source_format: Optional[str] = None,
     created_at: Optional[datetime] = None,
     validate: bool = True,
+    allow_partial: bool = False,
 ) -> WriteResult:
     """Write `bible` to `output`, replacing any existing file.
 
     The database is built in a temporary file beside `output`, validated (unless `validate` is
-    False), and moved into place only when it is complete and valid, so a failure never leaves a
+    False; `allow_partial` accepts fewer than 66 books), and moved into place only when it is complete and valid, so a failure never leaves a
     partial, empty or invalid database at `output`. A failed validation raises
     `DatabaseValidationError`, whose `report` lists every check.
     """
@@ -164,7 +165,7 @@ def write_database(
             raise DatabaseWriteError(str(error)) from error
         finally:
             conn.close()
-        report = validate_database(tmp_path) if validate else None
+        report = validate_database(tmp_path, allow_partial) if validate else None
         if report is not None:
             report.path = output
             if not report.ok:
