@@ -1,10 +1,11 @@
 ---
 id: TASK-005
 title: Input format detection
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:13'
+updated_date: '2026-10-22 14:34'
 labels:
   - cli
   - parsing
