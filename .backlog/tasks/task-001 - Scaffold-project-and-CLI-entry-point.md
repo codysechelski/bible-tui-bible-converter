@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:19'
+updated_date: '2026-10-22 14:20'
 labels:
   - cli
 dependencies: []
@@ -28,13 +28,13 @@ The CLI must accept the path to a single source file, an optional output locatio
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The repository contains a runnable package or script that can be invoked from a shell, and running it with a help flag prints usage for every supported option
-- [ ] #2 The CLI accepts a source file path as a positional argument plus optional flags for the output location, the output file name, and forcing a specific input format
-- [ ] #3 When no output file name is given, the output file is the input file base name with a .sqlite extension; when a name is given, that name is used
-- [ ] #4 The output location can be given as a directory, in which case the file name is placed inside it, or as a full file path, in which case that path is used directly
-- [ ] #5 When the output location is omitted, the database is written to the current working directory
-- [ ] #6 A missing output directory is created rather than causing a failure
-- [ ] #7 Running the CLI with no arguments prints usage and exits with a non zero status, and a successful run exits with status 0
+- [x] #1 The repository contains a runnable package or script that can be invoked from a shell, and running it with a help flag prints usage for every supported option
+- [x] #2 The CLI accepts a source file path as a positional argument plus optional flags for the output location, the output file name, and forcing a specific input format
+- [x] #3 When no output file name is given, the output file is the input file base name with a .sqlite extension; when a name is given, that name is used
+- [x] #4 The output location can be given as a directory, in which case the file name is placed inside it, or as a full file path, in which case that path is used directly
+- [x] #5 When the output location is omitted, the database is written to the current working directory
+- [x] #6 A missing output directory is created rather than causing a failure
+- [x] #7 Running the CLI with no arguments prints usage and exits with a non zero status, and a successful run exits with status 0
 - [ ] #8 The project has a README placeholder that states the intended usage, and the tool runs on the Python version available in the environment
 <!-- AC:END -->
 
