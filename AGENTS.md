@@ -21,7 +21,10 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
   `docs/normalization.md`; keep the doc and the marker sets in sync.
 - `bibles/writer.py` writes a `Bible` to SQLite with `write_database`. `SCHEMA` is copied from the reference
   project and a test compares it with `bible_esv.sqlite`; never change it on its own. The database is built in a
-  temporary file beside the output and moved into place only when complete. Book ids equal sort order.
+  temporary file beside the output, validated, and moved into place only when complete and valid. Book ids
+  equal sort order. Tests that write partial Bibles pass `validate=False`.
+- `bibles/validate.py` runs every check and returns a `ValidationReport` (pass/warn/fail per check); verse gaps
+  and unusual chapter counts only warn. `bibles --validate DB` prints it. Checks are listed in `docs/validation.md`.
 - `bibles/detect.py` owns `SUPPORTED_FORMATS` and `detect_format`: content sniffing wins over the extension,
   format-specific extensions are a fallback, `--format` bypasses detection. The CLI turns
   `FormatDetectionError` into a `CliError`.

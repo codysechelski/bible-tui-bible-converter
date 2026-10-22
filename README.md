@@ -20,6 +20,7 @@ python3 -m bibles SOURCE ...
 | `-o, --output` | Output directory or full output file path. Defaults to the current working directory. |
 | `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`. `.sqlite` is appended when the name has no extension. |
 | `-f, --format` | Force a specific input format instead of detecting it (`usfm`, `usx`, `osis`, `vpl`, `usj`). |
+| `--validate` | Validate an existing database (`SOURCE`) instead of converting. |
 
 How `--output` is interpreted:
 
@@ -49,10 +50,21 @@ Examples:
 
 Running with no arguments prints usage and exits with status 2; a successful run exits with status 0.
 
+## Validating a database
+
+```sh
+./bin/bibles --validate bible.sqlite
+```
+
+Runs every check (integrity, foreign keys, 66 books in canonical order, contiguous chapters, duplicate and
+empty verses, and more), lists each result, and exits 1 if any check fails. Conversions run the same checks
+before writing. See [validation](docs/validation.md).
+
 ## Documentation
 
 - [Verse text normalization](docs/normalization.md): how headings, notes, poetry lines and whitespace are
   handled so every input format produces the same verse text.
+- [Database validation](docs/validation.md): every check, and which ones fail or only warn.
 
 ## Development
 

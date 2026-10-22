@@ -65,7 +65,7 @@ class WriterTestCase(unittest.TestCase):
         self._tmp.cleanup()
 
     def write(self, bible: Bible) -> sqlite3.Connection:
-        write_database(bible, self.output, SOURCE, "usfm", FIXED_TIME)
+        write_database(bible, self.output, SOURCE, "usfm", FIXED_TIME, validate=False)
         conn = sqlite3.connect(self.output)
         self.addCleanup(conn.close)
         return conn
@@ -185,7 +185,7 @@ class FailureTests(WriterTestCase):
         self.output.write_text("previous database")
         with mock.patch.object(writer, "SCHEMA", writer.SCHEMA + "\nCREATE TABLE books (x);"):
             with self.assertRaises(DatabaseWriteError):
-                write_database(sample_bible(), self.output, SOURCE)
+                write_database(sample_bible(), self.output, SOURCE, validate=False)
         self.assertEqual(list(self.tmp.iterdir()), [self.output])
         self.assertEqual(self.output.read_text(), "previous database")
 

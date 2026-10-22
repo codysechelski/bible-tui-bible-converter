@@ -7,9 +7,11 @@ import sqlite3
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from bibles.model import Bible, BibleBook
+from bibles.validate import DatabaseValidationError, ValidationReport, validate_database
 
 # Copied from bible-esv/tools/build_sqlite.py. The TUI depends on it, so it must not drift; the
 # schema test compares it with the reference database.
@@ -54,6 +56,12 @@ CREATE INDEX idx_verses_chapter_number ON verses(chapter_id, verse_number);
 
 class DatabaseWriteError(Exception):
     """The Bible cannot be written as a valid database."""
+
+
+@dataclass(frozen=True)
+class WriteResult:
+    metadata: Dict[str, str]
+    validation: Optional[ValidationReport]
 
 
 def build_metadata(
@@ -132,11 +140,14 @@ def write_database(
     source: Path,
     source_format: Optional[str] = None,
     created_at: Optional[datetime] = None,
-) -> Dict[str, str]:
-    """Write `bible` to `output`, replacing any existing file, and return the metadata written.
+    validate: bool = True,
+) -> WriteResult:
+    """Write `bible` to `output`, replacing any existing file.
 
-    The database is built in a temporary file beside `output` and moved into place only when it is
-    complete, so a failure never leaves a partial or empty database at `output`.
+    The database is built in a temporary file beside `output`, validated (unless `validate` is
+    False), and moved into place only when it is complete and valid, so a failure never leaves a
+    partial, empty or invalid database at `output`. A failed validation raises
+    `DatabaseValidationError`, whose `report` lists every check.
     """
     books = _ordered_books(bible)
     metadata = build_metadata(bible, source, source_format, created_at)
@@ -153,8 +164,13 @@ def write_database(
             raise DatabaseWriteError(str(error)) from error
         finally:
             conn.close()
+        report = validate_database(tmp_path) if validate else None
+        if report is not None:
+            report.path = output
+            if not report.ok:
+                raise DatabaseValidationError(report)
         os.replace(tmp_path, output)
     except BaseException:
         tmp_path.unlink(missing_ok=True)
         raise
-    return metadata
+    return WriteResult(metadata, report)

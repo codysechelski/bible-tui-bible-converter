@@ -10,6 +10,7 @@ from typing import Optional, Sequence, Tuple
 
 from bibles import __version__
 from bibles.detect import SUPPORTED_FORMATS, Detection, FormatDetectionError, detect_format
+from bibles.validate import ValidationReport, validate_database
 
 OUTPUT_SUFFIX = ".sqlite"
 
@@ -23,7 +24,9 @@ def build_parser() -> argparse.ArgumentParser:
         prog="bibles",
         description="Convert a text-formatted Bible file into a SQLite database for the Bible TUI.",
     )
-    parser.add_argument("source", type=Path, help="path to the source Bible file")
+    parser.add_argument(
+        "source", type=Path, help="path to the source Bible file (with --validate: the database to check)"
+    )
     parser.add_argument(
         "-o",
         "--output",
@@ -46,6 +49,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--format",
         choices=SUPPORTED_FORMATS,
         help="force a specific input format instead of detecting it",
+    )
+    parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="validate an existing database instead of converting; exits 1 when a check fails",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return parser
@@ -114,6 +122,20 @@ def run(args: argparse.Namespace) -> Tuple[Detection, Path]:
     return detection, output_path
 
 
+def print_report(report: ValidationReport) -> None:
+    print(f"Validating: {report.path}")
+    for line in report.lines():
+        print(line)
+
+
+def validate_command(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
+    if args.output is not None or args.name is not None or args.format is not None:
+        parser.error("--validate cannot be combined with --output, --name or --format")
+    report = validate_database(args.source)
+    print_report(report)
+    return 0 if report.ok else 1
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = build_parser()
     argv = list(sys.argv[1:] if argv is None else argv)
@@ -123,6 +145,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
 
     args = parser.parse_args(argv)
+    if args.validate:
+        return validate_command(parser, args)
     try:
         detection, output_path = run(args)
     except CliError as error:
