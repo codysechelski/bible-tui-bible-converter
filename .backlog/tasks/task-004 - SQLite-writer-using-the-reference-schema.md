@@ -1,10 +1,11 @@
 ---
 id: TASK-004
 title: SQLite writer using the reference schema
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:10'
+updated_date: '2026-10-22 14:31'
 labels:
   - schema
 dependencies:
