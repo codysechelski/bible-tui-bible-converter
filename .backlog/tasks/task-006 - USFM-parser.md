@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:39'
+updated_date: '2026-10-22 14:47'
 labels:
   - parsing
 dependencies:
@@ -25,14 +25,14 @@ The parser must produce the shared verse model, resolve the book from its id mar
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The parser reads a USFM file and produces normalized books, chapters and verses through the shared model
-- [ ] #2 Book identity comes from the id marker and resolves to the canonical book record, and a file containing more than one book is split into separate books in order
-- [ ] #3 Chapters come from the c marker and verses from the v marker, and verse text continues across following lines until the next verse, chapter or book marker
-- [ ] #4 Paragraph, poetry and character formatting markers do not leak into verse text
-- [ ] #5 Non verse content such as title markers, section headings, table of contents entries and reminder markers is excluded from verse text
-- [ ] #6 Footnotes, endnotes and cross references are removed or inlined consistently with the documented normalization policy
-- [ ] #7 UTF-8 files are read correctly, and files carrying a byte order mark or a legacy encoding are handled without a crash
-- [ ] #8 Automated tests cover a single book excerpt and a file containing multiple books
+- [x] #1 The parser reads a USFM file and produces normalized books, chapters and verses through the shared model
+- [x] #2 Book identity comes from the id marker and resolves to the canonical book record, and a file containing more than one book is split into separate books in order
+- [x] #3 Chapters come from the c marker and verses from the v marker, and verse text continues across following lines until the next verse, chapter or book marker
+- [x] #4 Paragraph, poetry and character formatting markers do not leak into verse text
+- [x] #5 Non verse content such as title markers, section headings, table of contents entries and reminder markers is excluded from verse text
+- [x] #6 Footnotes, endnotes and cross references are removed or inlined consistently with the documented normalization policy
+- [x] #7 UTF-8 files are read correctly, and files carrying a byte order mark or a legacy encoding are handled without a crash
+- [x] #8 Automated tests cover a single book excerpt and a file containing multiple books
 <!-- AC:END -->
 
 ## Definition of Done
@@ -57,3 +57,29 @@ The parser must produce the shared verse model, resolve the book from its id mar
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/parsers/usfm.py` (tokenizer) on top of the shared core: `parsers/base.py` (`ParseError`, `VerseCollector`, `read_text`, `parse_number`) and `parsers/markers.py` (`MarkerEvents`, shared with USX/USJ). `parsers/__init__.py` registers all five parsers in `PARSERS` and exposes `parse_file(path, format)`.
+
+- \\id starts a book (rest of the line ignored); several \\id in one file give several books in order.
+- Paragraph/poetry markers start a new fragment; character markers keep their text; \\w attributes after | are dropped; milestones (\\qt-s ... \\*) and sidebars (\\esb..\\esbe) are skipped; note-internal markers (\\fp etc.) are treated as character-level so a note never leaks.
+- Encoding: UTF-8 with or without BOM; otherwise cp1252 then latin-1, with a warning.
+- Errors raise ParseError with file and line.
+
+Design decisions (please review):
+- A verse with no text (e.g. only a footnote, as for omitted verses like ACT 8:37) is left out with a warning instead of failing the run.
+- Verse ranges (\\v 1-2) are kept on the first verse; segments (3a/3b) are joined.
+- \\qa (Psalm 119 acrostic letters) added to the dropped headings.
+- Unknown book codes (FRT, GLO, deuterocanon) still fail the parse, per TASK-002. eBible USFM zips include 00-FRT*.usfm etc., so converting a whole folder will need the pipeline (TASK-014) to skip those files.
+- Psalm titles (\\d) are still dropped (TASK-003 decision). Note: both the ESV reference db and eBible's VPL keep them in verse 1; flipping is a one-line change in NON_VERSE_BLOCK_MARKERS.
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 110 tests OK (tests/test_parsers.py is new, incl. one passage in all five formats producing identical verses). Real-data smoke test (scratchpad, not committed): eBible.org World English Bible (engwebp) USFM, all 66 book files, parsed with 0 errors (31,098 verses, 5 warnings for verses WEB omits, e.g. ACT 8:37); the eBible VPL edition parsed to the same 31,098 references and wrote a 66-book / 1,189-chapter database through write_database. Text matched USFM except Psalm titles (\\d) and Song of Solomon speaker labels (\\sp), which eBible's VPL keeps and our policy drops, and one source-faithful spacing difference (PSA 68:32). eBible no longer serves USX/OSIS downloads at the usual URLs, so USX/OSIS/USJ are covered by fixtures only. Committed together in c0e1769 (shared core + cross-format test). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the USFM parser and the shared parser core used by every format.
+<!-- SECTION:FINAL_SUMMARY:END -->
