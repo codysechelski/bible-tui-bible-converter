@@ -1,9 +1,11 @@
 ---
 id: TASK-016
 title: Collect converted SQLite Bible databases in the repository
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 15:01'
+updated_date: '2026-10-22 15:35'
 labels:
   - repo-layout
 dependencies:
