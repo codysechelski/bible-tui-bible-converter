@@ -4,12 +4,10 @@ title: README and project documentation
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:10'
+updated_date: '2026-10-22 14:12'
 labels:
   - cli
-dependencies:
-  - TASK-001
-  - TASK-012
+dependencies: []
 references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: medium
