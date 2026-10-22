@@ -1,11 +1,11 @@
 ---
 id: TASK-005
 title: Input format detection
-status: Ready for Testing
+status: Done
 assignee:
   - '@cody'
 created_date: '2026-10-22 14:08'
-updated_date: '2026-10-22 14:36'
+updated_date: '2026-10-22 14:43'
 labels:
   - cli
   - parsing
@@ -13,7 +13,7 @@ dependencies:
   - TASK-001
 priority: high
 type: feature
-ordinal: 10
+ordinal: 62.5
 ---
 
 ## Description
