@@ -1,11 +1,19 @@
 # bibles
 
-`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL, USJ or RTF) into a SQLite database that the
-custom Bible terminal UI can read. The source can be a single file, a folder of book files, or the zip archive a
-Bible download usually comes as. The database uses exactly the schema of the reference project
-(`bible-esv/bible_esv.sqlite`), so the TUI opens it without changes.
+`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL, USJ or RTF) into a SQLite database with one
+simple, fixed schema: books, chapters and verses. The source can be a single file, a folder of book files, or the
+zip archive a Bible download usually comes as.
 
-It is Python 3.9+ and standard library only, so it runs anywhere the TUI does.
+It is Python 3.9+ and standard library only, so it runs anywhere Python does.
+
+## Quickstart
+
+New to the command line, or to Bible file formats? The [Quickstart](Quickstart.md) walks you through
+downloading a Bible and converting it, step by step.
+
+```sh
+tool/bin/bibles ~/Downloads/eng-web_usfm.zip --name bible_web   # writes bibles/bible_web.sqlite
+```
 
 ## Repository layout
 
@@ -22,7 +30,7 @@ The commands below are run from the repository root. The wrapper works from any 
 
 ## Converted Bibles
 
-These databases are in `bibles/`. Open one with the TUI directly; nothing needs converting first.
+These databases are in `bibles/`, ready to use; nothing needs converting first.
 
 | File | Translation | Books, chapters, verses | Licence |
 | --- | --- | --- | --- |
@@ -48,7 +56,7 @@ Notes on the content:
 
 1. Pick a source whose licence allows redistribution, and download it. Convert the downloaded zip as it is
    (or the folder it unzips to). Without a Digital Bible Library `metadata.xml` in the bundle, the source
-   name becomes the `version` the TUI shows, so name the copy after the translation's short name:
+   name becomes the database's `version`, so name the copy after the translation's short name:
 
    ```sh
    cp eng-web_usfm.zip WEB.zip
@@ -59,11 +67,16 @@ Notes on the content:
    ones the translation genuinely omits. The conversion fails if any validation check fails.
 3. Add the database to both tables above (source URL, date of the source files, SHA-256 of the download,
    licence) and to `COLLECTION` in `tool/tests/test_collection.py`, which checks that every database in
-   `bibles/` is listed, validates and matches the reference schema.
+   `bibles/` is listed, validates and has the expected schema.
 4. Commit the `.sqlite` file in `bibles/`. Re-converting the same download must give the same books, chapters and verses;
    only `created_at_utc` changes.
 
-## Quick start
+## Usage
+
+```sh
+tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj,rtf}] [--allow-partial]
+tool/bin/bibles --validate DATABASE [--allow-partial]
+```
 
 ```sh
 tool/bin/bibles kjv.usfm                      # writes bibles/kjv.sqlite
@@ -87,13 +100,6 @@ Validating: /home/me/bibles/bibles/kjv.sqlite
 Validation passed: 15 checks, 0 failed, 0 warnings
 Output: /home/me/bibles/bibles/kjv.sqlite
 Wrote 66 books, 1189 chapters and 31102 verses (version kjv)
-```
-
-## Usage
-
-```sh
-tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj,rtf}] [--allow-partial]
-tool/bin/bibles --validate DATABASE [--allow-partial]
 ```
 
 | Option | Meaning |
@@ -235,7 +241,7 @@ the test suite checks this with real files.
 
 ## Output schema
 
-The database matches the reference schema exactly (a test compares the two):
+Every database has this schema:
 
 | Table | Columns | Notes |
 | --- | --- | --- |
@@ -254,7 +260,7 @@ Metadata keys:
 
 | Key | Value |
 | --- | --- |
-| `version` | Short version name from the source (OSIS `osisIDWork`, or a bundle's DBL `metadata.xml` abbreviation), otherwise the source name without its extension. The TUI shows it. |
+| `version` | Short version name from the source (OSIS `osisIDWork`, or a bundle's DBL `metadata.xml` abbreviation), otherwise the source name without its extension. |
 | `version_name` | Full version name from the source (OSIS work title, or the DBL bundle name), otherwise `version`. |
 | `source` | Source file, folder or zip name and format, for example `kjv.usfm (usfm)`. |
 | `created_at_utc` | When the database was written, ISO 8601 in UTC, for example `2026-10-22T14:30:05+00:00`. |
@@ -265,13 +271,14 @@ Metadata keys:
 Every conversion validates the database before moving it into place, and `--validate` checks an existing one:
 SQLite integrity, foreign keys, metadata, 66 books in canonical order with the right names and testaments,
 contiguous chapters, chapters with verses, duplicate and empty verses, and verse to chapter links fail; verse
-gaps, unusual chapter counts and totals different from the reference only warn. Every check is listed with its
+gaps, unusual chapter counts and totals different from a standard Bible's only warn. Every check is listed with its
 result. See [validation](tool/docs/validation.md).
 
 ## Documentation
 
 - [Verse text normalization](tool/docs/normalization.md): how headings, notes, poetry lines, whitespace, verse
   ranges and absent verses are handled.
+- [Quickstart](Quickstart.md): a step-by-step guide for converting your first Bible.
 - [Folders and zip archives](tool/docs/sources.md): how book files are found and combined, and the RTF layout.
 - [Database validation](tool/docs/validation.md): every check, and which ones fail or only warn.
 - [Samples](tool/samples/README.md): where the sample files come from and how they differ.
@@ -286,5 +293,5 @@ python3 -m unittest discover -s tool/tests -t tool                              
 python3 -m py_compile tool/bibles/*.py tool/bibles/parsers/*.py tool/tests/*.py  # syntax check
 ```
 
-Some tests compare against the reference project at `../bible-esv` (`bible_esv.sqlite` and `tui/bible_tui.py`);
-they are skipped when it is not present.
+Some tests compare the output with a reference database that is not part of this repository; they are skipped
+when it is not present.

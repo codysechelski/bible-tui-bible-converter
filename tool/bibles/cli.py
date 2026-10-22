@@ -29,8 +29,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="bibles",
         description=(
-            "Convert a text-formatted Bible into a SQLite database for the Bible TUI. The source is a "
-            "file, a folder of book files, or a zip archive of one."
+            "Convert a text-formatted Bible into a SQLite database. The source is a file, a folder "
+            "of book files, or a zip archive of one."
         ),
     )
     parser.add_argument(
