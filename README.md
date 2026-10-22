@@ -17,6 +17,49 @@ The repository is both the converter and a collection of the databases it produc
 The commands below are run from the repository root. The wrapper works from any directory, and
 `python3 -m bibles` works from inside `tool/`.
 
+## Converted Bibles
+
+These databases sit at the repository root. Open one with the TUI directly; nothing needs converting first.
+
+| File | Translation | Books, chapters, verses | Licence |
+| --- | --- | --- | --- |
+| `bible_kjv.sqlite` | King James Version (1769 standardized text) | 66, 1189, 31102 | Public domain (outside the United Kingdom, where the Crown's letters patent restrict printing) |
+| `bible_asv.sqlite` | American Standard Version (1901) | 66, 1189, 31086 | Public domain |
+
+Where each one came from:
+
+| File | Source | Source files dated | SHA-256 of the downloaded zip |
+| --- | --- | --- | --- |
+| `bible_kjv.sqlite` | eBible.org [`eng-kjv_usfm.zip`](https://ebible.org/Scriptures/eng-kjv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-kjv)) | 2026-09-26 | `67561758cf58d9e767e89226a99171dba722579157d3894767c2f27538bcb38e` |
+| `bible_asv.sqlite` | eBible.org [`eng-asv_usfm.zip`](https://ebible.org/Scriptures/eng-asv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-asv)) | 2026-10-20 | `5e385a1a89887849cb07c88ddf4df37708e0fa901b1f1b7f0b8204c153f0a901` |
+
+Both copyright pages shipped in the zips (`copr.htm`) state the text is public domain and may be copied freely.
+Notes on the content:
+
+- The KJV zip also holds the Apocrypha and front matter; those books are skipped, leaving the 66. The `¶`
+  paragraph marks that eBible.org keeps in the text are kept.
+- The ASV leaves out 16 New Testament verses that later manuscripts add (Matthew 17:21, Acts 8:37 and others).
+  They are absent rather than empty, so validation warns about the verse gaps and the totals.
+
+### Adding a Bible
+
+1. Pick a source whose licence allows redistribution, and download it. For an eBible.org USFM zip, concatenate
+   the books into one file named after the translation's short name, which becomes the `version` the TUI
+   shows:
+
+   ```sh
+   unzip eng-web_usfm.zip -d eng-web && cat eng-web/*.usfm > WEB.usfm
+   tool/bin/bibles WEB.usfm -n bible_web       # writes ./bible_web.sqlite
+   ```
+
+2. Check the run's warnings: skipped books should be only non-canonical ones, and missing verses should be
+   ones the translation genuinely omits. The conversion fails if any validation check fails.
+3. Add the database to both tables above (source URL, date of the source files, SHA-256 of the download,
+   licence) and to `COLLECTION` in `tool/tests/test_collection.py`, which checks that every database at the
+   root is listed, validates and matches the reference schema.
+4. Commit the `.sqlite` file. Re-converting the same download must give the same books, chapters and verses;
+   only `created_at_utc` changes.
+
 ## Quick start
 
 ```sh

@@ -13,8 +13,10 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 
 ## Repository Map
 
-The repository root holds only the converted databases, the README, AGENTS.md, CLAUDE.md, `.gitignore` and
-`.backlog/`. Everything else is under `tool/`, and the paths below are relative to it.
+The repository root holds only the converted databases (`bible_<short name>.sqlite`), the README, AGENTS.md,
+CLAUDE.md, `.gitignore` and `.backlog/`. The README's "Converted Bibles" section records each database's source,
+download checksum and licence; add a row there and to `COLLECTION` in `tests/test_collection.py` whenever a
+database is added or reconverted. Everything else is under `tool/`, and the paths below are relative to it.
 
 - `bibles/cli.py` holds argument parsing, output path resolution and the output of a run; `bibles/__main__.py`
   makes `python3 -m bibles` work from `tool/`. `bin/bibles` is a bash wrapper that runs the package from any
@@ -46,7 +48,8 @@ The repository root holds only the converted databases, the README, AGENTS.md, C
 - `docs/` holds Markdown documentation, linked from the README.
 - `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all five formats;
   `test_samples.py` converts the samples end to end through the CLI and the wrapper and reads the result with
-  the reference TUI's `BibleStore`.
+  the reference TUI's `BibleStore`. `test_collection.py` validates the committed databases at the repository
+  root.
 - `.backlog/` (at the repository root) holds Backlog.md tasks; work is planned there.
 
 ## Commands
