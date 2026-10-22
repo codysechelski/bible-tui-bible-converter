@@ -1,9 +1,9 @@
 ---
 id: TASK-002
 title: Canonical 66-book reference data
-status: In Progress
+status: Ready for Testing
 assignee:
-  - '@claude'
+  - '@cody'
 created_date: '2026-10-22 14:08'
 updated_date: '2026-10-22 14:27'
 labels:
