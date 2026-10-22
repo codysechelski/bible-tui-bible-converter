@@ -1,0 +1,277 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.bibletechnologies.net/2003/OSIS/namespace http://www.bibletechnologies.net/osisCore.2.1.1.xsd">  <osisText osisIDWork="Bible.en.kjv" osisRefWork="bible" xml:lang="en" canonical="true">    <header>      <revisionDesc>        <date>2013.07.12T21.38.21</date>        <p>This Modified OSIS file was generated from a USFX source as part of the process to convert to a SWORD module using Haiola
+ open source software from http://haiola.org.
+ Some non-canonical parts of the USFX source file that are not currently supported by The Sword Project (http://crosswire.org) were
+ stripped out, as were some of the pure presentational elements that make no sense in a Bible study program,
+ but the canonical Scripture text and punctuation remain. Sometimes more than one source format markup was mapped to the same
+ OSIS markup, which may result in some minor formatting changes. The usage of the &lt;q&gt; element in this file is not compliant with
+ the OSIS User Manual in that &lt;q&gt; markup is stopped and restarted at all verse boundaries, and NEVER intended to trigger generation
+ of any punctuation. ALL correct punctuation for quotations for this language, dialect, and translation style, if any, are already
+ in the text of the Scriptures. This is why the n attribute of &lt;q&gt; is always the empty string. Because of these limitations, this
+ file may be good to include in archives, BUT not to the exclusion of the source USFM, USFX, or USX file(s) from which this Modified
+ OSIS file was generated.
+</p>      </revisionDesc>      <revisionDesc>        <date>2013.07.08</date>        <p>created or updated OSIS file contents</p>      </revisionDesc>      <work osisWork="Bible.en.kjv">        <title type="x-vernacular">King James Version</title>        <description type="x-english">The King James Version or Authorized Version of the Holy Bible, using the standardized text of 1769, with Apocrypha/Deuterocanon</description>        <publisher type="x-print">Cambridge University Press, Oxford University Press, Collins, etc.</publisher>        <publisher type="x-electronic">eBible.org</publisher>        <identifier type="x-ebible-id">eng-kjv</identifier>        <language type="x-ethnologue">eng</language>        <language type="x-in-english">17th century England dialect of English</language>        <language type="x-vernacular">English</language>        <rights type="x-copyright">public domain</rights>        <rights type="x-license">This work is in the Public Domain. That means that it is not copyrighted.
+ It is still subject to God's Law concerning His Word, including the Great Commission (Matthew 28:18-20).
+A United Kingdom Crown Copyright with no expiration date means that to print this translation in the United Kingdom, you need letters patent. Currently, the Cambridge University Press, the Oxford University Press, and Collins have the exclusive right to print this Bible translation in the UK. This Crown Copyright has no effect outside of the UK, where this work is firmly in the Public Domain.</rights>        <refSystem>Bible</refSystem>      </work>      <work osisWork="bible">        <type type="OSIS">Bible</type>        <refSystem>Bible</refSystem>      </work>    </header>    <div type="bookGroup" canonical="true">      <title>Old Testament</title>      <div type="book" osisID="Ruth" canonical="true">        <title type="main" short="Ruth">The Book of Ruth</title>        <chapter osisRef="Ruth.1" sID="Ruth.1.seID.07361" n="1"/>        <p>          <verse osisID="Ruth.1.1" sID="Ruth.1.1.seID.07362" n="1"/>Now it came to pass in the days when the judges ruled, that there was a famine in the land. And a certain man of Bethlehemjudah went to sojourn in the country of Moab, he, and his wife, and his two sons.
+<verse eID="Ruth.1.1.seID.07362"/><verse osisID="Ruth.1.2" sID="Ruth.1.2.seID.07363" n="2"/>And the name of the man
+<transChange type="added">was</transChange> Elimelech, and the name of his wife Naomi, and the name of his two sons Mahlon and Chilion, Ephrathites of Bethlehemjudah. And they came into the country of Moab, and continued there.
+<verse eID="Ruth.1.2.seID.07363"/><verse osisID="Ruth.1.3" sID="Ruth.1.3.seID.07364" n="3"/>And Elimelech Naomi’s husband died; and she was left, and her two sons.
+<verse eID="Ruth.1.3.seID.07364"/><verse osisID="Ruth.1.4" sID="Ruth.1.4.seID.07365" n="4"/>And they took them wives of the women of Moab; the name of the one
+<transChange type="added">was</transChange> Orpah, and the name of the other Ruth: and they dwelled there about ten years.
+<verse eID="Ruth.1.4.seID.07365"/><verse osisID="Ruth.1.5" sID="Ruth.1.5.seID.07366" n="5"/>And Mahlon and Chilion died also both of them; and the woman was left of her two sons and her husband.
+<verse eID="Ruth.1.5.seID.07366"/></p>        <p>          <verse osisID="Ruth.1.6" sID="Ruth.1.6.seID.07367" n="6"/>Then she arose with her daughters in law, that she might return from the country of Moab: for she had heard in the country of Moab how that the LORD had visited his people in giving them bread.
+<verse eID="Ruth.1.6.seID.07367"/><verse osisID="Ruth.1.7" sID="Ruth.1.7.seID.07368" n="7"/>Wherefore she went forth out of the place where she was, and her two daughters in law with her; and they went on the way to return unto the land of Judah.
+<verse eID="Ruth.1.7.seID.07368"/><verse osisID="Ruth.1.8" sID="Ruth.1.8.seID.07369" n="8"/>And Naomi said unto her two daughters in law, Go, return each to her mother’s house: the LORD deal kindly with you, as ye have dealt with the dead, and with me.
+<verse eID="Ruth.1.8.seID.07369"/><verse osisID="Ruth.1.9" sID="Ruth.1.9.seID.07370" n="9"/>The LORD grant you that ye may find rest, each
+<transChange type="added">of you</transChange> in the house of her husband. Then she kissed them; and they lifted up their voice, and wept.
+<verse eID="Ruth.1.9.seID.07370"/><verse osisID="Ruth.1.10" sID="Ruth.1.10.seID.07371" n="10"/>And they said unto her, Surely we will return with thee unto thy people.
+<verse eID="Ruth.1.10.seID.07371"/><verse osisID="Ruth.1.11" sID="Ruth.1.11.seID.07372" n="11"/>And Naomi said, Turn again, my daughters: why will ye go with me?
+<transChange type="added">are</transChange> there yet
+<transChange type="added">any more</transChange> sons in my womb, that they may be your husbands?
+<verse eID="Ruth.1.11.seID.07372"/><verse osisID="Ruth.1.12" sID="Ruth.1.12.seID.07373" n="12"/>Turn again, my daughters, go
+<transChange type="added">your way;</transChange> for I am too old to have an husband. If I should say, I have hope,
+<transChange type="added">if</transChange> I should have an husband also to night, and should also bear sons;
+<verse eID="Ruth.1.12.seID.07373"/><verse osisID="Ruth.1.13" sID="Ruth.1.13.seID.07374" n="13"/>Would ye tarry for them till they were grown? would ye stay for them from having husbands? nay, my daughters; for it grieveth me much for your sakes that the hand of the LORD is gone out against me.
+<verse eID="Ruth.1.13.seID.07374"/><verse osisID="Ruth.1.14" sID="Ruth.1.14.seID.07375" n="14"/>And they lifted up their voice, and wept again: and Orpah kissed her mother in law; but Ruth clave unto her.
+<verse eID="Ruth.1.14.seID.07375"/><verse osisID="Ruth.1.15" sID="Ruth.1.15.seID.07376" n="15"/>And she said, Behold, thy sister in law is gone back unto her people, and unto her gods: return thou after thy sister in law.
+<verse eID="Ruth.1.15.seID.07376"/><verse osisID="Ruth.1.16" sID="Ruth.1.16.seID.07377" n="16"/>And Ruth said, Intreat me not to leave thee,
+<transChange type="added">or</transChange> to return from following after thee: for whither thou goest, I will go; and where thou lodgest, I will lodge: thy people
+<transChange type="added">shall be</transChange> my people, and thy God my God:
+<verse eID="Ruth.1.16.seID.07377"/><verse osisID="Ruth.1.17" sID="Ruth.1.17.seID.07378" n="17"/>Where thou diest, will I die, and there will I be buried: the LORD do so to me, and more also,
+<transChange type="added">if ought</transChange> but death part thee and me.
+<verse eID="Ruth.1.17.seID.07378"/><verse osisID="Ruth.1.18" sID="Ruth.1.18.seID.07379" n="18"/>When she saw that she was stedfastly minded to go with her, then she left speaking unto her.
+<verse eID="Ruth.1.18.seID.07379"/></p>        <p>          <verse osisID="Ruth.1.19" sID="Ruth.1.19.seID.07380" n="19"/>So they two went until they came to Bethlehem. And it came to pass, when they were come to Bethlehem, that all the city was moved about them, and they said,
+<transChange type="added">Is</transChange> this Naomi?
+<verse eID="Ruth.1.19.seID.07380"/><verse osisID="Ruth.1.20" sID="Ruth.1.20.seID.07381" n="20"/>And she said unto them, Call me not Naomi, call me Mara: for the Almighty hath dealt very bitterly with me.
+<verse eID="Ruth.1.20.seID.07381"/><verse osisID="Ruth.1.21" sID="Ruth.1.21.seID.07382" n="21"/>I went out full, and the LORD hath brought me home again empty: why
+<transChange type="added">then</transChange> call ye me Naomi, seeing the LORD hath testified against me, and the Almighty hath afflicted me?
+<verse eID="Ruth.1.21.seID.07382"/><verse osisID="Ruth.1.22" sID="Ruth.1.22.seID.07383" n="22"/>So Naomi returned, and Ruth the Moabitess, her daughter in law, with her, which returned out of the country of Moab: and they came to Bethlehem in the beginning of barley harvest.
+<verse eID="Ruth.1.22.seID.07383"/></p>        <chapter eID="Ruth.1.seID.07361"/>        <chapter osisRef="Ruth.2" sID="Ruth.2.seID.07384" n="2"/>        <p>          <verse osisID="Ruth.2.1" sID="Ruth.2.1.seID.07385" n="1"/>And Naomi had a kinsman of her husband’s, a mighty man of wealth, of the family of Elimelech; and his name
+<transChange type="added">was</transChange> Boaz.
+<verse eID="Ruth.2.1.seID.07385"/><verse osisID="Ruth.2.2" sID="Ruth.2.2.seID.07386" n="2"/>And Ruth the Moabitess said unto Naomi, Let me now go to the field, and glean ears of corn after
+<transChange type="added">him</transChange> in whose sight I shall find grace. And she said unto her, Go, my daughter.
+<verse eID="Ruth.2.2.seID.07386"/><verse osisID="Ruth.2.3" sID="Ruth.2.3.seID.07387" n="3"/>And she went, and came, and gleaned in the field after the reapers: and her hap was to light on a part of the field
+<transChange type="added">belonging</transChange> unto Boaz, who
+<transChange type="added">was</transChange> of the kindred of Elimelech.
+<verse eID="Ruth.2.3.seID.07387"/></p>        <p>          <verse osisID="Ruth.2.4" sID="Ruth.2.4.seID.07388" n="4"/>And behold, Boaz came from Bethlehem, and said unto the reapers, The LORD
+<transChange type="added">be</transChange> with you. And they answered him, The LORD bless thee.
+<verse eID="Ruth.2.4.seID.07388"/><verse osisID="Ruth.2.5" sID="Ruth.2.5.seID.07389" n="5"/>Then said Boaz unto his servant that was set over the reapers, Whose damsel
+<transChange type="added">is</transChange> this?
+<verse eID="Ruth.2.5.seID.07389"/><verse osisID="Ruth.2.6" sID="Ruth.2.6.seID.07390" n="6"/>And the servant that was set over the reapers answered and said, It
+<transChange type="added">is</transChange> the Moabitish damsel that came back with Naomi out of the country of Moab:
+<verse eID="Ruth.2.6.seID.07390"/><verse osisID="Ruth.2.7" sID="Ruth.2.7.seID.07391" n="7"/>And she said, I pray you, let me glean and gather after the reapers among the sheaves: so she came, and hath continued even from the morning until now, that she tarried a little in the house.
+<verse eID="Ruth.2.7.seID.07391"/><verse osisID="Ruth.2.8" sID="Ruth.2.8.seID.07392" n="8"/>Then said Boaz unto Ruth, Hearest thou not, my daughter? Go not to glean in another field, neither go from hence, but abide here fast by my maidens:
+<verse eID="Ruth.2.8.seID.07392"/><verse osisID="Ruth.2.9" sID="Ruth.2.9.seID.07393" n="9"/><transChange type="added">Let</transChange> thine eyes
+<transChange type="added">be</transChange> on the field that they do reap, and go thou after them: have I not charged the young men that they shall not touch thee? and when thou art athirst, go unto the vessels, and drink of
+<transChange type="added">that
+</transChange> which the young men have drawn.
+<verse eID="Ruth.2.9.seID.07393"/><verse osisID="Ruth.2.10" sID="Ruth.2.10.seID.07394" n="10"/>Then she fell on her face, and bowed herself to the ground, and said unto him, Why have I found grace in thine eyes, that thou shouldest take knowledge of me, seeing I
+<transChange type="added">am</transChange> a stranger?
+<verse eID="Ruth.2.10.seID.07394"/><verse osisID="Ruth.2.11" sID="Ruth.2.11.seID.07395" n="11"/>And Boaz answered and said unto her, It hath fully been shewed me, all that thou hast done unto thy mother in law since the death of thine husband: and
+<transChange type="added">how</transChange> thou hast left thy father and thy mother, and the land of thy nativity, and art come unto a people which thou knewest not heretofore.
+<verse eID="Ruth.2.11.seID.07395"/><verse osisID="Ruth.2.12" sID="Ruth.2.12.seID.07396" n="12"/>The LORD recompense thy work, and a full reward be given thee of the LORD God of Israel, under whose wings thou art come to trust.
+<verse eID="Ruth.2.12.seID.07396"/><verse osisID="Ruth.2.13" sID="Ruth.2.13.seID.07397" n="13"/>Then she said, Let me find favour in thy sight, my lord; for that thou hast comforted me, and for that thou hast spoken friendly unto thine handmaid, though I be not like unto one of thine handmaidens.
+<verse eID="Ruth.2.13.seID.07397"/><verse osisID="Ruth.2.14" sID="Ruth.2.14.seID.07398" n="14"/>And Boaz said unto her, At mealtime come thou hither, and eat of the bread, and dip thy morsel in the vinegar. And she sat beside the reapers: and he reached her parched
+<transChange type="added">corn,</transChange> and she did eat, and was sufficed, and left.
+<verse eID="Ruth.2.14.seID.07398"/><verse osisID="Ruth.2.15" sID="Ruth.2.15.seID.07399" n="15"/>And when she was risen up to glean, Boaz commanded his young men, saying, Let her glean even among the sheaves, and reproach her not:
+<verse eID="Ruth.2.15.seID.07399"/><verse osisID="Ruth.2.16" sID="Ruth.2.16.seID.07400" n="16"/>And let fall also
+<transChange type="added">some</transChange> of the handfuls of purpose for her, and leave
+<transChange type="added">them,</transChange> that she may glean
+<transChange type="added">them,</transChange> and rebuke her not.
+<verse eID="Ruth.2.16.seID.07400"/><verse osisID="Ruth.2.17" sID="Ruth.2.17.seID.07401" n="17"/>So she gleaned in the field until even, and beat out that she had gleaned: and it was about an ephah of barley.
+<verse eID="Ruth.2.17.seID.07401"/></p>        <p>          <verse osisID="Ruth.2.18" sID="Ruth.2.18.seID.07402" n="18"/>And she took
+<transChange type="added">it</transChange> up, and went into the city: and her mother in law saw what she had gleaned: and she brought forth, and gave to her that she had reserved after she was sufficed.
+<verse eID="Ruth.2.18.seID.07402"/><verse osisID="Ruth.2.19" sID="Ruth.2.19.seID.07403" n="19"/>And her mother in law said unto her, Where hast thou gleaned to day? and where wroughtest thou? blessed be he that did take knowledge of thee. And she shewed her mother in law with whom she had wrought, and said, The man’s name with whom I wrought to day
+<transChange type="added">is</transChange> Boaz.
+<verse eID="Ruth.2.19.seID.07403"/><verse osisID="Ruth.2.20" sID="Ruth.2.20.seID.07404" n="20"/>And Naomi said unto her daughter in law, Blessed
+<transChange type="added">be</transChange> he of the LORD, who hath not left off his kindness to the living and to the dead. And Naomi said unto her, The man
+<transChange type="added">is</transChange> near of kin unto us, one of our next kinsmen.
+<verse eID="Ruth.2.20.seID.07404"/><verse osisID="Ruth.2.21" sID="Ruth.2.21.seID.07405" n="21"/>And Ruth the Moabitess said, He said unto me also, Thou shalt keep fast by my young men, until they have ended all my harvest.
+<verse eID="Ruth.2.21.seID.07405"/><verse osisID="Ruth.2.22" sID="Ruth.2.22.seID.07406" n="22"/>And Naomi said unto Ruth her daughter in law,
+<transChange type="added">It is</transChange> good, my daughter, that thou go out with his maidens, that they meet thee not in any other field.
+<verse eID="Ruth.2.22.seID.07406"/><verse osisID="Ruth.2.23" sID="Ruth.2.23.seID.07407" n="23"/>So she kept fast by the maidens of Boaz to glean unto the end of barley harvest and of wheat harvest; and dwelt with her mother in law.
+<verse eID="Ruth.2.23.seID.07407"/></p>        <chapter eID="Ruth.2.seID.07384"/>        <chapter osisRef="Ruth.3" sID="Ruth.3.seID.07408" n="3"/>        <p>          <verse osisID="Ruth.3.1" sID="Ruth.3.1.seID.07409" n="1"/>Then Naomi her mother in law said unto her, My daughter, shall I not seek rest for thee, that it may be well with thee?
+<verse eID="Ruth.3.1.seID.07409"/><verse osisID="Ruth.3.2" sID="Ruth.3.2.seID.07410" n="2"/>And now
+<transChange type="added">is</transChange> not Boaz of our kindred, with whose maidens thou wast? Behold, he winnoweth barley to night in the threshingfloor.
+<verse eID="Ruth.3.2.seID.07410"/><verse osisID="Ruth.3.3" sID="Ruth.3.3.seID.07411" n="3"/>Wash thyself therefore, and anoint thee, and put thy raiment upon thee, and get thee down to the floor:
+<transChange type="added">but</transChange> make not thyself known unto the man, until he shall have done eating and drinking.
+<verse eID="Ruth.3.3.seID.07411"/><verse osisID="Ruth.3.4" sID="Ruth.3.4.seID.07412" n="4"/>And it shall be, when he lieth down, that thou shalt mark the place where he shall lie, and thou shalt go in, and uncover his feet, and lay thee down; and he will tell thee what thou shalt do.
+<verse eID="Ruth.3.4.seID.07412"/><verse osisID="Ruth.3.5" sID="Ruth.3.5.seID.07413" n="5"/>And she said unto her, All that thou sayest unto me I will do.
+<verse eID="Ruth.3.5.seID.07413"/></p>        <p>          <verse osisID="Ruth.3.6" sID="Ruth.3.6.seID.07414" n="6"/>And she went down unto the floor, and did according to all that her mother in law bade her.
+<verse eID="Ruth.3.6.seID.07414"/><verse osisID="Ruth.3.7" sID="Ruth.3.7.seID.07415" n="7"/>And when Boaz had eaten and drunk, and his heart was merry, he went to lie down at the end of the heap of corn: and she came softly, and uncovered his feet, and laid her down.
+<verse eID="Ruth.3.7.seID.07415"/></p>        <p>          <verse osisID="Ruth.3.8" sID="Ruth.3.8.seID.07416" n="8"/>And it came to pass at midnight, that the man was afraid, and turned himself: and, behold, a woman lay at his feet.
+<verse eID="Ruth.3.8.seID.07416"/><verse osisID="Ruth.3.9" sID="Ruth.3.9.seID.07417" n="9"/>And he said, Who
+<transChange type="added">art</transChange> thou? And she answered, I
+<transChange type="added">am
+</transChange> Ruth thine handmaid: spread therefore thy skirt over thine handmaid; for thou
+<transChange type="added">art</transChange> a near kinsman.
+<verse eID="Ruth.3.9.seID.07417"/><verse osisID="Ruth.3.10" sID="Ruth.3.10.seID.07418" n="10"/>And he said, Blessed
+<transChange type="added">be</transChange> thou of the LORD, my daughter:
+<transChange type="added">for</transChange> thou hast shewed more kindness in the latter end than at the beginning, inasmuch as thou followedst not young men, whether poor or rich.
+<verse eID="Ruth.3.10.seID.07418"/><verse osisID="Ruth.3.11" sID="Ruth.3.11.seID.07419" n="11"/>And now, my daughter, fear not; I will do to thee all that thou requirest: for all the city of my people doth know that thou
+<transChange type="added">art
+</transChange> a virtuous woman.
+<verse eID="Ruth.3.11.seID.07419"/><verse osisID="Ruth.3.12" sID="Ruth.3.12.seID.07420" n="12"/>And now it is true that I
+<transChange type="added">am thy</transChange> near kinsman: howbeit there is a kinsman nearer than I.
+<verse eID="Ruth.3.12.seID.07420"/><verse osisID="Ruth.3.13" sID="Ruth.3.13.seID.07421" n="13"/>Tarry this night, and it shall be in the morning,
+<transChange type="added">that</transChange> if he will perform unto thee the part of a kinsman, well; let him do the kinsman’s part: but if he will not do the part of a kinsman to thee, then will I do the part of a kinsman to thee,
+<transChange type="added">as</transChange> the LORD liveth: lie down until the morning.
+<verse eID="Ruth.3.13.seID.07421"/></p>        <p>          <verse osisID="Ruth.3.14" sID="Ruth.3.14.seID.07422" n="14"/>And she lay at his feet until the morning: and she rose up before one could know another. And he said, Let it not be known that a woman came into the floor.
+<verse eID="Ruth.3.14.seID.07422"/><verse osisID="Ruth.3.15" sID="Ruth.3.15.seID.07423" n="15"/>Also he said, Bring the vail that
+<transChange type="added">thou hast</transChange> upon thee, and hold it. And when she held it, he measured six
+<transChange type="added">measures</transChange> of barley, and laid
+<transChange type="added">it</transChange> on her: and she went into the city.
+<verse eID="Ruth.3.15.seID.07423"/><verse osisID="Ruth.3.16" sID="Ruth.3.16.seID.07424" n="16"/>And when she came to her mother in law, she said, Who
+<transChange type="added">art
+</transChange> thou, my daughter? And she told her all that the man had done to her.
+<verse eID="Ruth.3.16.seID.07424"/><verse osisID="Ruth.3.17" sID="Ruth.3.17.seID.07425" n="17"/>And she said, These six
+<transChange type="added">measures</transChange> of barley gave he me; for he said to me, Go not empty unto thy mother in law.
+<verse eID="Ruth.3.17.seID.07425"/><verse osisID="Ruth.3.18" sID="Ruth.3.18.seID.07426" n="18"/>Then said she, Sit still, my daughter, until thou know how the matter will fall: for the man will not be in rest, until he have finished the thing this day.
+<verse eID="Ruth.3.18.seID.07426"/></p>        <chapter eID="Ruth.3.seID.07408"/>        <chapter osisRef="Ruth.4" sID="Ruth.4.seID.07427" n="4"/>        <p>          <verse osisID="Ruth.4.1" sID="Ruth.4.1.seID.07428" n="1"/>Then went Boaz up to the gate, and sat him down there: and, behold, the kinsman of whom Boaz spake came by; unto whom he said, Ho, such a one! turn aside, sit down here. And he turned aside, and sat down.
+<verse eID="Ruth.4.1.seID.07428"/><verse osisID="Ruth.4.2" sID="Ruth.4.2.seID.07429" n="2"/>And he took ten men of the elders of the city, and said, Sit ye down here. And they sat down.
+<verse eID="Ruth.4.2.seID.07429"/><verse osisID="Ruth.4.3" sID="Ruth.4.3.seID.07430" n="3"/>And he said unto the kinsman, Naomi, that is come again out of the country of Moab, selleth a parcel of land, which
+<transChange type="added">was</transChange> our brother Elimelech’s:
+<verse eID="Ruth.4.3.seID.07430"/><verse osisID="Ruth.4.4" sID="Ruth.4.4.seID.07431" n="4"/>And I thought to advertise thee, saying, Buy
+<transChange type="added">it</transChange> before the inhabitants, and before the elders of my people. If thou wilt redeem
+<transChange type="added">it,</transChange> redeem
+<transChange type="added">it:</transChange> but if thou wilt not redeem
+<transChange type="added">it, then
+</transChange> tell me, that I may know: for
+<transChange type="added">there is</transChange> none to redeem
+<transChange type="added">it</transChange> beside thee; and I
+<transChange type="added">am</transChange> after thee. And he said, I will redeem
+<transChange type="added">it.
+</transChange><verse eID="Ruth.4.4.seID.07431"/><verse osisID="Ruth.4.5" sID="Ruth.4.5.seID.07432" n="5"/>Then said Boaz, What day thou buyest the field of the hand of Naomi, thou must buy
+<transChange type="added">it</transChange> also of Ruth the Moabitess, the wife of the dead, to raise up the name of the dead upon his inheritance.
+<verse eID="Ruth.4.5.seID.07432"/></p>        <p>          <verse osisID="Ruth.4.6" sID="Ruth.4.6.seID.07433" n="6"/>And the kinsman said, I cannot redeem
+<transChange type="added">it</transChange> for myself, lest I mar mine own inheritance: redeem thou my right to thyself; for I cannot redeem it.
+<verse eID="Ruth.4.6.seID.07433"/><verse osisID="Ruth.4.7" sID="Ruth.4.7.seID.07434" n="7"/>Now this
+<transChange type="added">was the manner</transChange> in former time in Israel concerning redeeming and concerning changing, for to confirm all things; a man plucked off his shoe, and gave
+<transChange type="added">it</transChange> to his neighbour: and this
+<transChange type="added">was
+</transChange> a testimony in Israel.
+<verse eID="Ruth.4.7.seID.07434"/><verse osisID="Ruth.4.8" sID="Ruth.4.8.seID.07435" n="8"/>Therefore the kinsman said unto Boaz, Buy
+<transChange type="added">it</transChange> for thee. So he drew off his shoe.
+<verse eID="Ruth.4.8.seID.07435"/></p>        <p>          <verse osisID="Ruth.4.9" sID="Ruth.4.9.seID.07436" n="9"/>And Boaz said unto the elders, and
+<transChange type="added">unto</transChange> all the people, Ye
+<transChange type="added">are</transChange> witnesses this day, that I have bought all that
+<transChange type="added">was
+</transChange> Elimelech’s, and all that
+<transChange type="added">was</transChange> Chilion’s and Mahlon’s, of the hand of Naomi.
+<verse eID="Ruth.4.9.seID.07436"/><verse osisID="Ruth.4.10" sID="Ruth.4.10.seID.07437" n="10"/>Moreover Ruth the Moabitess, the wife of Mahlon, have I purchased to be my wife, to raise up the name of the dead upon his inheritance, that the name of the dead be not cut off from among his brethren, and from the gate of his place: ye
+<transChange type="added">are</transChange> witnesses this day.
+<verse eID="Ruth.4.10.seID.07437"/><verse osisID="Ruth.4.11" sID="Ruth.4.11.seID.07438" n="11"/>And all the people that
+<transChange type="added">were</transChange> in the gate, and the elders, said,
+<transChange type="added">We are</transChange> witnesses. The LORD make the woman that is come into thine house like Rachel and like Leah, which two did build the house of Israel: and do thou worthily in Ephratah, and be famous in Bethlehem:
+<verse eID="Ruth.4.11.seID.07438"/><verse osisID="Ruth.4.12" sID="Ruth.4.12.seID.07439" n="12"/>And let thy house be like the house of Pharez, whom Tamar bare unto Judah, of the seed which the LORD shall give thee of this young woman.
+<verse eID="Ruth.4.12.seID.07439"/></p>        <p>          <verse osisID="Ruth.4.13" sID="Ruth.4.13.seID.07440" n="13"/>So Boaz took Ruth, and she was his wife: and when he went in unto her, the LORD gave her conception, and she bare a son.
+<verse eID="Ruth.4.13.seID.07440"/><verse osisID="Ruth.4.14" sID="Ruth.4.14.seID.07441" n="14"/>And the women said unto Naomi, Blessed
+<transChange type="added">be</transChange> the LORD, which hath not left thee this day without a kinsman, that his name may be famous in Israel.
+<verse eID="Ruth.4.14.seID.07441"/><verse osisID="Ruth.4.15" sID="Ruth.4.15.seID.07442" n="15"/>And he shall be unto thee a restorer of
+<transChange type="added">thy</transChange> life, and a nourisher of thine old age: for thy daughter in law, which loveth thee, which is better to thee than seven sons, hath born him.
+<verse eID="Ruth.4.15.seID.07442"/><verse osisID="Ruth.4.16" sID="Ruth.4.16.seID.07443" n="16"/>And Naomi took the child, and laid it in her bosom, and became nurse unto it.
+<verse eID="Ruth.4.16.seID.07443"/><verse osisID="Ruth.4.17" sID="Ruth.4.17.seID.07444" n="17"/>And the women her neighbours gave it a name, saying, There is a son born to Naomi; and they called his name Obed: he
+<transChange type="added">is</transChange> the father of Jesse, the father of David.
+<verse eID="Ruth.4.17.seID.07444"/></p>        <p>          <verse osisID="Ruth.4.18" sID="Ruth.4.18.seID.07445" n="18"/>Now these
+<transChange type="added">are</transChange> the generations of Pharez: Pharez begat Hezron,
+<verse eID="Ruth.4.18.seID.07445"/><verse osisID="Ruth.4.19" sID="Ruth.4.19.seID.07446" n="19"/>And Hezron begat Ram, and Ram begat Amminadab,
+<verse eID="Ruth.4.19.seID.07446"/><verse osisID="Ruth.4.20" sID="Ruth.4.20.seID.07447" n="20"/>And Amminadab begat Nahshon, and Nahshon begat Salmon,
+<verse eID="Ruth.4.20.seID.07447"/><verse osisID="Ruth.4.21" sID="Ruth.4.21.seID.07448" n="21"/>And Salmon begat Boaz, and Boaz begat Obed,
+<verse eID="Ruth.4.21.seID.07448"/><verse osisID="Ruth.4.22" sID="Ruth.4.22.seID.07449" n="22"/>And Obed begat Jesse, and Jesse begat David.
+<verse eID="Ruth.4.22.seID.07449"/></p>        <chapter eID="Ruth.4.seID.07427"/>      </div>      <div type="book" osisID="Jonah" canonical="true">        <title type="main" short="Jonah">Jonah</title>        <chapter osisRef="Jonah.1" sID="Jonah.1.seID.23422" n="1"/>        <p>          <verse osisID="Jonah.1.1" sID="Jonah.1.1.seID.23423" n="1"/>Now the word of the LORD came unto Jonah the son of Amittai, saying,
+<verse eID="Jonah.1.1.seID.23423"/><verse osisID="Jonah.1.2" sID="Jonah.1.2.seID.23424" n="2"/>Arise, go to Nineveh, that great city, and cry against it; for their wickedness is come up before me.
+<verse eID="Jonah.1.2.seID.23424"/><verse osisID="Jonah.1.3" sID="Jonah.1.3.seID.23425" n="3"/>But Jonah rose up to flee unto Tarshish from the presence of the LORD, and went down to Joppa; and he found a ship going to Tarshish: so he paid the fare thereof, and went down into it, to go with them unto Tarshish from the presence of the LORD.
+<verse eID="Jonah.1.3.seID.23425"/></p>        <p>          <verse osisID="Jonah.1.4" sID="Jonah.1.4.seID.23426" n="4"/>But the LORD sent out a great wind into the sea, and there was a mighty tempest in the sea, so that the ship was like to be broken.
+<verse eID="Jonah.1.4.seID.23426"/><verse osisID="Jonah.1.5" sID="Jonah.1.5.seID.23427" n="5"/>Then the mariners were afraid, and cried every man unto his god, and cast forth the wares that
+<transChange type="added">were</transChange> in the ship into the sea, to lighten
+<transChange type="added">it</transChange> of them. But Jonah was gone down into the sides of the ship; and he lay, and was fast asleep.
+<verse eID="Jonah.1.5.seID.23427"/><verse osisID="Jonah.1.6" sID="Jonah.1.6.seID.23428" n="6"/>So the shipmaster came to him, and said unto him, What meanest thou, O sleeper? arise, call upon thy God, if so be that God will think upon us, that we perish not.
+<verse eID="Jonah.1.6.seID.23428"/><verse osisID="Jonah.1.7" sID="Jonah.1.7.seID.23429" n="7"/>And they said every one to his fellow, Come, and let us cast lots, that we may know for whose cause this evil
+<transChange type="added">is</transChange> upon us. So they cast lots, and the lot fell upon Jonah.
+<verse eID="Jonah.1.7.seID.23429"/><verse osisID="Jonah.1.8" sID="Jonah.1.8.seID.23430" n="8"/>Then said they unto him, Tell us, we pray thee, for whose cause this evil
+<transChange type="added">is</transChange> upon us; What
+<transChange type="added">is</transChange> thine occupation? and whence comest thou? what
+<transChange type="added">is</transChange> thy country? and of what people
+<transChange type="added">art</transChange> thou?
+<verse eID="Jonah.1.8.seID.23430"/><verse osisID="Jonah.1.9" sID="Jonah.1.9.seID.23431" n="9"/>And he said unto them, I
+<transChange type="added">am</transChange> an Hebrew; and I fear the LORD, the God of heaven, which hath made the sea and the dry
+<transChange type="added">land.
+</transChange><verse eID="Jonah.1.9.seID.23431"/><verse osisID="Jonah.1.10" sID="Jonah.1.10.seID.23432" n="10"/>Then were the men exceedingly afraid, and said unto him, Why hast thou done this? For the men knew that he fled from the presence of the LORD, because he had told them.
+<verse eID="Jonah.1.10.seID.23432"/></p>        <p>          <verse osisID="Jonah.1.11" sID="Jonah.1.11.seID.23433" n="11"/>Then said they unto him, What shall we do unto thee, that the sea may be calm unto us? for the sea wrought, and was tempestuous.
+<verse eID="Jonah.1.11.seID.23433"/><verse osisID="Jonah.1.12" sID="Jonah.1.12.seID.23434" n="12"/>And he said unto them, Take me up, and cast me forth into the sea; so shall the sea be calm unto you: for I know that for my sake this great tempest
+<transChange type="added">is</transChange> upon you.
+<verse eID="Jonah.1.12.seID.23434"/><verse osisID="Jonah.1.13" sID="Jonah.1.13.seID.23435" n="13"/>Nevertheless the men rowed hard to bring
+<transChange type="added">it</transChange> to the land; but they could not: for the sea wrought, and was tempestuous against them.
+<verse eID="Jonah.1.13.seID.23435"/><verse osisID="Jonah.1.14" sID="Jonah.1.14.seID.23436" n="14"/>Wherefore they cried unto the LORD, and said, We beseech thee, O LORD, we beseech thee, let us not perish for this man’s life, and lay not upon us innocent blood: for thou, O LORD, hast done as it pleased thee.
+<verse eID="Jonah.1.14.seID.23436"/><verse osisID="Jonah.1.15" sID="Jonah.1.15.seID.23437" n="15"/>So they took up Jonah, and cast him forth into the sea: and the sea ceased from her raging.
+<verse eID="Jonah.1.15.seID.23437"/><verse osisID="Jonah.1.16" sID="Jonah.1.16.seID.23438" n="16"/>Then the men feared the LORD exceedingly, and offered a sacrifice unto the LORD, and made vows.
+<verse eID="Jonah.1.16.seID.23438"/></p>        <p>          <verse osisID="Jonah.1.17" sID="Jonah.1.17.seID.23439" n="17"/>Now the LORD had prepared a great fish to swallow up Jonah. And Jonah was in the belly of the fish three days and three nights.
+<verse eID="Jonah.1.17.seID.23439"/></p>        <chapter eID="Jonah.1.seID.23422"/>        <chapter osisRef="Jonah.2" sID="Jonah.2.seID.23440" n="2"/>        <p>          <verse osisID="Jonah.2.1" sID="Jonah.2.1.seID.23441" n="1"/>Then Jonah prayed unto the LORD his God out of the fish’s belly,
+<verse eID="Jonah.2.1.seID.23441"/><verse osisID="Jonah.2.2" sID="Jonah.2.2.seID.23442" n="2"/>And said, I cried by reason of mine affliction unto the LORD, and he heard me; out of the belly of hell cried I,
+<transChange type="added">and</transChange> thou heardest my voice.
+<verse eID="Jonah.2.2.seID.23442"/><verse osisID="Jonah.2.3" sID="Jonah.2.3.seID.23443" n="3"/>For thou hadst cast me into the deep, in the midst of the seas; and the floods compassed me about: all thy billows and thy waves passed over me.
+<verse eID="Jonah.2.3.seID.23443"/><verse osisID="Jonah.2.4" sID="Jonah.2.4.seID.23444" n="4"/>Then I said, I am cast out of thy sight; yet I will look again toward thy holy temple.
+<verse eID="Jonah.2.4.seID.23444"/><verse osisID="Jonah.2.5" sID="Jonah.2.5.seID.23445" n="5"/>The waters compassed me about,
+<transChange type="added">even</transChange> to the soul: the depth closed me round about, the weeds were wrapped about my head.
+<verse eID="Jonah.2.5.seID.23445"/><verse osisID="Jonah.2.6" sID="Jonah.2.6.seID.23446" n="6"/>I went down to the bottoms of the mountains; the earth with her bars
+<transChange type="added">was</transChange> about me for ever: yet hast thou brought up my life from corruption, O LORD my God.
+<verse eID="Jonah.2.6.seID.23446"/><verse osisID="Jonah.2.7" sID="Jonah.2.7.seID.23447" n="7"/>When my soul fainted within me I remembered the LORD: and my prayer came in unto thee, into thine holy temple.
+<verse eID="Jonah.2.7.seID.23447"/><verse osisID="Jonah.2.8" sID="Jonah.2.8.seID.23448" n="8"/>They that observe lying vanities forsake their own mercy.
+<verse eID="Jonah.2.8.seID.23448"/><verse osisID="Jonah.2.9" sID="Jonah.2.9.seID.23449" n="9"/>But I will sacrifice unto thee with the voice of thanksgiving; I will pay
+<transChange type="added">that</transChange> that I have vowed. Salvation
+<transChange type="added">is</transChange> of the LORD.
+<verse eID="Jonah.2.9.seID.23449"/></p>        <p>          <verse osisID="Jonah.2.10" sID="Jonah.2.10.seID.23450" n="10"/>And the LORD spake unto the fish, and it vomited out Jonah upon the dry
+<transChange type="added">land.</transChange><verse eID="Jonah.2.10.seID.23450"/></p>        <chapter eID="Jonah.2.seID.23440"/>        <chapter osisRef="Jonah.3" sID="Jonah.3.seID.23451" n="3"/>        <p>          <verse osisID="Jonah.3.1" sID="Jonah.3.1.seID.23452" n="1"/>And the word of the LORD came unto Jonah the second time, saying,
+<verse eID="Jonah.3.1.seID.23452"/><verse osisID="Jonah.3.2" sID="Jonah.3.2.seID.23453" n="2"/>Arise, go unto Nineveh, that great city, and preach unto it the preaching that I bid thee.
+<verse eID="Jonah.3.2.seID.23453"/><verse osisID="Jonah.3.3" sID="Jonah.3.3.seID.23454" n="3"/>So Jonah arose, and went unto Nineveh, according to the word of the LORD. Now Nineveh was an exceeding great city of three days’ journey.
+<verse eID="Jonah.3.3.seID.23454"/><verse osisID="Jonah.3.4" sID="Jonah.3.4.seID.23455" n="4"/>And Jonah began to enter into the city a day’s journey, and he cried, and said, Yet forty days, and Nineveh shall be overthrown.
+<verse eID="Jonah.3.4.seID.23455"/></p>        <p>          <verse osisID="Jonah.3.5" sID="Jonah.3.5.seID.23456" n="5"/>So the people of Nineveh believed God, and proclaimed a fast, and put on sackcloth, from the greatest of them even to the least of them.
+<verse eID="Jonah.3.5.seID.23456"/><verse osisID="Jonah.3.6" sID="Jonah.3.6.seID.23457" n="6"/>For word came unto the king of Nineveh, and he arose from his throne, and he laid his robe from him, and covered
+<transChange type="added">him</transChange> with sackcloth, and sat in ashes.
+<verse eID="Jonah.3.6.seID.23457"/><verse osisID="Jonah.3.7" sID="Jonah.3.7.seID.23458" n="7"/>And he caused
+<transChange type="added">it</transChange> to be proclaimed and published through Nineveh by the decree of the king and his nobles, saying, Let neither man nor beast, herd nor flock, taste any thing: let them not feed, nor drink water:
+<verse eID="Jonah.3.7.seID.23458"/><verse osisID="Jonah.3.8" sID="Jonah.3.8.seID.23459" n="8"/>But let man and beast be covered with sackcloth, and cry mightily unto God: yea, let them turn every one from his evil way, and from the violence that
+<transChange type="added">is</transChange> in their hands.
+<verse eID="Jonah.3.8.seID.23459"/><verse osisID="Jonah.3.9" sID="Jonah.3.9.seID.23460" n="9"/>Who can tell
+<transChange type="added">if</transChange> God will turn and repent, and turn away from his fierce anger, that we perish not?
+<verse eID="Jonah.3.9.seID.23460"/></p>        <p>          <verse osisID="Jonah.3.10" sID="Jonah.3.10.seID.23461" n="10"/>And God saw their works, that they turned from their evil way; and God repented of the evil, that he had said that he would do unto them; and he did
+<transChange type="added">it</transChange> not.
+<verse eID="Jonah.3.10.seID.23461"/></p>        <chapter eID="Jonah.3.seID.23451"/>        <chapter osisRef="Jonah.4" sID="Jonah.4.seID.23462" n="4"/>        <p>          <verse osisID="Jonah.4.1" sID="Jonah.4.1.seID.23463" n="1"/>But it displeased Jonah exceedingly, and he was very angry.
+<verse eID="Jonah.4.1.seID.23463"/><verse osisID="Jonah.4.2" sID="Jonah.4.2.seID.23464" n="2"/>And he prayed unto the LORD, and said, I pray thee, O LORD,
+<transChange type="added">was
+</transChange> not this my saying, when I was yet in my country? Therefore I fled before unto Tarshish: for I knew that thou
+<transChange type="added">art</transChange> a gracious God, and merciful, slow to anger, and of great kindness, and repentest thee of the evil.
+<verse eID="Jonah.4.2.seID.23464"/><verse osisID="Jonah.4.3" sID="Jonah.4.3.seID.23465" n="3"/>Therefore now, O LORD, take, I beseech thee, my life from me; for
+<transChange type="added">it is</transChange> better for me to die than to live.
+<verse eID="Jonah.4.3.seID.23465"/></p>        <p>          <verse osisID="Jonah.4.4" sID="Jonah.4.4.seID.23466" n="4"/>Then said the LORD, Doest thou well to be angry?
+<verse eID="Jonah.4.4.seID.23466"/><verse osisID="Jonah.4.5" sID="Jonah.4.5.seID.23467" n="5"/>So Jonah went out of the city, and sat on the east side of the city, and there made him a booth, and sat under it in the shadow, till he might see what would become of the city.
+<verse eID="Jonah.4.5.seID.23467"/><verse osisID="Jonah.4.6" sID="Jonah.4.6.seID.23468" n="6"/>And the LORD God prepared a gourd, and made
+<transChange type="added">it</transChange> to come up over Jonah, that it might be a shadow over his head, to deliver him from his grief. So Jonah was exceeding glad of the gourd.
+<verse eID="Jonah.4.6.seID.23468"/><verse osisID="Jonah.4.7" sID="Jonah.4.7.seID.23469" n="7"/>But God prepared a worm when the morning rose the next day, and it smote the gourd that it withered.
+<verse eID="Jonah.4.7.seID.23469"/><verse osisID="Jonah.4.8" sID="Jonah.4.8.seID.23470" n="8"/>And it came to pass, when the sun did arise, that God prepared a vehement east wind; and the sun beat upon the head of Jonah, that he fainted, and wished in himself to die, and said,
+<transChange type="added">It is</transChange> better for me to die than to live.
+<verse eID="Jonah.4.8.seID.23470"/><verse osisID="Jonah.4.9" sID="Jonah.4.9.seID.23471" n="9"/>And God said to Jonah, Doest thou well to be angry for the gourd? And he said, I do well to be angry,
+<transChange type="added">even</transChange> unto death.
+<verse eID="Jonah.4.9.seID.23471"/><verse osisID="Jonah.4.10" sID="Jonah.4.10.seID.23472" n="10"/>Then said the LORD, Thou hast had pity on the gourd, for the which thou hast not laboured, neither madest it grow; which came up in a night, and perished in a night:
+<verse eID="Jonah.4.10.seID.23472"/><verse osisID="Jonah.4.11" sID="Jonah.4.11.seID.23473" n="11"/>And should not I spare Nineveh, that great city, wherein are more than sixscore thousand persons that cannot discern between their right hand and their left hand; and
+<transChange type="added">also</transChange> much cattle?
+<verse eID="Jonah.4.11.seID.23473"/></p>        <chapter eID="Jonah.4.seID.23462"/>      </div>      </div>    <div type="bookGroup" canonical="true">      <title>New Testament</title>      <div type="book" osisID="3John" canonical="true">        <title type="main" short="3 John">The Third Epistle of John</title>        <chapter osisRef="3John.1" sID="3John.1.seID.39732" n="1"/>        <p>          <verse osisID="3John.1.1" sID="3John.1.1.seID.39733" n="1"/>The elder unto the wellbeloved Gaius, whom I love in the truth.
+<verse eID="3John.1.1.seID.39733"/></p>        <p>          <verse osisID="3John.1.2" sID="3John.1.2.seID.39734" n="2"/>Beloved, I wish above all things that thou mayest prosper and be in health, even as thy soul prospereth.
+<verse eID="3John.1.2.seID.39734"/><verse osisID="3John.1.3" sID="3John.1.3.seID.39735" n="3"/>For I rejoiced greatly, when the brethren came and testified of the truth that is in thee, even as thou walkest in the truth.
+<verse eID="3John.1.3.seID.39735"/><verse osisID="3John.1.4" sID="3John.1.4.seID.39736" n="4"/>I have no greater joy than to hear that my children walk in truth.
+<verse eID="3John.1.4.seID.39736"/><verse osisID="3John.1.5" sID="3John.1.5.seID.39737" n="5"/>Beloved, thou doest faithfully whatsoever thou doest to the brethren, and to strangers;
+<verse eID="3John.1.5.seID.39737"/><verse osisID="3John.1.6" sID="3John.1.6.seID.39738" n="6"/>Which have borne witness of thy charity before the church: whom if thou bring forward on their journey after a godly sort, thou shalt do well:
+<verse eID="3John.1.6.seID.39738"/><verse osisID="3John.1.7" sID="3John.1.7.seID.39739" n="7"/>Because that for his name’s sake they went forth, taking nothing of the Gentiles.
+<verse eID="3John.1.7.seID.39739"/><verse osisID="3John.1.8" sID="3John.1.8.seID.39740" n="8"/>We therefore ought to receive such, that we might be fellowhelpers to the truth.
+<verse eID="3John.1.8.seID.39740"/></p>        <p>          <verse osisID="3John.1.9" sID="3John.1.9.seID.39741" n="9"/>I wrote unto the church: but Diotrephes, who loveth to have the preeminence among them, receiveth us not.
+<verse eID="3John.1.9.seID.39741"/><verse osisID="3John.1.10" sID="3John.1.10.seID.39742" n="10"/>Wherefore, if I come, I will remember his deeds which he doeth, prating against us with malicious words: and not content therewith, neither doth he himself receive the brethren, and forbiddeth them that would, and casteth
+<transChange type="added">them</transChange> out of the church.
+<verse eID="3John.1.10.seID.39742"/></p>        <p>          <verse osisID="3John.1.11" sID="3John.1.11.seID.39743" n="11"/>Beloved, follow not that which is evil, but that which is good. He that doeth good is of God: but he that doeth evil hath not seen God.
+<verse eID="3John.1.11.seID.39743"/><verse osisID="3John.1.12" sID="3John.1.12.seID.39744" n="12"/>Demetrius hath good report of all
+<transChange type="added">men,</transChange> and of the truth itself: yea, and we
+<transChange type="added">also</transChange> bear record; and ye know that our record is true.
+<verse eID="3John.1.12.seID.39744"/></p>        <p>          <verse osisID="3John.1.13" sID="3John.1.13.seID.39745" n="13"/>I had many things to write, but I will not with ink and pen write unto thee:
+<verse eID="3John.1.13.seID.39745"/><verse osisID="3John.1.14" sID="3John.1.14.seID.39746" n="14"/>But I trust I shall shortly see thee, and we shall speak face to face. Peace
+<transChange type="added">be</transChange> to thee.
+<transChange type="added">Our</transChange> friends salute thee. Greet the friends by name.
+<verse eID="3John.1.14.seID.39746"/></p>        <chapter eID="3John.1.seID.39732"/>      </div>      </div>  </osisText></osis>
