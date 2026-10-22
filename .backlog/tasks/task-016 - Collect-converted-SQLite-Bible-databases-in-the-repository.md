@@ -55,3 +55,13 @@ This task converts the chosen source texts into databases, commits them at the r
 - [x] #18 The task is moved to "Ready for Testing"
 - [x] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Converted KJV and ASV (chosen by Cody) from the eBible.org USFM zips (cat eng-kjv/*.usfm > KJV.usfm, so metadata version is KJV / ASV like the reference ESV) into bible_kjv.sqlite and bible_asv.sqlite at the root. The README section Converted Bibles records the source URL, source-file date, zip SHA-256 and licence for each, and how to add another. New tool/tests/test_collection.py checks every root database is listed, validates strictly, matches the reference schema and has the expected version and counts.
+
+Results: KJV 66 books, 1189 chapters, 31102 verses (Apocrypha and front matter skipped); ASV 66, 1189, 31086 (the 16 NT verses the ASV omits are absent; validation warns). tool/bin/bibles --validate passes for both with 0 failures. Re-converting each source gave an identical SHA-256 over slug, chapter, verse and text of every verse.
+
+Verification: python3 -m unittest discover -s tool/tests -t tool (165 tests OK). Note: the writer creates files with mode 0600 (mkstemp), so the databases were chmod 644 before committing. DoD #7 does not apply.
+<!-- SECTION:NOTES:END -->
