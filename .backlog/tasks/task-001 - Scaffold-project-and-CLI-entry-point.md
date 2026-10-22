@@ -1,9 +1,11 @@
 ---
 id: TASK-001
 title: Scaffold project and CLI entry point
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-22 14:08'
+updated_date: '2026-10-22 14:19'
 labels:
   - cli
 dependencies: []
