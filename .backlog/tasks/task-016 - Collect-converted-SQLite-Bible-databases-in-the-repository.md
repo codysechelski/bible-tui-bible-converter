@@ -1,11 +1,11 @@
 ---
 id: TASK-016
 title: Collect converted SQLite Bible databases in the repository
-status: In Progress
+status: Ready for Testing
 assignee:
-  - '@claude'
+  - '@cody'
 created_date: '2026-10-22 15:01'
-updated_date: '2026-10-22 16:09'
+updated_date: '2026-10-22 16:11'
 labels:
   - repo-layout
 dependencies:
@@ -64,4 +64,6 @@ Converted KJV and ASV (chosen by Cody) from the eBible.org USFM zips (cat eng-kj
 Results: KJV 66 books, 1189 chapters, 31102 verses (Apocrypha and front matter skipped); ASV 66, 1189, 31086 (the 16 NT verses the ASV omits are absent; validation warns). tool/bin/bibles --validate passes for both with 0 failures. Re-converting each source gave an identical SHA-256 over slug, chapter, verse and text of every verse.
 
 Verification: python3 -m unittest discover -s tool/tests -t tool (165 tests OK). Note: the writer creates files with mode 0600 (mkstemp), so the databases were chmod 644 before committing. DoD #7 does not apply.
+
+Follow-up (Cody): databases moved to bibles/ (git mv). A conversion without --output now writes to bibles/ (cli.COLLECTION_DIR, resolved from the package location); --name alone only renames; relative --output still uses the working directory. Tests patch COLLECTION_DIR (test_cli, test_detect) or run the wrapper from a copied tool/ layout (test_samples), so the suite never writes into the real bibles/; a stray bibles/notes.sqlite from test_detect found during this work was removed and the test fixed. Verification: py_compile ok; python3 -m unittest discover -s tool/tests -t tool OK; tool/bin/bibles run from the scratchpad without -o wrote to bibles/ (smoke file removed).
 <!-- SECTION:NOTES:END -->
