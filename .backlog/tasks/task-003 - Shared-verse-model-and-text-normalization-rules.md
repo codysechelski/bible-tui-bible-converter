@@ -4,9 +4,11 @@ title: Shared verse model and text normalization rules
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:08'
+updated_date: '2026-10-22 14:10'
 labels:
   - core
-dependencies: []
+dependencies:
+  - TASK-002
 references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: high
