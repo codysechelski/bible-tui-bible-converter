@@ -4,12 +4,10 @@ title: Database validation and validate mode
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:10'
+updated_date: '2026-10-22 14:11'
 labels:
   - validation
-dependencies:
-  - TASK-004
-  - TASK-005
+dependencies: []
 references:
   - /Users/codysechelski/Developer/Projects/bible-esv/tools/build_sqlite.py
 priority: medium
