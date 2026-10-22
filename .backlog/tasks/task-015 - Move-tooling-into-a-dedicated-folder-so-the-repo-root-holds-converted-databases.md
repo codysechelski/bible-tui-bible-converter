@@ -3,11 +3,11 @@ id: TASK-015
 title: >-
   Move tooling into a dedicated folder so the repo root holds converted
   databases
-status: In Progress
+status: Ready for Testing
 assignee:
   - '@claude'
 created_date: '2026-10-22 15:01'
-updated_date: '2026-10-22 16:04'
+updated_date: '2026-10-22 16:06'
 labels:
   - repo-layout
 dependencies: []
@@ -36,7 +36,7 @@ Create a single new top-level folder that holds all of the tooling, so the repos
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 When you are asked to work on a task, first move it to `In Progress` if it is not already there
+- [x] #1 When you are asked to work on a task, first move it to `In Progress` if it is not already there
 - [ ] #2 After you have ensured the task has the proper status, you must assign the work to yourself (@claude, @codex, @opencode, etc.)
 - [ ] #3 Completed the development work outlined in the task. Ask questions if things are unclear
 - [ ] #4 Before making changes, be sure that you understand the codebase. Look for existing patterns, components, tooling, etc., before forging your own path
