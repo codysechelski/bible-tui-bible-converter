@@ -4,16 +4,10 @@ title: End to end tests and sample files for all five formats
 status: To Do
 assignee: []
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:10'
+updated_date: '2026-10-22 14:11'
 labels:
   - testing
-dependencies:
-  - TASK-006
-  - TASK-007
-  - TASK-008
-  - TASK-009
-  - TASK-010
-  - TASK-011
+dependencies: []
 priority: medium
 type: task
 ordinal: 12000
