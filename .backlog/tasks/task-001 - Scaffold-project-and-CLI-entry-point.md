@@ -11,7 +11,7 @@ references:
   - /Users/codysechelski/Developer/Projects/bible-esv
 priority: high
 type: chore
-ordinal: 1000
+ordinal: 1
 ---
 
 ## Description
