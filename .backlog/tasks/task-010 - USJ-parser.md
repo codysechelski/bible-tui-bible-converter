@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-22 14:09'
-updated_date: '2026-10-22 14:39'
+updated_date: '2026-10-22 14:47'
 labels:
   - parsing
 dependencies:
@@ -25,12 +25,12 @@ The parser must produce the shared verse model and apply the shared normalizatio
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The parser reads a USJ file and produces normalized books, chapters and verses through the shared model
-- [ ] #2 JSON markers are mapped to their USFM equivalents, including id for book, c for chapter, v for verse, and the paragraph, poetry and character styles
-- [ ] #3 Nested text content is flattened into the verse text with markup removed, and the resulting verse text is never empty
-- [ ] #4 A file containing several books is parsed in book order
-- [ ] #5 Malformed JSON produces a clear error naming the file and the parse failure, and no database is written
-- [ ] #6 Automated tests cover a USJ excerpt containing a book, a chapter, a verse and a nested paragraph marker
+- [x] #1 The parser reads a USJ file and produces normalized books, chapters and verses through the shared model
+- [x] #2 JSON markers are mapped to their USFM equivalents, including id for book, c for chapter, v for verse, and the paragraph, poetry and character styles
+- [x] #3 Nested text content is flattened into the verse text with markup removed, and the resulting verse text is never empty
+- [x] #4 A file containing several books is parsed in book order
+- [x] #5 Malformed JSON produces a clear error naming the file and the parse failure, and no database is written
+- [x] #6 Automated tests cover a USJ excerpt containing a book, a chapter, a verse and a nested paragraph marker
 <!-- AC:END -->
 
 ## Definition of Done
@@ -55,3 +55,20 @@ The parser must produce the shared verse model and apply the shared normalizatio
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added `bibles/parsers/usj.py`: walks the JSON tree and feeds the shared `MarkerEvents`, so USJ text is identical to USFM/USX.
+
+- Node types book/chapter/verse/para/char/note/figure map to the USFM markers (the task says a 'mark' property; the USJ spec uses 'marker' -- both are accepted). id/c/v are also recognized by marker alone. sidebar, periph, ms, optbreak skipped.
+- Malformed JSON -> ParseError naming the file, line and column; non-USJ JSON and no verses -> ParseError. Parsing happens fully before any write, so no database is written on failure.
+
+Verification: `python3 -m py_compile bibles/*.py bibles/parsers/*.py tests/*.py` OK; `python3 -m unittest discover -s tests -t .` -> 110 tests OK (tests/test_parsers.py is new, incl. one passage in all five formats producing identical verses). Real-data smoke test (scratchpad, not committed): eBible.org World English Bible (engwebp) USFM, all 66 book files, parsed with 0 errors (31,098 verses, 5 warnings for verses WEB omits, e.g. ACT 8:37); the eBible VPL edition parsed to the same 31,098 references and wrote a 66-book / 1,189-chapter database through write_database. Text matched USFM except Psalm titles (\\d) and Song of Solomon speaker labels (\\sp), which eBible's VPL keeps and our policy drops, and one source-faithful spacing difference (PSA 68:32). eBible no longer serves USX/OSIS downloads at the usual URLs, so USX/OSIS/USJ are covered by fixtures only. Committed together in c0e1769 (shared core + cross-format test). DoD #7 N/A. No linter installed.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the USJ parser on the shared marker model.
+<!-- SECTION:FINAL_SUMMARY:END -->
