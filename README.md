@@ -19,7 +19,7 @@ python3 -m bibles SOURCE ...
 | `SOURCE` | Path to the source Bible file (required). |
 | `-o, --output` | Output directory or full output file path. Defaults to the current working directory. |
 | `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`. `.sqlite` is appended when the name has no extension. |
-| `-f, --format` | Force a specific input format instead of detecting it. |
+| `-f, --format` | Force a specific input format instead of detecting it (`usfm`, `usx`, `osis`, `vpl`, `usj`). |
 
 How `--output` is interpreted:
 
@@ -27,6 +27,16 @@ How `--output` is interpreted:
   file name is placed inside it. Missing directories are created.
 - Anything else (for example `build/kjv.db`) is a **full file path** and is used directly. `--name` cannot be
   combined with a full file path.
+
+How the input format is detected:
+
+- The file content is checked first and always wins over the extension: an XML root of `<usx>` is USX and
+  `<osis>` is OSIS, a JSON object with `"type": "USJ"` is USJ, a line starting with a USFM marker such as `\id`,
+  `\c` or `\v` is USFM, and lines starting with a reference such as `Gen 1:1` are VPL.
+- If the content is inconclusive, a format-specific extension (`.usfm`, `.sfm`, `.usx`, `.osis`, `.vpl`, `.usj`)
+  is used. `.xml`, `.json` and `.txt` say nothing on their own.
+- Otherwise the run fails with exit status 1 and lists the supported formats. Use `--format` to override
+  detection; the output shows whether the format was detected or forced.
 
 Examples:
 

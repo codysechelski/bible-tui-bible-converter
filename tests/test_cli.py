@@ -107,7 +107,7 @@ class MainTests(unittest.TestCase):
         code, out, _ = run_main(str(self.source))
         self.assertEqual(code, 0)
         self.assertIn(f"Output: {Path.cwd() / 'kjv.sqlite'}", out)
-        self.assertIn("Format: auto-detect", out)
+        self.assertIn("Format: usfm (detected from content)", out)
 
     def test_missing_output_directory_is_created(self) -> None:
         code, out, _ = run_main(str(self.source), "--output", "nested/dir/")
@@ -123,7 +123,7 @@ class MainTests(unittest.TestCase):
     def test_forced_format_is_reported(self) -> None:
         code, out, _ = run_main(str(self.source), "--format", "usx")
         self.assertEqual(code, 0)
-        self.assertIn("Format: usx", out)
+        self.assertIn("Format: usx (forced with --format)", out)
 
     def test_unknown_format_is_rejected(self) -> None:
         code, _, err = run_main(str(self.source), "--format", "docx")

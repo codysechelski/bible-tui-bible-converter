@@ -22,6 +22,9 @@ schema (`bible_esv.sqlite`), the validation rules (`tools/build_sqlite.py`) and 
 - `bibles/writer.py` writes a `Bible` to SQLite with `write_database`. `SCHEMA` is copied from the reference
   project and a test compares it with `bible_esv.sqlite`; never change it on its own. The database is built in a
   temporary file beside the output and moved into place only when complete. Book ids equal sort order.
+- `bibles/detect.py` owns `SUPPORTED_FORMATS` and `detect_format`: content sniffing wins over the extension,
+  format-specific extensions are a fallback, `--format` bypasses detection. The CLI turns
+  `FormatDetectionError` into a `CliError`.
 - `docs/` holds Markdown documentation, linked from the README.
 - `bin/bibles` is a bash wrapper that runs the package from any directory.
 - `tests/` contains `unittest` tests.

@@ -6,11 +6,11 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 from bibles import __version__
+from bibles.detect import SUPPORTED_FORMATS, Detection, FormatDetectionError, detect_format
 
-SUPPORTED_FORMATS = ("usfm", "usx", "osis", "vpl", "usj")
 OUTPUT_SUFFIX = ".sqlite"
 
 
@@ -98,7 +98,7 @@ def resolve_output_path(
     return output_path
 
 
-def run(args: argparse.Namespace) -> Path:
+def run(args: argparse.Namespace) -> Tuple[Detection, Path]:
     source: Path = args.source
     if not source.is_file():
         raise CliError(f"source file not found: {source}")
@@ -106,8 +106,12 @@ def run(args: argparse.Namespace) -> Path:
     output_path = resolve_output_path(source, args.output, args.name)
     if output_path.is_dir():
         raise CliError(f"output path is a directory: {output_path}")
+    try:
+        detection = detect_format(source, args.format)
+    except FormatDetectionError as error:
+        raise CliError(str(error)) from error
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    return output_path
+    return detection, output_path
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -120,13 +124,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
     try:
-        output_path = run(args)
+        detection, output_path = run(args)
     except CliError as error:
         print(f"{parser.prog}: error: {error}", file=sys.stderr)
         return 1
 
     print(f"Source: {args.source}")
-    print(f"Format: {args.format or 'auto-detect'}")
+    print(f"Format: {detection.describe()}")
     print(f"Output: {output_path}")
     print("Conversion is not implemented yet; no database was written.")
     return 0
