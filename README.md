@@ -1,0 +1,49 @@
+# bibles
+
+> **Status:** early scaffold. The command line surface is in place, but no input format is parsed yet and
+> no database is written. Full documentation is tracked in TASK-013.
+
+`bibles` converts a text-formatted Bible (USFM, USX, OSIS, VPL or USJ) into a SQLite database that the
+custom Bible terminal UI can read. It is Python 3 and standard library only, so it runs anywhere the TUI does.
+
+## Usage
+
+```sh
+./bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f {usfm,usx,osis,vpl,usj}]
+# or, from the repository root
+python3 -m bibles SOURCE ...
+```
+
+| Option | Meaning |
+| --- | --- |
+| `SOURCE` | Path to the source Bible file (required). |
+| `-o, --output` | Output directory or full output file path. Defaults to the current working directory. |
+| `-n, --name` | Output file name inside the output directory. Defaults to the source base name with `.sqlite`. `.sqlite` is appended when the name has no extension. |
+| `-f, --format` | Force a specific input format instead of detecting it. |
+
+How `--output` is interpreted:
+
+- An existing directory, a path ending in `/`, or a path without a file extension is a **directory**; the
+  file name is placed inside it. Missing directories are created.
+- Anything else (for example `build/kjv.db`) is a **full file path** and is used directly. `--name` cannot be
+  combined with a full file path.
+
+Examples:
+
+```sh
+./bin/bibles kjv.usfm                      # ./kjv.sqlite
+./bin/bibles kjv.usfm -n king-james        # ./king-james.sqlite
+./bin/bibles kjv.usfm -o build/            # ./build/kjv.sqlite
+./bin/bibles kjv.usfm -o build/bible.db    # ./build/bible.db
+```
+
+Running with no arguments prints usage and exits with status 2; a successful run exits with status 0.
+
+## Development
+
+Requires Python 3.9 or newer (developed on 3.12). No third-party packages.
+
+```sh
+python3 -m unittest discover -s tests -t .   # run the test suite
+python3 -m py_compile bibles/*.py tests/*.py # syntax check
+```
