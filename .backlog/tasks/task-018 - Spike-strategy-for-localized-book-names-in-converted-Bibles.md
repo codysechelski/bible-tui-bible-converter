@@ -1,9 +1,11 @@
 ---
 id: TASK-018
 title: 'Spike: strategy for localized book names in converted Bibles'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-10-23 18:46'
+updated_date: '2026-10-23 18:48'
 labels:
   - schema
   - core
