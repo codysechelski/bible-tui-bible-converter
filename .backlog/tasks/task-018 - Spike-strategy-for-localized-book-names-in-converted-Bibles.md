@@ -1,9 +1,9 @@
 ---
 id: TASK-018
 title: 'Spike: strategy for localized book names in converted Bibles'
-status: In Progress
+status: Ready for Testing
 assignee:
-  - '@claude'
+  - '@cody'
 created_date: '2026-10-23 18:46'
 updated_date: '2026-10-23 18:50'
 labels:
@@ -78,3 +78,12 @@ This is a decision spike: produce the analysis and the recommendation, do not im
 - [ ] #18 The task is moved to "Ready for Testing"
 - [ ] #19 The task is assigned to Cody (the project owner) so he can review the changes.
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Spike writeup: .spike-docs/task-018-localized-book-names.md (gitignored, local only).
+Recommendation: Option 1, read each book's short name from the source (USFM/USX/USJ \toc2 then \h, OSIS title short, DBL metadata.xml) into the existing books.common_name; keep canonical_name, slug, sort_order and codes English. No schema change and no bible-tui change (bible-tui reads common_name and keys marks/highlights/position by sort_order). Requires relaxing validate.py's 'Book order and names' check for common_name.
+Evidence: eBible KJV and ASV \toc2/\h equal the current common_name for all 66 books, so KJV/ASV need no reconversion; only the Portuguese database does. The doc also lists bible-tui follow-ups (ASCII-only NOCASE A-Z sort, accent-sensitive go-to, English-only abbreviations) and 7 open questions.
+Verification: docs/backlog-only change, no tests run. bible-tui untouched (git status clean).
+<!-- SECTION:NOTES:END -->
