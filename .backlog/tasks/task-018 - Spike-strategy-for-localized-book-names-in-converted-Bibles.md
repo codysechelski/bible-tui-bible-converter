@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-23 18:46'
-updated_date: '2026-10-23 18:48'
+updated_date: '2026-10-23 18:50'
 labels:
   - schema
   - core
@@ -45,15 +45,15 @@ This is a decision spike: produce the analysis and the recommendation, do not im
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 .spike-docs/ exists at the repository root and contains the spike writeup as a Markdown file.
-- [ ] #2 .spike-docs/ is listed in .gitignore, and git status shows no spike output staged or tracked.
-- [ ] #3 The writeup documents current behavior with file references: where the converter sources book names (tool/bibles/books.py, tool/bibles/writer.py) and where bible-tui reads and renders them (e.g. bible_tui/store.py, bible_tui/versions.py).
-- [ ] #4 The writeup presents at least three distinct options for localized book names (plus any in-scope UI/localization concerns the author identifies), each with pros, cons, breaking-change risk and rough effort.
-- [ ] #5 Each option is assessed against the fixed database contract (SCHEMA in tool/bibles/writer.py and the requirements in bible_tui/versions.py), stating clearly whether it requires a schema change and what that would cost.
-- [ ] #6 The writeup recommends one option as the least-breaking path, with rationale, and explains what happens to databases already converted and committed under bibles/ (including whether reconversion is needed).
-- [ ] #7 The writeup shows how the Portuguese example would appear under each option (e.g. Genesis/Gênesis, I Samuel/1 Samuel, John/João) and explains how codes, slugs and sort order stay stable.
-- [ ] #8 The writeup lists the open questions or decisions left to Cody.
-- [ ] #9 No files outside .backlog/, .spike-docs/ and .gitignore were changed, and /Users/codysechelski/Developer/Projects/bible-tui is untouched.
+- [x] #1 .spike-docs/ exists at the repository root and contains the spike writeup as a Markdown file.
+- [x] #2 .spike-docs/ is listed in .gitignore, and git status shows no spike output staged or tracked.
+- [x] #3 The writeup documents current behavior with file references: where the converter sources book names (tool/bibles/books.py, tool/bibles/writer.py) and where bible-tui reads and renders them (e.g. bible_tui/store.py, bible_tui/versions.py).
+- [x] #4 The writeup presents at least three distinct options for localized book names (plus any in-scope UI/localization concerns the author identifies), each with pros, cons, breaking-change risk and rough effort.
+- [x] #5 Each option is assessed against the fixed database contract (SCHEMA in tool/bibles/writer.py and the requirements in bible_tui/versions.py), stating clearly whether it requires a schema change and what that would cost.
+- [x] #6 The writeup recommends one option as the least-breaking path, with rationale, and explains what happens to databases already converted and committed under bibles/ (including whether reconversion is needed).
+- [x] #7 The writeup shows how the Portuguese example would appear under each option (e.g. Genesis/Gênesis, I Samuel/1 Samuel, John/João) and explains how codes, slugs and sort order stay stable.
+- [x] #8 The writeup lists the open questions or decisions left to Cody.
+- [x] #9 No files outside .backlog/, .spike-docs/ and .gitignore were changed, and /Users/codysechelski/Developer/Projects/bible-tui is untouched.
 <!-- AC:END -->
 
 ## Definition of Done
