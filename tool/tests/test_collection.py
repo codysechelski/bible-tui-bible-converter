@@ -18,6 +18,7 @@ COLLECTION_DIR = REPO_ROOT / "bibles"
 COLLECTION = {
     "bible_kjv.sqlite": ("KJV", 31102),
     "bible_asv.sqlite": ("ASV", 31086),
+    "bible_blivre.sqlite": ("BLIVRE", 31102),
 }
 
 

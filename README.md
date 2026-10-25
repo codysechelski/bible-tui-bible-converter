@@ -38,6 +38,7 @@ These databases are in `bibles/`, ready to use; nothing needs converting first.
 | --- | --- | --- | --- |
 | `bibles/bible_kjv.sqlite` | King James Version (1769 standardized text) | 66, 1189, 31102 | Public domain (outside the United Kingdom, where the Crown's letters patent restrict printing) |
 | `bibles/bible_asv.sqlite` | American Standard Version (1901) | 66, 1189, 31086 | Public domain |
+| `bibles/bible_blivre.sqlite` | Bíblia Livre (Portuguese, 2018 Textus Receptus edition) | 66, 1189, 31102 | [CC BY 4.0 Brasil](https://creativecommons.org/licenses/by/4.0/br/): © 2018 Diego Santos, Mario Sérgio e Marco Teles; credit them when sharing |
 
 Where each one came from:
 
@@ -45,13 +46,19 @@ Where each one came from:
 | --- | --- | --- | --- |
 | `bibles/bible_kjv.sqlite` | eBible.org [`eng-kjv_usfm.zip`](https://ebible.org/Scriptures/eng-kjv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-kjv)) | 2026-09-26 | `67561758cf58d9e767e89226a99171dba722579157d3894767c2f27538bcb38e` |
 | `bibles/bible_asv.sqlite` | eBible.org [`eng-asv_usfm.zip`](https://ebible.org/Scriptures/eng-asv_usfm.zip) ([details](https://ebible.org/find/details.php?id=eng-asv)) | 2026-10-20 | `5e385a1a89887849cb07c88ddf4df37708e0fa901b1f1b7f0b8204c153f0a901` |
+| `bibles/bible_blivre.sqlite` | eBible.org [`porbr2018_usfm.zip`](https://ebible.org/Scriptures/porbr2018_usfm.zip) ([details](https://ebible.org/find/details.php?id=porbr2018)) | 2026-10-20 | `499d562f744bc27a3d85bceb6225ae58c4bb8abb13bbe82e7fde3bc1bb676992` |
 
-Both copyright pages shipped in the zips (`copr.htm`) state the text is public domain and may be copied freely.
+The KJV and ASV copyright pages shipped in the zips (`copr.htm`) state the text is public domain and may be
+copied freely. The Bíblia Livre's states it is licensed under Creative Commons Attribution 4.0, which allows
+redistribution with credit to its authors.
 
 - The KJV zip also holds the Apocrypha and front matter; those books are skipped, leaving the 66. The `¶`
   paragraph marks that eBible.org keeps at the start of some verses are removed.
 - The ASV leaves out 16 New Testament verses that later manuscripts add (Matthew 17:21, Acts 8:37 and others).
   They are absent rather than empty, so validation warns about the verse gaps and the totals.
+- The Bíblia Livre keeps its Portuguese book names (`Gênesis`, `Salmos`, `Apocalipse`). Its abbreviation and
+  name were given with `--abbreviation BLIVRE --version-name "Bíblia Livre"`, as its copyright page asks it to
+  be credited.
 
 To add one to the collection, see [adding a Bible](tool/docs/adding-bibles.md).
 
