@@ -11,6 +11,48 @@ repository.
 The schema is fixed. The converter's copy is `SCHEMA` in `bibles/writer.py`, and the tests check that it matches the
 reference database's schema exactly.
 
+## Entity relationship diagram
+
+```mermaid
+erDiagram
+    books ||--|{ chapters : "has"
+    books ||--|{ verses : "has"
+    chapters ||--|{ verses : "has"
+
+    metadata {
+        TEXT key PK
+        TEXT value "NOT NULL"
+    }
+
+    books {
+        INTEGER id PK "equals sort_order"
+        INTEGER sort_order UK "1 (Genesis) to 66 (Revelation)"
+        TEXT canonical_name UK "e.g. I Samuel"
+        TEXT common_name "e.g. 1 Samuel, shown in the UI"
+        TEXT slug UK "e.g. 1-samuel"
+        TEXT testament "old or new"
+    }
+
+    chapters {
+        INTEGER id PK
+        INTEGER book_id FK "books.id"
+        INTEGER chapter_number "unique per book, from 1"
+    }
+
+    verses {
+        INTEGER id PK
+        INTEGER book_id FK "books.id"
+        INTEGER chapter_id FK "chapters.id"
+        INTEGER chapter_number "matches the chapter row"
+        INTEGER verse_number "unique per book and chapter"
+        TEXT text "plain text, never empty"
+    }
+```
+
+`metadata` stands alone: one key and value per row, describing the whole database. Every book has at least
+one chapter and every chapter at least one verse. Each verse points to its book directly and to its chapter,
+and deleting a book or chapter deletes its rows.
+
 ## SQL
 
 ```sql
