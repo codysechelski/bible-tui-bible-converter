@@ -4,9 +4,6 @@
   <a href="https://github.com/codysechelski/bible-tui"><img alt="Companion to bible-tui" src="https://img.shields.io/badge/companion%20to-bible--tui-8A2BE2"></a>
   <a href="AGENTS.md#code-notes"><img alt="Python 3.9+" src="https://img.shields.io/badge/python-3.9%2B-blue"></a>
   <a href="AGENTS.md#code-notes"><img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-brightgreen"></a>
-  <a href="tool/docs/formats.md"><img alt="Formats: USFM, USX, OSIS, VPL, USJ, RTF" src="https://img.shields.io/badge/formats-USFM%20%7C%20USX%20%7C%20OSIS%20%7C%20VPL%20%7C%20USJ%20%7C%20RTF-orange"></a>
-  <a href="tool/docs/schema.md"><img alt="Output: SQLite" src="https://img.shields.io/badge/output-SQLite-003B57?logo=sqlite&logoColor=white"></a>
-  <a href="https://github.com/codysechelski/bible-tui-bible-converter/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/codysechelski/bible-tui-bible-converter"></a>
 </p>
 
 A companion to [bible-tui](https://github.com/codysechelski/bible-tui), a terminal Bible reader. This repository
