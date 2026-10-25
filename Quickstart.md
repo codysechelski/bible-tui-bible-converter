@@ -109,4 +109,5 @@ To see every option, type:
 tool/bin/bibles --help
 ```
 
-The [README](README.md) covers all of them, along with the supported formats and how the database is laid out.
+[Command line usage](tool/docs/usage.md) covers all of them, [supported formats](tool/docs/formats.md) lists what
+each format can hold, and [database schema](tool/docs/schema.md) shows how the database is laid out.

@@ -3,8 +3,9 @@
 ## Repo Purpose
 
 `bibles` is a command line tool that converts a text-formatted Bible (USFM, USX, OSIS, VPL, USJ, RTF), given
-as one file, a folder of book files or a zip archive of one, into a SQLite database for the custom Bible terminal
-UI. The repository also collects the converted databases: the
+as one file, a folder of book files or a zip archive of one, into a SQLite database for the
+[bible-tui](https://github.com/codysechelski/bible-tui) terminal reader, which this repository is a companion to
+(GitHub repository `codysechelski/bible-tui-bible-converter`). The repository also collects the converted databases: the
 tooling lives under `tool/`, and the converted `.sqlite` files live under `bibles/`.
 
 The reference project at `/Users/codysechelski/Developer/Projects/bible-esv` (read-only) defines the output
@@ -53,7 +54,9 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
 - `samples/` holds real KJV excerpts (Ruth, Jonah, 3 John) in the five text formats, and the same ASV books as
   RTF files in `samples/asv-rtf/`; `samples/README.md` records where each came from. Regenerate them the same
   way rather than hand-editing.
-- `docs/` holds Markdown documentation, linked from the README.
+- `docs/` holds Markdown documentation, linked from the README. The README stays short; detail (CLI options,
+  formats, schema, adding a Bible) lives here. `docs/schema.md` documents the format bible-tui reads; keep it in
+  sync with `SCHEMA` and `bibles/books.py`.
 - `tests/` contains `unittest` tests. `test_parsers.py` checks one passage in all six formats (RTF, one book per
   file, has only its Psalm); `test_samples.py` converts the samples end to end through the CLI and the wrapper
   and reads the result with the reference TUI's `BibleStore`. `test_sources.py` covers folder and zip sources.
