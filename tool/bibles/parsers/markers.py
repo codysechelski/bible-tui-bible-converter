@@ -13,7 +13,7 @@ from bibles.normalize import is_dropped_inline, is_non_verse_block, marker_base
 from bibles.parsers.base import VerseCollector, is_segment, parse_number
 
 # Header markers whose text is recorded on the book (`BibleBook.headers`) instead of being dropped.
-HEADER_MARKERS = frozenset({"id"})
+HEADER_MARKERS = frozenset({"id", "h", "toc2"})
 
 
 class MarkerEvents:
@@ -77,7 +77,7 @@ class MarkerEvents:
         self._end_header()
         self._chars.clear()
         self._skip_block = is_non_verse_block(marker)
-        self._start_header(marker_base(marker))
+        self._start_header(marker.lstrip("+").lower())
         if not self._skip_block:
             self.collector.line_break()
 

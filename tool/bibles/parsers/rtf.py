@@ -204,6 +204,7 @@ class _Reader:
                 except UnknownBookError:
                     self.collector.skip_book(self.stem)
                 self.has_book = True
+            self.collector.book_header("h", text)
             return
         match = _CHAPTER_HEADING.fullmatch(text)
         if match and match.group(1).casefold() == self.title.casefold():

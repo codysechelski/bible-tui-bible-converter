@@ -64,6 +64,7 @@ def parse_files(files: Sequence[Tuple[Path, str]], source_format: str) -> Bible:
             raise ParseError(str(error).replace(str(path), name)) from error
         merged.version = merged.version or bible.version
         merged.version_name = merged.version_name or bible.version_name
+        merged.language = merged.language or bible.language
         merged.warnings.extend(w for w in bible.warnings if w not in merged.warnings)
         for bible_book in bible.books:
             first = origins.get(bible_book.code)

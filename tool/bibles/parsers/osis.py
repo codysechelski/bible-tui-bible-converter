@@ -18,6 +18,7 @@ from bibles.parsers.base import ParseError, VerseCollector, parse_number
 
 # Elements whose start and end separate lines or paragraphs of verse text.
 _LINE_ELEMENTS = frozenset({"p", "l", "lg", "lb", "list", "item", "row", "cell"})
+_XML_LANG = "{http://www.w3.org/XML/1998/namespace}lang"
 # Metadata elements that never hold verse text.
 _SKIPPED = frozenset({"header"})
 
@@ -132,6 +133,24 @@ def parse(path: Path) -> Bible:
     for element in root.iter():
         if _local(element.tag) == "osisText":
             bible.version = work_abbreviation(element.get("osisIDWork") or "")
+            bible.language = element.get(_XML_LANG) or None
             break
     bible.version_name = _header_text(root, "title")
+    _book_names(root, bible)
     return bible
+
+
+def _book_names(root: ET.Element, bible: Bible) -> None:
+    """Record each book's short title (`<title type="main" short="Ruth">`) as its name."""
+    for element in root.iter():
+        if _local(element.tag) != "div" or element.get("type") != "book":
+            continue
+        try:
+            bible_book = bible.book(book_for_osis(element.get("osisID") or "").usfm_code)
+        except UnknownBookError:
+            continue
+        for child in element:
+            short = " ".join((child.get("short") or "").split())
+            if bible_book is not None and _local(child.tag) == "title" and short:
+                bible_book.headers.setdefault("toc2", short)
+                break

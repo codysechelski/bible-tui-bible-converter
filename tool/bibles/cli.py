@@ -253,6 +253,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     metadata = result.metadata
     print_detection(result.detection, result.files)
     print_version(result.version)
+    print(f"Book names: {result.book_names.describe()}")
     print_warnings(result.bible.warnings)
     print_report(result.validation)
     print(f"Output: {result.output}")

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional
 
+from bibles.booknames import BookNames, apply_book_names
 from bibles.detect import Detection, FormatDetectionError, detect_format
 from bibles.identity import Version, resolve_version
 from bibles.model import Bible
@@ -51,6 +52,7 @@ class ConversionResult:
     metadata: Dict[str, str]
     validation: ValidationReport
     version: Version
+    book_names: BookNames
     files: Optional[BookFiles] = None
 
 
@@ -103,11 +105,14 @@ def _convert(source: Path, opened: OpenedSource, output: Path, forced_format: Op
     except ParseError as error:
         raise ConversionError(PARSE, str(error), detection=detection, files=files) from error
 
-    found = [(bible.version, bible.version_name, f"from the {detection.format.upper()} header")]
+    header = f"from the {detection.format.upper()} header"
+    found = [(bible.version, bible.version_name, header)]
     if files is not None:
         found.append((files.version, files.version_name, f"from {METADATA_FILE}"))
     version = resolve_version(bible, source, found, abbreviation, version_name)
     bible.version, bible.version_name = version.abbreviation, version.name
+    book_names = apply_book_names(bible, source, header, files.language if files else None,
+                                  files.book_names if files else None, f"from {METADATA_FILE}")
 
     try:
         result = write_database(bible, output, source, detection.format, allow_partial=allow_partial)
@@ -118,4 +123,4 @@ def _convert(source: Path, opened: OpenedSource, output: Path, forced_format: Op
 
     assert result.validation is not None
     return ConversionResult(detection, parser_name(detection.format), bible, output, result.metadata,
-                            result.validation, version, files)
+                            result.validation, version, book_names, files)

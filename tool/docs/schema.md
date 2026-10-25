@@ -116,9 +116,10 @@ One row per key. The converter writes all of these:
 - **Book ids and order.** `books.id` equals `sort_order`, and `sort_order` is the canonical position below even
   for a Bible with only some books. bible-tui uses it to keep your place when you switch versions.
 - **Chapters** are numbered from 1 with no gaps, and every chapter has at least one verse.
-- **Book names.** The converter writes the English names below. bible-tui shows `common_name`, so a database in
-  another language can carry its own book names there; `--validate` would then fail its name check, but
-  bible-tui doesn't mind.
+- **Book names.** `canonical_name` and `slug` are always the English values below, so they identify a book in
+  any language. `common_name` is the name bible-tui shows: the English one below for an English Bible, and the
+  translation's own (`Gênesis`, `Mateus`) for a Bible in another language. See
+  [book names](normalization.md#6-book-names).
 
 bible-tui reads `books(id, sort_order, common_name, testament)`, `chapters(book_id, chapter_number)`,
 `verses(book_id, chapter_number, verse_number, text)` and the two metadata keys above. It allows extra tables,
@@ -134,7 +135,7 @@ tool/bin/bibles --validate path/to/my-bible.sqlite                   # a whole B
 tool/bin/bibles --validate path/to/my-new-testament.sqlite --allow-partial
 ```
 
-These checks are stricter than bible-tui (all seven metadata keys, English book names, the 66-book count); the
+These checks are stricter than bible-tui (all seven metadata keys, English canonical names and slugs, the 66-book count); the
 full list is in [validation](validation.md). A database that passes them works in bible-tui.
 
 A quick query to check a database by hand:
@@ -147,7 +148,8 @@ WHERE b.slug = 'john' AND v.chapter_number = 3 AND v.verse_number = 16;
 
 ## The 66 books
 
-The values the converter writes to `books`, from `bibles/books.py`. Chapters is the usual chapter count;
+The values the converter writes to `books`, from `bibles/books.py`; a Bible in another language has its own
+`common_name`. Chapters is the usual chapter count;
 versification traditions differ, so a different count only warns.
 
 | `sort_order` / `id` | `canonical_name` | `common_name` | `slug` | `testament` | Chapters |

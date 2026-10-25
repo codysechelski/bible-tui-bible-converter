@@ -99,3 +99,22 @@ becomes `He makes me lie down in green pastures. He leads me beside still waters
   `skipped book TOB: not one of the 66 canonical books`; `bibles/books.py` raises `UnknownBookError` and the
   parsers catch it.
 - Parsers raise `ParseError` naming the file and, for USFM and VPL, the line.
+
+## 6. Book names
+
+Each book's `common_name`, the name bible-tui shows, is the translation's own name when the Bible is not in
+English. `canonical_name` and `slug` stay English in every database. `bibles/booknames.py` applies the rule:
+
+- **The translation's name** for a book is the first of: the short name in a bundle's `metadata.xml`
+  (`<names><name id="book-gen"><short>`), the `\toc2` line, the `\h` line (USFM, USX and USJ), the `short`
+  attribute of an OSIS book title (`<title type="main" short="Ruth">`), or an RTF file's title heading. VPL has
+  no book names. A book without one keeps its English name.
+- **The language** is the first known of: `metadata.xml` (`<language><iso>`), the OSIS `xml:lang`, and the
+  source's name (`[eng]` in `American Standard Version of 1901 [eng] ASV.zip`, `eng-` in `eng-web_usfm.zip`).
+  English (`en`, `eng`, `en-US`, ...) keeps the English names; any other language uses the translation's.
+- **Without a language**, the translation's names are used when most of them are not English book names
+  (`Gênesis`, `Êxodo`). An English Bible whose names differ a little (`Psalm`, `Song of Songs`) keeps the
+  standard English names.
+
+The run prints the outcome, for example
+`Book names: the translation's own, for 27 books (language por from metadata.xml)`.

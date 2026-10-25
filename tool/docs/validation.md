@@ -39,7 +39,7 @@ Validation passed: 15 checks, 0 failed, 2 warnings
 | Foreign keys | `PRAGMA foreign_key_check` reports a violation | |
 | Metadata | a required key (`version`, `version_name`, `source`, `created_at_utc`, `book_count`, `chapter_count`, `verse_count`) is missing or blank | |
 | Book count | there are not exactly 66 books | there are fewer than 66 books and `--allow-partial` is given |
-| Book order and names | sort order is not 1..66, or a book's canonical name, common name or slug differs from `bibles/books.py` | |
+| Book order and names | sort order is not 1..66, a book's canonical name or slug differs from `bibles/books.py`, or its common name is blank (a common name in another language passes, and the detail counts them) | |
 | Testament split | the split is not 39 old / 27 new, or a book has the wrong testament | |
 | Chapter numbering | a book's chapters do not run from 1 with no gaps | |
 | Chapters with verses | a chapter row has no verses | |

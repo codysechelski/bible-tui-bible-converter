@@ -126,6 +126,14 @@ def source_name_version(source: Path) -> Tuple[Optional[str], Optional[str], str
     return None, None, SOURCE_NAME
 
 
+def source_name_language(source: Path) -> Optional[str]:
+    """The language code in a download's name: `eng` in `American Standard Version [eng] ASV.zip` and
+    in eBible.org's `eng-web_usfm.zip`."""
+    stem = source_stem(source)
+    match = _BRACKETED_LANGUAGE.fullmatch(stem) or _EBIBLE.fullmatch(stem)
+    return match.group("language") if match else None
+
+
 def initials(name: str) -> Optional[str]:
     """The first letters of the capitalized words: "American Standard Version of 1901" is ASV. None
     when that gives fewer than two letters."""

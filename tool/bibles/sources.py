@@ -3,7 +3,8 @@
 Bible downloads are usually a zip holding one file per book beside metadata, stylesheets, licences and
 other files (a Digital Bible Library bundle, an eBible.org zip). `open_source` extracts a zip to a
 temporary folder for the length of a run, and `find_book_files` picks out the files in a supported
-format, searching subfolders. A Digital Bible Library `metadata.xml` supplies the version.
+format, searching subfolders. A Digital Bible Library `metadata.xml` supplies the version, the language
+and the book names.
 """
 
 from __future__ import annotations
@@ -15,10 +16,11 @@ import xml.etree.ElementTree as ET
 import zipfile
 import zlib
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Tuple
 
+from bibles.books import UnknownBookError, book_for_code
 from bibles.detect import (
     EXTENSION_FORMATS,
     SUPPORTED_FORMATS,
@@ -65,6 +67,9 @@ class BookFiles:
     detection: Detection
     version: Optional[str] = None
     version_name: Optional[str] = None
+    language: Optional[str] = None
+    # The bundle's short book names, by USFM book code.
+    book_names: Dict[str, str] = field(default_factory=dict)
 
     def describe(self) -> str:
         folders = sorted({posixpath.dirname(f.name) or "." for f in self.files})
@@ -137,6 +142,29 @@ def read_dbl_metadata(path: Path) -> Tuple[Optional[str], Optional[str]]:
     return value("abbreviation") or value("abbreviationLocal"), value("name") or value("nameLocal")
 
 
+def read_dbl_books(path: Path) -> Tuple[Optional[str], Dict[str, str]]:
+    """The language code (`language/iso`) and the short book names (`names/name/short`, by USFM book
+    code) in a Digital Bible Library `metadata.xml`."""
+    try:
+        root = ET.parse(path).getroot()
+    except (ET.ParseError, OSError):
+        return None, {}
+    if root.tag != "DBLMetadata":
+        return None, {}
+    language = (root.findtext("language/iso") or "").strip() or None
+    names: Dict[str, str] = {}
+    for name in root.findall("names/name"):
+        identifier = name.get("id") or ""
+        short = " ".join((name.findtext("short") or name.findtext("long") or "").split())
+        if not identifier.startswith("book-") or not short:
+            continue
+        try:
+            names[book_for_code(identifier[len("book-"):].upper()).usfm_code] = short
+        except UnknownBookError:
+            continue
+    return language, names
+
+
 def find_book_files(source: Path, opened: OpenedSource, forced: Optional[str] = None) -> BookFiles:
     """Find the Bible files in an opened folder or archive.
 
@@ -180,11 +208,12 @@ def find_book_files(source: Path, opened: OpenedSource, forced: Optional[str] = 
         method = "forced"
     else:
         method = "content" if all(f.method == "content" for f in files) else "extension"
-    version, version_name = None, None
+    version, version_name, language, book_names = None, None, None, {}
     # The bundle's own metadata.xml sits at its top; one deeper down may belong to something else.
     for path in sorted(metadata, key=lambda p: len(p.parts)):
         version, version_name = read_dbl_metadata(path)
         if version or version_name:
+            language, book_names = read_dbl_books(path)
             break
     return BookFiles(opened.kind, tuple(files), tuple(ignored), Detection(source_format, method),
-                     version, version_name)
+                     version, version_name, language, book_names)

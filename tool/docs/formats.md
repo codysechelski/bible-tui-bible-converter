@@ -39,6 +39,9 @@ The schema stores one plain text column per verse, so every parser applies the s
 Because USFM, USX and USJ share one marker handler, the same Bible in those formats produces identical text;
 the test suite checks this with real files.
 
+A Bible in another language keeps its own book names (`Gênesis`, `Mateus`) for display; see
+[book names](normalization.md#6-book-names).
+
 ## Known limitations
 
 - **All formats.** Only the 66 books of the Protestant canon are written; any other book (Apocrypha,

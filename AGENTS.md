@@ -45,6 +45,10 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
 - `bibles/identity.py` works out the version abbreviation (`version`) and full name (`version_name`):
   `--abbreviation` with `--version-name` (always together), then the parser's findings and a DBL
   `metadata.xml`, then the books' `\id` descriptions, then the source's name. Documented in `docs/usage.md`.
+- `bibles/booknames.py` gives a Bible in another language its own book names in `common_name` (from DBL
+  `<names>`, `\toc2`/`\h`, OSIS short titles or the RTF title); `canonical_name` and `slug` stay English.
+  Parsers record a book's header text in `BibleBook.headers`, keyed by USFM marker. Documented in
+  `docs/normalization.md`.
 - `bibles/model.py` holds the in-memory `Bible` (books, chapters, verses, version, warnings); verses are added
   with `Bible.add_verse`, which applies `bibles/normalize.py`. The rules are documented in
   `docs/normalization.md`; keep the doc and the marker sets in sync.

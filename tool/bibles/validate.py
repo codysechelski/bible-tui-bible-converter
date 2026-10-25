@@ -120,13 +120,22 @@ def _books(conn: sqlite3.Connection, allow_partial: bool) -> List[CheckResult]:
     order_problems = [] if allow_partial or orders == list(range(1, 67)) else [
         f"sort orders are {_examples([str(o) for o in orders]) or 'empty'}, expected 1..66"
     ]
+    translated = 0
     for order, canonical, common, slug, _ in rows:
         book = expected.get(order)
         if book is None:
             order_problems.append(f"unexpected sort order {order}")
-        elif (canonical, common, slug) != (book.canonical_name, book.common_name, book.slug):
-            order_problems.append(f"{order} is {canonical!r}/{common!r}/{slug!r}, expected {book.canonical_name!r}")
-    order = _result("Book order and names", order_problems, "sort order 1..66 matches the canonical books")
+        elif (canonical, slug) != (book.canonical_name, book.slug):
+            order_problems.append(f"{order} is {canonical!r}/{slug!r}, expected {book.canonical_name!r}")
+        elif not str(common or "").strip():
+            order_problems.append(f"{order} ({canonical}) has no common name")
+        elif common != book.common_name:
+            # A translation in another language shows its own book names.
+            translated += 1
+    detail = "sort order 1..66 matches the canonical books"
+    if translated:
+        detail += f"; {translated} books use the translation's own names"
+    order = _result("Book order and names", order_problems, detail)
 
     old = sum(1 for row in rows if row[4] == OLD_TESTAMENT)
     new = sum(1 for row in rows if row[4] == NEW_TESTAMENT)

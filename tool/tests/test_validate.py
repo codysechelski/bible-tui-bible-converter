@@ -102,6 +102,14 @@ class WarningTests(ValidateTestCase):
         status, detail, ok = self.status("Chapter counts")
         self.assertEqual((status, detail, ok), (WARN, "Malachi has 3 chapters, usually 4", True))
 
+    def test_translated_common_names_pass(self) -> None:
+        self.execute("UPDATE books SET common_name = 'Gênesis' WHERE id = 1",
+                     "UPDATE books SET common_name = 'Êxodo' WHERE id = 2")
+        status, detail, ok = self.status("Book order and names")
+        self.assertEqual(status, PASS)
+        self.assertIn("2 books use the translation's own names", detail)
+        self.assertTrue(ok)
+
     def test_long_lists_are_summarized(self) -> None:
         self.execute("DELETE FROM verses WHERE verse_number = 2 AND book_id = 19")
         _, detail, _ = self.status("Verse numbering")
@@ -128,6 +136,14 @@ class FailureTests(ValidateTestCase):
     def test_wrong_book_names(self) -> None:
         self.execute("UPDATE books SET slug = 'gen' WHERE id = 1")
         self.assert_fails("Book order and names", "'gen'")
+
+    def test_blank_common_name(self) -> None:
+        self.execute("UPDATE books SET common_name = ' ' WHERE id = 1")
+        self.assert_fails("Book order and names", "1 (Genesis) has no common name")
+
+    def test_wrong_canonical_name_with_a_translated_common_name(self) -> None:
+        self.execute("UPDATE books SET canonical_name = 'Gênesis', common_name = 'Gênesis' WHERE id = 1")
+        self.assert_fails("Book order and names", "'Gênesis'")
 
     def test_chapter_gap(self) -> None:
         self.execute("DELETE FROM chapters WHERE book_id = 1 AND chapter_number = 2")

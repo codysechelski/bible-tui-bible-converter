@@ -34,11 +34,18 @@ class Chapter:
 @dataclass
 class BibleBook:
     """A book's chapters, and `headers`: the text of the book's header markers in the source, by
-    marker (`id` holds the description after the book code on a USFM `\\id` line)."""
+    USFM marker (`id` holds the description after the book code on a `\\id` line, `h` and `toc2` the
+    book's name; other formats record their book names under these markers too). `name` is the name
+    written as the book's `common_name` when it is not the English one (`bibles/booknames.py`)."""
 
     book: Book
     chapters: List[Chapter] = field(default_factory=list)
     headers: Dict[str, str] = field(default_factory=dict)
+    name: Optional[str] = None
+
+    @property
+    def common_name(self) -> str:
+        return self.name or self.book.common_name
 
     @property
     def code(self) -> str:
@@ -49,14 +56,16 @@ class BibleBook:
 class Bible:
     """Books, chapters and verses in the order the parser added them.
 
-    `version` (a short abbreviation such as "KJV") and `version_name` are set by parsers whose format
-    supplies them; the writer derives a fallback when they are left as None. `warnings` holds
-    problems a parser worked around (for example a skipped line) so the run output can show them.
+    `version` (a short abbreviation such as "KJV"), `version_name` and `language` (a language code
+    such as "en" or "por") are set by parsers whose format supplies them; the writer derives a fallback
+    when the version is left as None. `warnings` holds problems a parser worked around (for example a
+    skipped line) so the run output can show them.
     """
 
     books: List[BibleBook] = field(default_factory=list)
     version: Optional[str] = None
     version_name: Optional[str] = None
+    language: Optional[str] = None
     warnings: List[str] = field(default_factory=list)
     _book_index: Dict[str, BibleBook] = field(default_factory=dict, repr=False, compare=False)
     _chapter_index: Dict[tuple, Chapter] = field(default_factory=dict, repr=False, compare=False)

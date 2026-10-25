@@ -110,7 +110,7 @@ def _write_rows(conn: sqlite3.Connection, books: List[BibleBook], metadata: Dict
             conn.execute(
                 "INSERT INTO books (id, sort_order, canonical_name, common_name, slug, testament) "
                 "VALUES (?, ?, ?, ?, ?, ?)",
-                (book.sort_order, book.sort_order, book.canonical_name, book.common_name, book.slug,
+                (book.sort_order, book.sort_order, book.canonical_name, bible_book.common_name, book.slug,
                  book.testament),
             )
             for chapter in sorted(bible_book.chapters, key=lambda c: c.number):

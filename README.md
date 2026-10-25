@@ -73,7 +73,7 @@ tool/bin/bibles --validate bibles/kjv.sqlite  # checks an existing database
 
 The format is detected from the content, and the version's abbreviation and full name are worked out from the
 source (its header, `metadata.xml`, `\id` lines or file name) unless `--abbreviation` and `--version-name` give
-them. Every database is validated before it is written; if anything fails,
+them. A Bible in another language keeps its own book names (`Gênesis`, `Mateus`). Every database is validated before it is written; if anything fails,
 nothing is left at the output path. Books outside the 66 of the Protestant canon (Apocrypha, front matter) are
 skipped with a warning, and `--allow-partial` accepts a Bible with fewer than 66 books, such as a New Testament.
 
