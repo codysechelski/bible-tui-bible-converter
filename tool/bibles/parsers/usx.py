@@ -38,6 +38,7 @@ class _Walker:
 
         if tag == "book":
             events.book(element.get("code") or element.get("id") or "")
+            self.children(element)  # the description after the code, as on a USFM \id line
         elif tag == "chapter":
             number = _number(element, "chapter")
             if number is None:
@@ -87,7 +88,9 @@ def parse(path: Path) -> Bible:
 
     collector = VerseCollector()
     try:
-        _Walker(MarkerEvents(collector)).children(root)
+        events = MarkerEvents(collector)
+        _Walker(events).children(root)
+        events.finish()
         bible = collector.finish()
     except ValueError as error:
         raise ParseError(f"{path}: {error}") from error

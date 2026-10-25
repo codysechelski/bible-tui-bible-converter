@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from bibles.books import UnknownBookError, book_for_code
 from bibles.model import Bible
@@ -71,6 +71,8 @@ class VerseCollector:
         # True while inside a book that is not one of the 66 (Apocrypha, front matter, glossary).
         self.skipping = False
         self._skipped: List[str] = []
+        # Header marker text per book code, attached to the books when parsing finishes.
+        self._headers: Dict[str, Dict[str, str]] = {}
 
     @property
     def in_verse(self) -> bool:
@@ -94,6 +96,12 @@ class VerseCollector:
         if key not in self._skipped:
             self._skipped.append(key)
             self.bible.warnings.append(f"skipped book {key}: not one of the 66 canonical books")
+
+    def book_header(self, marker: str, value: str) -> None:
+        """Record the text of a header marker of the current book; the first value of a marker is kept."""
+        value = " ".join(value.split())
+        if self.book_code is not None and not self.skipping and value:
+            self._headers.setdefault(self.book_code, {}).setdefault(marker, value)
 
     def start_chapter(self, number: int) -> None:
         self.end_verse()
@@ -154,5 +162,10 @@ class VerseCollector:
 
     def finish(self) -> Bible:
         self.end_verse()
+        for code, headers in self._headers.items():
+            bible_book = self.bible.book(code)
+            if bible_book is not None:
+                for marker, value in headers.items():
+                    bible_book.headers.setdefault(marker, value)
         return self.bible
 

@@ -102,8 +102,8 @@ One row per key. The converter writes all of these:
 
 | Key | Value | Used by bible-tui |
 | --- | --- | --- |
-| `version` | Short name, for example `KJV`. Taken from the source (OSIS `osisIDWork`, or a bundle's DBL `metadata.xml` abbreviation), otherwise the source name without its extension. | The abbreviation for picking a version on the command line, in `default_version` and in saved state. Without it, the file name is used, upper-cased, with a leading `bible_` removed. |
-| `version_name` | Full name, for example `King James Version`. From the OSIS work title or the DBL bundle name, otherwise `version`. | Shown in the title bar, status bar and version picker. Falls back to the abbreviation. |
+| `version` | The abbreviation, for example `KJV`: `--abbreviation`, or worked out from the source (see [version and abbreviation](usage.md#version-and-abbreviation)). | The abbreviation for picking a version on the command line, in `default_version` and in saved state. Without it, the file name is used, upper-cased, with a leading `bible_` removed. |
+| `version_name` | The full name, for example `King James Version`: `--version-name`, or worked out from the source, otherwise `version`. | Shown in the title bar, status bar and version picker. Falls back to the abbreviation. |
 | `source` | Source file, folder or zip name and format, for example `kjv.usfm (usfm)`. | No |
 | `created_at_utc` | When the database was written, ISO 8601 in UTC, for example `2026-10-22T14:30:05+00:00`. | No |
 | `book_count`, `chapter_count`, `verse_count` | The number of rows written. | No |

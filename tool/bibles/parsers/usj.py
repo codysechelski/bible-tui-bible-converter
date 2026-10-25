@@ -34,6 +34,7 @@ class _Walker:
         marker = _marker(node)
         if kind == "book" or marker == "id":
             events.book(str(node.get("code", "")))
+            self.content(node)  # the description after the code, as on a USFM \id line
         elif kind == "chapter" or marker == "c":
             events.chapter(str(node.get("number", "")))
         elif kind == "verse" or marker == "v":
@@ -75,7 +76,9 @@ def parse(path: Path) -> Bible:
 
     collector = VerseCollector()
     try:
-        _Walker(MarkerEvents(collector)).content(data)
+        events = MarkerEvents(collector)
+        _Walker(events).content(data)
+        events.finish()
         bible = collector.finish()
     except ValueError as error:
         raise ParseError(f"{path}: {error}") from error

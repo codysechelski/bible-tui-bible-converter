@@ -42,6 +42,9 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
   (`parsers/base.py`) directly. The RTF parser understands one layout (the ASV bundle's, one book per file),
   described in `docs/sources.md`. Fix text handling in the shared layer, not in one front end, so the formats stay
   identical.
+- `bibles/identity.py` works out the version abbreviation (`version`) and full name (`version_name`):
+  `--abbreviation` with `--version-name` (always together), then the parser's findings and a DBL
+  `metadata.xml`, then the books' `\id` descriptions, then the source's name. Documented in `docs/usage.md`.
 - `bibles/model.py` holds the in-memory `Bible` (books, chapters, verses, version, warnings); verses are added
   with `Bible.add_verse`, which applies `bibles/normalize.py`. The rules are documented in
   `docs/normalization.md`; keep the doc and the marker sets in sync.
@@ -67,7 +70,7 @@ relative to `tool/`, so `bibles/` there is the Python package (`tool/bibles/`), 
 
 Run from the repository root:
 
-- Convert: `tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f FORMAT] [--allow-partial]`
+- Convert: `tool/bin/bibles SOURCE [-o OUTPUT] [-n NAME] [-f FORMAT] [--version-name NAME --abbreviation ABBR] [--allow-partial]`
 - Validate an existing database: `tool/bin/bibles --validate DATABASE [--allow-partial]`
 - Run tests: `python3 -m unittest discover -s tool/tests -t tool`
 - Syntax check: `python3 -m py_compile tool/bibles/*.py tool/bibles/parsers/*.py tool/tests/*.py`

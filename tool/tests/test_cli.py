@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import io
 import os
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -124,8 +125,8 @@ class MainTests(unittest.TestCase):
     def test_help_lists_every_option(self) -> None:
         code, out, _ = run_main("--help")
         self.assertEqual(code, 0)
-        for option in ("source", "--output", "--name", "--format", "--allow-partial", "--validate",
-                       "--version", "--help"):
+        for option in ("source", "--output", "--name", "--format", "--version-name", "--abbreviation",
+                       "--allow-partial", "--validate", "--version", "--help"):
             self.assertIn(option, out)
 
     def test_success_writes_database_in_collection_and_reports_it(self) -> None:
@@ -139,6 +140,38 @@ class MainTests(unittest.TestCase):
         self.assertIn("Parser: bibles.parsers.usfm", out)
         self.assertIn("WARN  Book count: 1 of 66 books (partial Bible allowed)", out)
         self.assertIn("Wrote 1 books, 1 chapters and 2 verses (version kjv)", out)
+
+    def test_version_is_reported(self) -> None:
+        code, out, _ = self.convert()
+        self.assertEqual(code, 0)
+        self.assertIn("Version: kjv (from the source name)", out)
+        self.assertIn("Version name: kjv (same as the abbreviation)", out)
+
+    def test_given_version_is_stamped(self) -> None:
+        code, out, _ = self.convert("--version-name", "King James Version", "--abbreviation", "KJV")
+        self.assertEqual(code, 0)
+        self.assertIn("Version: KJV (given on the command line)", out)
+        conn = sqlite3.connect(self.collection / "kjv.sqlite")
+        try:
+            metadata = dict(conn.execute("SELECT key, value FROM metadata"))
+        finally:
+            conn.close()
+        self.assertEqual((metadata["version"], metadata["version_name"]), ("KJV", "King James Version"))
+
+    def test_version_name_and_abbreviation_go_together(self) -> None:
+        for argv in (("--version-name", "King James Version"), ("--abbreviation", "KJV"),
+                     ("--version-name", "King James Version", "--abbreviation", "K J V")):
+            with self.subTest(argv):
+                code, _, err = self.convert(*argv)
+                self.assertEqual(code, 2)
+                self.assertIn("--abbreviation", err)
+                self.assertFalse(self.collection.exists())
+
+    def test_validate_rejects_version_options(self) -> None:
+        code, _, err = run_main("--validate", str(self.source), "--abbreviation", "KJV",
+                                "--version-name", "King James Version")
+        self.assertEqual(code, 2)
+        self.assertIn("--validate cannot be combined", err)
 
     def test_missing_output_directory_is_created(self) -> None:
         code, out, _ = self.convert("--output", "nested/dir/")

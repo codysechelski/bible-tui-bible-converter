@@ -66,8 +66,9 @@ Format: usx (detected from content)
 
 When the bundle has a DBL `metadata.xml` (the shallowest one is used), its `identification/abbreviation`
 becomes the database's `version` and `identification/name` its `version_name`. A version that the parsed
-text supplies itself (OSIS `osisIDWork`) takes precedence. Without either, the version falls back to the source
-name, as for a single file.
+text supplies itself (an OSIS header) takes precedence, and `--abbreviation` with `--version-name` overrides
+both. Without any of them, the `\id` lines and the zip's or folder's name are tried, as described in
+[version and abbreviation](usage.md#version-and-abbreviation).
 
 The default output file name is the zip's name without `.zip`, or the folder's name, plus `.sqlite`. Download
 names are often long (`King James Version [eng] without Strong's numbers, 1769 standardized text.zip`), so give

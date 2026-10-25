@@ -91,6 +91,16 @@ class _Walker:
             self.walk(child)
 
 
+def work_abbreviation(work: str) -> Optional[str]:
+    """The abbreviation in an `osisIDWork` value: `Bible.en.kjv` is KJV, and `KJV` stays KJV."""
+    parts = [part for part in work.strip().split(".") if part]
+    if not parts:
+        return None
+    if len(parts) >= 2 and parts[0].lower() == "bible":
+        return parts[-1].upper()
+    return ".".join(parts)
+
+
 def _header_text(root: ET.Element, name: str) -> Optional[str]:
     for element in root.iter():
         if _local(element.tag) == "work":
@@ -121,7 +131,7 @@ def parse(path: Path) -> Bible:
 
     for element in root.iter():
         if _local(element.tag) == "osisText":
-            bible.version = element.get("osisIDWork") or None
+            bible.version = work_abbreviation(element.get("osisIDWork") or "")
             break
     bible.version_name = _header_text(root, "title")
     return bible

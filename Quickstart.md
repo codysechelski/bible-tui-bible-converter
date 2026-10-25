@@ -53,6 +53,10 @@ tool/bin/bibles ~/Downloads/eng-web_usfm.zip --name bible_web
 - `--name bible_web` is the name of the database file to create. Without it, the file is named after the
   download.
 
+The run works out the Bible's abbreviation (such as `WEB`) and full name (such as `World English Bible`) from the
+download and prints them on the `Version:` lines. If they're wrong, add both to the command:
+`--abbreviation WEB --version-name "World English Bible"`.
+
 If a file or folder name contains spaces, put quotes around the path and write it out in full, because `~`
 doesn't work inside quotes: `tool/bin/bibles "/Users/you/Downloads/My Bible.zip" --name my_bible`. Dragging the
 file in handles all of this for you.
@@ -64,7 +68,7 @@ A successful run ends like this:
 ```
 Validation passed: 15 checks, 0 failed, 2 warnings
 Output: /Users/you/bibles/bibles/bible_web.sqlite
-Wrote 66 books, 1189 chapters and 31098 verses (version eng-web_usfm)
+Wrote 66 books, 1189 chapters and 31098 verses (version WEB)
 ```
 
 The database is in the project's `bibles` folder, at the path shown after `Output:`. It is a standard SQLite

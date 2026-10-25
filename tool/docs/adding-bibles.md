@@ -4,13 +4,12 @@ The `bibles/` directory at the repository root holds the converted databases tha
 Only add translations whose licence allows redistribution (see
 [Copyright and licensing](../../README.md#copyright-and-licensing)).
 
-1. Download the source and convert the downloaded zip as it is (or the folder it unzips to). Without a Digital
-   Bible Library `metadata.xml` in the bundle, the source name becomes the database's `version`, so name the
-   copy after the translation's short name:
+1. Download the source and convert the downloaded zip as it is (or the folder it unzips to). Check the
+   `Version:` and `Version name:` lines the run prints; when either is not the translation's own
+   abbreviation or full name, give both:
 
    ```sh
-   cp eng-web_usfm.zip WEB.zip
-   tool/bin/bibles WEB.zip -n bible_web        # writes bibles/bible_web.sqlite (version WEB)
+   tool/bin/bibles eng-web_usfm.zip -n bible_web --abbreviation WEB --version-name "World English Bible"
    ```
 
 2. Check the run's warnings: skipped books should be only non-canonical ones, and missing verses should be

@@ -8,9 +8,18 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from bibles.detect import Detection, FormatDetectionError, detect_format
+from bibles.identity import Version, resolve_version
 from bibles.model import Bible
 from bibles.parsers import PARSERS, ParseError, parse_file, parse_files
-from bibles.sources import FILE, BookFiles, OpenedSource, SourceError, find_book_files, open_source
+from bibles.sources import (
+    FILE,
+    METADATA_FILE,
+    BookFiles,
+    OpenedSource,
+    SourceError,
+    find_book_files,
+    open_source,
+)
 from bibles.validate import DatabaseValidationError, ValidationReport
 from bibles.writer import DatabaseWriteError, write_database
 
@@ -41,6 +50,7 @@ class ConversionResult:
     output: Path
     metadata: Dict[str, str]
     validation: ValidationReport
+    version: Version
     files: Optional[BookFiles] = None
 
 
@@ -54,22 +64,27 @@ def convert(
     output: Path,
     forced_format: Optional[str] = None,
     allow_partial: bool = False,
+    abbreviation: Optional[str] = None,
+    version_name: Optional[str] = None,
 ) -> ConversionResult:
     """Convert `source` (a file, a folder of book files, or a zip archive of one) to a database at
     `output`.
+
+    `abbreviation` and `version_name`, given together, set the version; otherwise it is worked out
+    from the source (see `bibles/identity.py`).
 
     Raises `ConversionError` naming the failing stage. Nothing is written to `output` unless every
     stage succeeds, and a zip archive's extracted files are removed either way.
     """
     try:
         with open_source(source) as opened:
-            return _convert(source, opened, output, forced_format, allow_partial)
+            return _convert(source, opened, output, forced_format, allow_partial, abbreviation, version_name)
     except SourceError as error:
         raise ConversionError(DETECT, str(error)) from error
 
 
 def _convert(source: Path, opened: OpenedSource, output: Path, forced_format: Optional[str],
-             allow_partial: bool) -> ConversionResult:
+             allow_partial: bool, abbreviation: Optional[str], version_name: Optional[str]) -> ConversionResult:
     files: Optional[BookFiles] = None
     try:
         if opened.kind == FILE:
@@ -85,10 +100,14 @@ def _convert(source: Path, opened: OpenedSource, output: Path, forced_format: Op
             bible = parse_file(source, detection.format)
         else:
             bible = parse_files([(f.path, f.name) for f in files.files], detection.format)
-            bible.version = bible.version or files.version
-            bible.version_name = bible.version_name or files.version_name
     except ParseError as error:
         raise ConversionError(PARSE, str(error), detection=detection, files=files) from error
+
+    found = [(bible.version, bible.version_name, f"from the {detection.format.upper()} header")]
+    if files is not None:
+        found.append((files.version, files.version_name, f"from {METADATA_FILE}"))
+    version = resolve_version(bible, source, found, abbreviation, version_name)
+    bible.version, bible.version_name = version.abbreviation, version.name
 
     try:
         result = write_database(bible, output, source, detection.format, allow_partial=allow_partial)
@@ -99,4 +118,4 @@ def _convert(source: Path, opened: OpenedSource, output: Path, forced_format: Op
 
     assert result.validation is not None
     return ConversionResult(detection, parser_name(detection.format), bible, output, result.metadata,
-                            result.validation, files)
+                            result.validation, version, files)

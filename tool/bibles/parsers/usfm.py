@@ -114,6 +114,7 @@ def parse_text(text: str, bible: Optional[Bible] = None, name: str = "<usfm>") -
             position = match.end()
         tokenizer.text(text[position:])
         tokenizer.finish()
+        tokenizer.events.finish()
         return collector.finish()
     except ValueError as error:
         line = text.count("\n", 0, position) + 1

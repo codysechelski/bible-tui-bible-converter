@@ -33,8 +33,12 @@ class Chapter:
 
 @dataclass
 class BibleBook:
+    """A book's chapters, and `headers`: the text of the book's header markers in the source, by
+    marker (`id` holds the description after the book code on a USFM `\\id` line)."""
+
     book: Book
     chapters: List[Chapter] = field(default_factory=list)
+    headers: Dict[str, str] = field(default_factory=dict)
 
     @property
     def code(self) -> str:

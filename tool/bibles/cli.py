@@ -10,6 +10,7 @@ from typing import List, Optional, Sequence
 
 from bibles import __version__
 from bibles.detect import SUPPORTED_FORMATS, Detection
+from bibles.identity import Version, VersionError, check_given
 from bibles.pipeline import ConversionError, ConversionResult, convert, parser_name
 from bibles.sources import BookFiles
 from bibles.validate import ValidationReport, validate_database
@@ -65,6 +66,21 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "force a specific input format instead of detecting it; for a folder or zip archive, "
             "only the files in this format are used"
+        ),
+    )
+    parser.add_argument(
+        "--version-name",
+        metavar="NAME",
+        help=(
+            "the version's full name, stored as version_name (for example \"World English Bible\"); "
+            "requires --abbreviation (default: worked out from the source)"
+        ),
+    )
+    parser.add_argument(
+        "--abbreviation",
+        help=(
+            "the version's abbreviation, stored as version (for example WEB); requires --version-name "
+            "(default: worked out from the source)"
         ),
     )
     parser.add_argument(
@@ -156,7 +172,8 @@ def run(args: argparse.Namespace) -> ConversionResult:
     created = _missing_parents(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        return convert(source, output_path, args.format, args.allow_partial)
+        return convert(source, output_path, args.format, args.allow_partial, args.abbreviation,
+                       args.version_name)
     except BaseException:
         # Leave no trace of a failed run: remove directories this run created, if still empty.
         for directory in created:
@@ -180,6 +197,11 @@ def print_detection(detection: Detection, files: Optional[BookFiles] = None) -> 
     print(f"Parser: {parser_name(detection.format)}")
 
 
+def print_version(version: Version) -> None:
+    print(f"Version: {version.abbreviation} ({version.abbreviation_origin})")
+    print(f"Version name: {version.name} ({version.name_origin})")
+
+
 def print_warnings(warnings: Sequence[str]) -> None:
     for warning in warnings[:MAX_WARNINGS]:
         print(f"Warning: {warning}")
@@ -188,8 +210,10 @@ def print_warnings(warnings: Sequence[str]) -> None:
 
 
 def validate_command(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
-    if args.output is not None or args.name is not None or args.format is not None:
-        parser.error("--validate cannot be combined with --output, --name or --format")
+    if any(value is not None for value in (args.output, args.name, args.format, args.version_name,
+                                           args.abbreviation)):
+        parser.error("--validate cannot be combined with --output, --name, --format, --version-name "
+                     "or --abbreviation")
     report = validate_database(args.source, args.allow_partial)
     print_report(report)
     return 0 if report.ok else 1
@@ -206,6 +230,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
     if args.validate:
         return validate_command(parser, args)
+    try:
+        check_given(args.abbreviation, args.version_name)
+    except VersionError as error:
+        parser.error(str(error))
 
     print(f"Source: {args.source}")
     try:
@@ -224,6 +252,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     metadata = result.metadata
     print_detection(result.detection, result.files)
+    print_version(result.version)
     print_warnings(result.bible.warnings)
     print_report(result.validation)
     print(f"Output: {result.output}")
